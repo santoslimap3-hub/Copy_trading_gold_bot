@@ -384,6 +384,33 @@ def get_min_stop_distance(symbol: str) -> float:
     return float(min_dist)
 
 
+def clamp_sl_to_valid(symbol: str, side: str, sl: float) -> float:
+    """
+    Clamp SL ONLY to satisfy broker minimum stop distance.
+    """
+    min_dist = get_min_stop_distance(symbol)
+    tick = mt5.symbol_info_tick(symbol)
+    if tick is None:
+        dbg("⚠️ clamp_sl_to_valid: tick=None, returning raw sl", style="yellow")
+        return float(sl)
+
+    side = side.upper()
+    bid, ask = tick.bid, tick.ask
+    raw_sl = float(sl)
+
+    if side == "BUY":
+        sl_max = bid - min_dist
+        sl = min(raw_sl, sl_max)
+    else:
+        sl_min = ask + min_dist
+        sl = max(raw_sl, sl_min)
+
+    if DEBUG_SHOW_RISK_MATH and raw_sl != sl:
+        dbg(f"🔧 SL Adjusted: SL {fmt(raw_sl)}→{fmt(sl)}", style="yellow")
+
+    return float(sl)
+
+
 def clamp_sltp_to_valid(symbol: str, side: str, sl: float, tp: float) -> Tuple[float, float]:
     """
     Clamps SL/TP ONLY to satisfy broker minimum stop distance.
@@ -527,6 +554,25 @@ def parse_tp1_sl(text: str) -> Tuple[Optional[float], Optional[float]]:
     return tp1, sl
 
 
+def parse_tp_sl_update(text: str) -> Tuple[Optional[str], Optional[float]]:
+    """
+    Parse standalone TP or SL updates like "TP 5084.5" or "SL 5076.2"
+    Returns (type, value) where type is "TP" or "SL", and value is the price
+    Returns (None, None) if no valid TP/SL update is found
+    """
+    t = (text or "").strip()
+    
+    # Check if message starts with TP or SL (case-insensitive)
+    # Pattern: starts with TP or SL, followed by optional spaces and a number
+    m = re.match(r"^\s*(TP|SL)\s+([0-9]+(?:\.[0-9]+)?)\s*$", t, re.IGNORECASE)
+    if m:
+        tp_sl_type = m.group(1).upper()
+        value = float(m.group(2))
+        return tp_sl_type, value
+    
+    return None, None
+
+
 def is_noise_message(text: str) -> bool:
     t = (text or "").upper()
     noise_phrases = [
@@ -588,6 +634,103 @@ async def on_new(event):
     if DEBUG_DUMP_EVERY_EVENT:
         banner(f"📨 NEW TELEGRAM MESSAGE (ID: {event.message.id})", style="bold magenta on dark_magenta")
         dbg(text_raw, style="white")
+
+    # First check if this is a TP1/SL update for the last trade
+    tp1, sl = parse_tp1_sl(text_raw)
+    if tp1 is not None or sl is not None:
+        # This message contains TP1 or SL - update the last open trade
+        dbg(f"✅ Detected TP1/SL update in new message: TP1={tp1} | SL={sl}", style="green")
+        
+        # Get the most recent open position
+        poss = mt5.positions_get(symbol=SYMBOL)
+        if not poss:
+            dbg("❌ No open position found to update. Ignoring.", style="yellow")
+            return
+        
+        ticket = poss[0].ticket
+        dbg(f"🔍 Updating last open position: Ticket {ticket}", style="cyan")
+        
+        ensure_symbol(SYMBOL)
+        dump_symbol_specs(SYMBOL)
+        dump_market(SYMBOL)
+        dump_positions(SYMBOL)
+        
+        side = get_position_side(ticket)
+        if not side:
+            dbg("❌ Position not found (may be closed already).", style="yellow")
+            return
+        
+        # Get current position details
+        pos = mt5.positions_get(ticket=ticket)
+        if not pos:
+            dbg("❌ Position not found.", style="yellow")
+            return
+        
+        p = pos[0]
+        current_tp = float(p.tp) if p.tp > 0 else None
+        current_sl = float(p.sl) if p.sl > 0 else None
+        
+        # Build the new TP and SL values
+        if tp1 is not None:
+            new_tp = tp1
+            new_sl = current_sl if sl is None else sl
+            if new_sl is None:
+                dbg(f"⚠️ Cannot update TP: current SL not set and no SL in message", style="yellow")
+                return
+            dbg(f"📊 Updating TP: {fmt(current_tp, 5) if current_tp else 'None'} → ${fmt(new_tp, 5)}", style="cyan")
+        else:
+            new_sl = sl
+            new_tp = current_tp
+            if new_tp is None:
+                dbg(f"⚠️ Cannot update SL: current TP not set", style="yellow")
+                return
+            dbg(f"📊 Updating SL: {fmt(current_sl, 5) if current_sl else 'None'} → ${fmt(new_sl, 5)}", style="cyan")
+        
+        # Sanity check against market
+        tick = mt5.symbol_info_tick(SYMBOL)
+        if tick is not None:
+            cur = float(tick.bid if side == "SELL" else tick.ask)
+            if sl is not None:
+                dist = abs(float(new_sl) - cur)
+                dbg(f"📏 Sanity check: current=${fmt(cur, 5)} | SL=${fmt(new_sl, 5)} | distance=${fmt(dist, 4)}", style="cyan")
+                if dist > SANITY_MAX_SL_DIST:
+                    dbg(f"🚫 SL too far from market (${fmt(dist, 2)} > limit ${fmt(SANITY_MAX_SL_DIST, 2)}). Possible symbol mismatch!", style="bold red")
+                    return
+        
+        # Apply the update
+        deadline = time.time() + SLTP_RETRY_SECONDS
+        attempt = 0
+        
+        while time.time() < deadline:
+            attempt += 1
+            try:
+                adj_sl, adj_tp = clamp_sltp_to_valid(SYMBOL, side, float(new_sl) if new_sl else current_sl, float(new_tp) if new_tp else current_tp)
+                
+                r = set_sltp(SYMBOL, ticket, sl=adj_sl, tp=adj_tp)
+                rc = getattr(r, "retcode", -1)
+                
+                if retcode_is_ok(rc):
+                    banner(f"✅ TP1/SL UPDATED", style="bold green on dark_green")
+                    dbg(f"Ticket {ticket} | TP1=${fmt(adj_tp, 5)} | SL=${fmt(adj_sl, 5)}", style="bold green")
+                    dump_positions(SYMBOL)
+                    return
+                
+                if rc in RETRYABLE_RETCODES:
+                    dbg(f"⏳ Retryable error (code {rc}). Retry {attempt}/{int(SLTP_RETRY_SECONDS/SLTP_RETRY_DELAY)}", style="yellow")
+                    time.sleep(SLTP_RETRY_DELAY)
+                    continue
+                
+                dbg(f"❌ Update FAILED (non-retry): retcode={rc}", style="bold red")
+                dump_positions(SYMBOL)
+                return
+            
+            except Exception as e:
+                dbg(f"⚠️ Exception: {str(e)}. Retrying...", style="yellow")
+                time.sleep(SLTP_RETRY_DELAY)
+        
+        dbg(f"❌ TIMEOUT: Gave up after {SLTP_RETRY_SECONDS}s", style="bold red")
+        dump_positions(SYMBOL)
+        return
 
     side = parse_entry_side(text_raw)
     if not side:
@@ -686,6 +829,42 @@ async def on_new(event):
             msgid_to_ticket[tg_id] = ticket
             dbg(f"✅ ENTRY EXECUTED: Ticket {ticket} | Lot {fmt(lot, 3)}", style="bold green")
             dump_positions(SYMBOL)
+            
+            # Automatically set FAILSAFE SL at the assumed distance used for lot calculation
+            dbg(f"🛡️ Setting failsafe SL at distance: SL=${fmt(assumed_sl_price, 5)}", style="cyan")
+            
+            deadline = time.time() + SLTP_RETRY_SECONDS
+            attempt = 0
+            sltp_set_success = False
+            
+            while time.time() < deadline and not sltp_set_success:
+                attempt += 1
+                try:
+                    # Clamp SL to broker min-distance requirements
+                    adj_sl = clamp_sl_to_valid(SYMBOL, side_u, assumed_sl_price)
+                    
+                    # Set SL only as failsafe (TP intentionally removed)
+                    r = set_sltp(SYMBOL, ticket, sl=adj_sl, tp=0.0)
+                    rc = getattr(r, "retcode", -1)
+                    
+                    if retcode_is_ok(rc):
+                        dbg(f"✅ Failsafe SL SET: SL=${fmt(adj_sl, 5)} (Attempt {attempt})", style="bold green")
+                        ticket_last_targets[ticket] = (0.0, float(adj_sl))
+                        dump_positions(SYMBOL)
+                        sltp_set_success = True
+                    elif rc in RETRYABLE_RETCODES:
+                        dbg(f"⏳ SL/TP retryable error (code {rc}). Retry {attempt}/{int(SLTP_RETRY_SECONDS/SLTP_RETRY_DELAY)}", style="yellow")
+                        time.sleep(SLTP_RETRY_DELAY)
+                    else:
+                        dbg(f"⚠️ SL/TP setting failed (retcode={rc}). Will wait for signal update.", style="yellow")
+                        break
+                
+                except Exception as e:
+                    dbg(f"⚠️ Exception setting SL/TP: {str(e)}. Retrying...", style="yellow")
+                    time.sleep(SLTP_RETRY_DELAY)
+            
+            if not sltp_set_success:
+                dbg(f"⚠️ Could not set failsafe SL automatically. Waiting for manual signal update.", style="yellow")
         else:
             dbg("⏳ ENTRY OK but ticket not found yet. Waiting for confirmation...", style="yellow")
 
@@ -723,6 +902,109 @@ async def on_edit(event):
     banner(f"🎯 EDIT SIGNAL RECEIVED", style="bold yellow on dark_blue")
     dbg(f"Message ID: {tg_id}", style="bright_cyan")
 
+    # First, check if this is a standalone TP or SL update (e.g., "TP 5084.5" or "SL 5076.2")
+    tp_sl_type, tp_sl_value = parse_tp_sl_update(text)
+    
+    if tp_sl_type is not None:
+        # This is a standalone TP/SL update message
+        dbg(f"✅ Detected standalone {tp_sl_type} update: ${fmt(tp_sl_value, 5)}", style="green")
+        
+        # Try to find the most recent position for this symbol
+        # (We don't have a direct message ID -> ticket mapping for this new message)
+        ticket = find_position_ticket(SYMBOL, tg_id)
+        if not ticket:
+            # Try to get any open position
+            poss = mt5.positions_get(symbol=SYMBOL)
+            if poss:
+                ticket = poss[0].ticket
+                dbg(f"🔍 Using most recent position: Ticket {ticket}", style="yellow")
+            else:
+                dbg("❌ No open position found for this update. Ignoring.", style="yellow")
+                return
+        
+        ensure_symbol(SYMBOL)
+        dump_symbol_specs(SYMBOL)
+        dump_market(SYMBOL)
+        dump_positions(SYMBOL)
+        
+        side = get_position_side(ticket)
+        if not side:
+            dbg("❌ Position not found (may be closed already).", style="yellow")
+            return
+        
+        # Get current position details
+        pos = mt5.positions_get(ticket=ticket)
+        if not pos:
+            dbg("❌ Position not found.", style="yellow")
+            return
+        
+        p = pos[0]
+        current_tp = float(p.tp) if p.tp > 0 else None
+        current_sl = float(p.sl) if p.sl > 0 else None
+        
+        # Build the new TP and SL values
+        if tp_sl_type == "TP":
+            new_tp = tp_sl_value
+            new_sl = current_sl
+            if new_tp is None:
+                dbg(f"⚠️ Cannot update TP: current SL not set", style="yellow")
+                return
+            dbg(f"📊 Updating TP: {fmt(current_tp, 5) if current_tp else 'None'} → ${fmt(new_tp, 5)}", style="cyan")
+        else:  # SL
+            new_sl = tp_sl_value
+            new_tp = current_tp
+            if new_tp is None:
+                dbg(f"⚠️ Cannot update SL: current TP not set", style="yellow")
+                return
+            dbg(f"📊 Updating SL: {fmt(current_sl, 5) if current_sl else 'None'} → ${fmt(new_sl, 5)}", style="cyan")
+        
+        # Sanity check against market
+        tick = mt5.symbol_info_tick(SYMBOL)
+        if tick is not None:
+            cur = float(tick.bid if side == "SELL" else tick.ask)
+            if tp_sl_type == "SL":
+                dist = abs(float(new_sl) - cur)
+                dbg(f"📏 Sanity check: current=${fmt(cur, 5)} | SL=${fmt(new_sl, 5)} | distance=${fmt(dist, 4)}", style="cyan")
+                if dist > SANITY_MAX_SL_DIST:
+                    dbg(f"🚫 SL too far from market (${fmt(dist, 2)} > limit ${fmt(SANITY_MAX_SL_DIST, 2)}). Possible symbol mismatch!", style="bold red")
+                    return
+        
+        # Apply the update
+        deadline = time.time() + SLTP_RETRY_SECONDS
+        attempt = 0
+        
+        while time.time() < deadline:
+            attempt += 1
+            try:
+                adj_sl, adj_tp = clamp_sltp_to_valid(SYMBOL, side, float(new_sl) if new_sl else current_sl, float(new_tp) if new_tp else current_tp)
+                
+                r = set_sltp(SYMBOL, ticket, sl=adj_sl, tp=adj_tp)
+                rc = getattr(r, "retcode", -1)
+                
+                if retcode_is_ok(rc):
+                    banner(f"✅ {tp_sl_type} UPDATED", style="bold green on dark_green")
+                    dbg(f"Ticket {ticket} | {tp_sl_type}=${fmt(adj_tp if tp_sl_type == 'TP' else adj_sl, 5)}", style="bold green")
+                    dump_positions(SYMBOL)
+                    return
+                
+                if rc in RETRYABLE_RETCODES:
+                    dbg(f"⏳ Retryable error (code {rc}). Retry {attempt}/{int(SLTP_RETRY_SECONDS/SLTP_RETRY_DELAY)}", style="yellow")
+                    time.sleep(SLTP_RETRY_DELAY)
+                    continue
+                
+                dbg(f"❌ Update FAILED (non-retry): retcode={rc}", style="bold red")
+                dump_positions(SYMBOL)
+                return
+            
+            except Exception as e:
+                dbg(f"⚠️ Exception: {str(e)}. Retrying...", style="yellow")
+                time.sleep(SLTP_RETRY_DELAY)
+        
+        dbg(f"❌ TIMEOUT: Gave up after {SLTP_RETRY_SECONDS}s", style="bold red")
+        dump_positions(SYMBOL)
+        return
+    
+    # Original logic for full TP1/SL messages
     ticket = msgid_to_ticket.get(tg_id)
     if not ticket:
         ticket = find_position_ticket(SYMBOL, tg_id)
