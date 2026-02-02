@@ -4,6 +4,7 @@ import math
 import argparse
 import sys
 import os
+import asyncio
 from typing import Optional, Tuple, Dict
 
 from telethon import TelegramClient, events
@@ -29,7 +30,7 @@ TEST_CHANNEL_ID = None  # Set this to your test channel ID (find via find_channe
 api_id = 34597981
 api_hash = "2cd59609b6cacb56da261e43fdb897ea"
 CHANNEL = -1003349563414  # EGN GOLD (Live Trading)
-TEST_CHANNEL = -1003896390912  # TODO: Set to your test channel ID (use find_channel.py to find it)
+TEST_CHANNEL = -1003860296364  # test channel
 
 
 # ===================== MT5 CONFIG =====================
@@ -1100,7 +1101,7 @@ async def on_edit(event):
 
 
 # ===================== RUN LOOP WITH AUTO-RECONNECT =====================
-def run_forever():
+async def run_forever():
     global TEST_MODE, CHANNEL
     
     # Display test mode status
@@ -1131,12 +1132,12 @@ def run_forever():
     
     while True:
         try:
-            client.start()
-            client.run_until_disconnected()
+            await client.start()
+            await client.run_until_disconnected()
         except Exception as e:
             dbg(f"⚠️ Telegram connection lost: {str(e)}", style="bold yellow")
             dbg("🔄 Reconnecting in 5 seconds...", style="yellow")
-            time.sleep(5)
+            await asyncio.sleep(5)
 
 
 if __name__ == "__main__":
@@ -1195,4 +1196,4 @@ Examples:
             import sys
             sys.exit(1)
     
-    run_forever()
+    asyncio.run(run_forever())
