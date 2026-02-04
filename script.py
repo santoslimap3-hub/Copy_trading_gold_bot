@@ -38,7 +38,7 @@ MAGIC = 777
 DEVIATION = 20
 
 # Risk sizing (NO PIPS, ONLY PRICE DISTANCE)
-RISK_PCT = 0.1                 # risk % of BALANCE per trade - CRITICAL: 6% max risk per trade
+RISK_PCT = 0.05                 # risk % of BALANCE per trade - CRITICAL: 6% max risk per trade
 ASSUMED_SL_PRICE_DIST = 8.0     # assume worst-case SL is this many PRICE units away (e.g. $8.0)
 MAX_LOT = 1.0                   # hard cap to prevent surprises
 
