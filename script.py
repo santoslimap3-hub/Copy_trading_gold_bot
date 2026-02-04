@@ -39,7 +39,7 @@ MAGIC = 777
 DEVIATION = 20
 
 # Risk sizing (NO PIPS, ONLY PRICE DISTANCE)
-RISK_PCT = 0.1                 # risk % of BALANCE per trade - CRITICAL: 6% max risk per trade
+RISK_PCT = 0.05                 # risk % of BALANCE per trade - CRITICAL: 6% max risk per trade
 ASSUMED_SL_PRICE_DIST = 8.0     # assume worst-case SL is this many PRICE units away (e.g. $8.0)
 MAX_LOT = 1.0                   # hard cap to prevent surprises
 
@@ -68,6 +68,11 @@ DEBUG_SHOW_POSITION_STATE = True
 DEBUG_WARN_ON_MULTI_POSITIONS = True
 
 
+# ===================== STRATEGY CONFIG =====================
+# TP3 Breakeven Strategy: Target TP3, move SL to breakeven when TP1 is passed
+TARGET_TP_LEVEL = 3                           # Always target TP3
+BREAKEVEN_ACTIVATION_TP = 1                   # Activate breakeven SL when TP1 is passed
+
 # ===================== INTERNAL STATE =====================
 client = TelegramClient("zinra_session", api_id, api_hash)
 
@@ -79,6 +84,19 @@ ticket_last_targets: Dict[int, Tuple[float, float]] = {}
 
 # Track duplicates / spam
 last_seen_event_text: Dict[int, str] = {}
+
+# ===================== STRATEGY STATE =====================
+# Track all TP levels for each ticket
+ticket_tp_levels: Dict[int, Dict[int, float]] = {}  # ticket -> {tp_level: price}
+
+# Track entry price for each ticket (needed for breakeven SL calculation)
+ticket_entry_prices: Dict[int, float] = {}  # ticket -> entry_price
+
+# Track which tickets have had breakeven SL activated
+ticket_breakeven_activated: Dict[int, bool] = {}  # ticket -> bool
+
+# Track which tickets are targeting TP3
+ticket_target_tp3: Dict[int, bool] = {}  # ticket -> bool
 
 
 # ===================== UTILITIES / DEBUG =====================
@@ -574,6 +592,84 @@ def parse_tp_sl_update(text: str) -> Tuple[Optional[str], Optional[float]]:
     return None, None
 
 
+def parse_all_tp_levels(text: str) -> Dict[int, float]:
+    """
+    Parse ALL TP levels from a message (TP1, TP2, TP3, TP4, TP5, etc.)
+    Returns: {tp_level: price}
+    """
+    t = text or ""
+    tp_levels = {}
+    
+    # Pattern: TP followed by digits, followed by price
+    # Matches: "TP1 4705", "TP 2 4715", "TP3 4725", etc.
+    matches = re.finditer(r"\bTP\s*(\d+)\b[^0-9]*([0-9]+(?:\.[0-9]+)?)", t, re.IGNORECASE)
+    for match in matches:
+        tp_num = int(match.group(1))
+        tp_price = float(match.group(2))
+        tp_levels[tp_num] = tp_price
+    
+    return tp_levels
+
+
+def get_target_tp_for_signal(tp_levels: Dict[int, float]) -> Optional[float]:
+    """
+    Get the TP3 price from parsed TP levels.
+    If TP3 doesn't exist, fall back to highest TP available.
+    Returns the price, or None if no TPs found.
+    """
+    if not tp_levels:
+        return None
+    
+    # Prefer TP3 (the strategy target)
+    if TARGET_TP_LEVEL in tp_levels:
+        return tp_levels[TARGET_TP_LEVEL]
+    
+    # Fallback: use highest TP available
+    max_level = max(tp_levels.keys())
+    return tp_levels[max_level]
+
+
+def price_passes_tp1(side: str, current_price: float, entry_price: float, tp1_price: float) -> bool:
+    """
+    Check if price has passed the TP1 level.
+    For BUY: price must be >= TP1
+    For SELL: price must be <= TP1
+    """
+    side = side.upper()
+    if side == "BUY":
+        return current_price >= tp1_price
+    elif side == "SELL":
+        return current_price <= tp1_price
+    return False
+
+
+def clamp_sl_to_market(symbol: str, side: str, sl_price: float) -> float:
+    """
+    Ensure SL is at minimum broker distance from market.
+    This is critical for safety when moving to breakeven.
+    """
+    min_dist = get_min_stop_distance(symbol)
+    tick = mt5.symbol_info_tick(symbol)
+    if tick is None:
+        dbg("⚠️ clamp_sl_to_market: tick=None, returning raw sl", style="yellow")
+        return float(sl_price)
+    
+    side = side.upper()
+    bid, ask = tick.bid, tick.ask
+    
+    if side == "BUY":
+        # For BUY, SL must be below bid
+        max_sl = bid - min_dist
+        clamped_sl = min(sl_price, max_sl)
+    else:
+        # For SELL, SL must be above ask
+        min_sl = ask + min_dist
+        clamped_sl = max(sl_price, min_sl)
+    
+    return float(clamped_sl)
+
+
+
 def is_noise_message(text: str) -> bool:
     t = (text or "").upper()
     noise_phrases = [
@@ -636,11 +732,13 @@ async def on_new(event):
         banner(f"📨 NEW TELEGRAM MESSAGE (ID: {event.message.id})", style="bold magenta on dark_magenta")
         dbg(text_raw, style="white")
 
-    # First check if this is a TP1/SL update for the last trade
+    # First check if this is a TP/SL update for the last trade
     tp1, sl = parse_tp1_sl(text_raw)
-    if tp1 is not None or sl is not None:
-        # This message contains TP1 or SL - update the last open trade
-        dbg(f"✅ Detected TP1/SL update in new message: TP1={tp1} | SL={sl}", style="green")
+    all_tp_levels = parse_all_tp_levels(text_raw)
+    target_tp = get_target_tp_for_signal(all_tp_levels) if all_tp_levels else None
+    if tp1 is not None or sl is not None or all_tp_levels:
+        # This message contains TP/SL - update the last open trade
+        dbg(f"✅ Detected TP/SL update in new message: TP1={tp1} | SL={sl} | TPs={all_tp_levels}", style="green")
         
         # Get the most recent open position
         poss = mt5.positions_get(symbol=SYMBOL)
@@ -671,19 +769,26 @@ async def on_new(event):
         current_tp = float(p.tp) if p.tp > 0 else None
         current_sl = float(p.sl) if p.sl > 0 else None
         
+        # Store TP levels and entry price for breakeven monitoring
+        if all_tp_levels:
+            ticket_tp_levels[ticket] = all_tp_levels
+            if pos:
+                entry_price = float(pos[0].price_open)
+                ticket_entry_prices[ticket] = entry_price
+
         # Build the new TP and SL values
-        if tp1 is not None:
-            new_tp = tp1
+        if target_tp is not None:
+            new_tp = target_tp
             new_sl = current_sl if sl is None else sl
             if new_sl is None:
-                dbg(f"⚠️ Cannot update TP: current SL not set and no SL in message", style="yellow")
+                dbg("⚠️ Cannot update TP: current SL not set and no SL in message", style="yellow")
                 return
-            dbg(f"📊 Updating TP: {fmt(current_tp, 5) if current_tp else 'None'} → ${fmt(new_tp, 5)}", style="cyan")
+            dbg(f"📊 Updating TP (TP{TARGET_TP_LEVEL if target_tp == all_tp_levels.get(TARGET_TP_LEVEL) else 'X'}): {fmt(current_tp, 5) if current_tp else 'None'} → ${fmt(new_tp, 5)}", style="cyan")
         else:
             new_sl = sl
             new_tp = current_tp
             if new_tp is None:
-                dbg(f"⚠️ Cannot update SL: current TP not set", style="yellow")
+                dbg("⚠️ Cannot update SL: current TP not set", style="yellow")
                 return
             dbg(f"📊 Updating SL: {fmt(current_sl, 5) if current_sl else 'None'} → ${fmt(new_sl, 5)}", style="cyan")
         
@@ -711,8 +816,8 @@ async def on_new(event):
                 rc = getattr(r, "retcode", -1)
                 
                 if retcode_is_ok(rc):
-                    banner(f"✅ TP1/SL UPDATED", style="bold green on dark_green")
-                    dbg(f"Ticket {ticket} | TP1=${fmt(adj_tp, 5)} | SL=${fmt(adj_sl, 5)}", style="bold green")
+                    banner("✅ TP/SL UPDATED", style="bold green on dark_green")
+                    dbg(f"Ticket {ticket} | TP=${fmt(adj_tp, 5)} | SL=${fmt(adj_sl, 5)}", style="bold green")
                     dump_positions(SYMBOL)
                     return
                 
@@ -1022,8 +1127,33 @@ async def on_edit(event):
         dbg(f"✅ Parsed: TP1=${fmt(tp1, 5)} | SL=${fmt(sl, 5)}", style="green")
     else:
         dbg(f"⏳ Incomplete: TP1={tp1} | SL={sl}. Waiting for next edit.", style="yellow")
-        if tp1 is None or sl is None:
-            return
+        return
+    
+    # ======= STRATEGY ENHANCEMENT: Parse ALL TP levels =======
+    all_tp_levels = parse_all_tp_levels(text)
+    target_tp = get_target_tp_for_signal(all_tp_levels)
+    
+    if not all_tp_levels:
+        dbg("⚠️ No TP levels found. Using TP1 as fallback.", style="yellow")
+        all_tp_levels = {1: tp1}
+        target_tp = tp1
+    
+    dbg(f"📊 All TP Levels: {all_tp_levels} | Target TP{TARGET_TP_LEVEL}: ${fmt(target_tp, 5)}", style="bright_cyan")
+    
+    # Store TP levels and entry price for this ticket
+    if target_tp is None:
+        dbg("❌ No valid TP found. Refusing to trade.", style="bold red")
+        return
+    
+    ticket_tp_levels[ticket] = all_tp_levels
+    
+    # Get entry price from position
+    pos = mt5.positions_get(ticket=ticket)
+    if pos:
+        entry_price = float(pos[0].price_open)
+        ticket_entry_prices[ticket] = entry_price
+        dbg(f"📍 Entry Price stored: ${fmt(entry_price, 5)}", style="cyan")
+    # ======= END STRATEGY ENHANCEMENT =======
 
     ensure_symbol(SYMBOL)
     dump_symbol_specs(SYMBOL)
@@ -1049,9 +1179,13 @@ async def on_edit(event):
     last = ticket_last_targets.get(ticket)
     if last is not None:
         last_tp, last_sl = last
-        if is_close(last_tp, float(tp1), tol=0.05) and is_close(last_sl, float(sl), tol=0.05):
+        if is_close(last_tp, float(target_tp), tol=0.05) and is_close(last_sl, float(sl), tol=0.05):
             dbg("⏭️ Targets already applied recently. Skipping duplicate modification.", style="yellow")
             return
+
+    # ======= STRATEGY: Use TARGET_TP instead of TP1 =======
+    dbg(f"🎯 STRATEGY: Setting TP to TP{TARGET_TP_LEVEL} (${fmt(target_tp, 5)}) instead of TP1 (${fmt(tp1, 5)})", style="bold yellow")
+    # ======= END STRATEGY =======
 
     deadline = time.time() + SLTP_RETRY_SECONDS
     last_ret = None
@@ -1061,7 +1195,9 @@ async def on_edit(event):
         attempt += 1
         try:
             # adjust to broker min-distance
-            adj_sl, adj_tp = clamp_sltp_to_valid(SYMBOL, side, float(sl), float(tp1))
+            # ======= STRATEGY: Use target_tp (TP3) instead of tp1 =======
+            adj_sl, adj_tp = clamp_sltp_to_valid(SYMBOL, side, float(sl), float(target_tp))
+            # ======= END STRATEGY =======
 
             # EXTRA: check we are not setting something absurdly close to market after clamp
             tick2 = mt5.symbol_info_tick(SYMBOL)
@@ -1078,8 +1214,9 @@ async def on_edit(event):
 
             if retcode_is_ok(rc):
                 banner(f"✅ POSITION UPDATED", style="bold green on dark_green")
-                dbg(f"Ticket {ticket} | SL=${fmt(adj_sl, 5)} | TP=${fmt(adj_tp, 5)}", style="bold green")
-                ticket_last_targets[ticket] = (float(tp1), float(sl))
+                dbg(f"Ticket {ticket} | SL=${fmt(adj_sl, 5)} | TP (TP{TARGET_TP_LEVEL})=${fmt(adj_tp, 5)}", style="bold green")
+                ticket_last_targets[ticket] = (float(target_tp), float(sl))
+                ticket_target_tp3[ticket] = True
                 dump_positions(SYMBOL)
                 return
 
@@ -1098,6 +1235,89 @@ async def on_edit(event):
 
     dbg(f"❌ TIMEOUT: Gave up after {SLTP_RETRY_SECONDS}s", style="bold red")
     dump_positions(SYMBOL)
+
+
+# ===================== BREAKEVEN MONITORING =====================
+def monitor_and_activate_breakeven():
+    """
+    Monitor all open positions and move SL to breakeven when TP1 is passed.
+    """
+    try:
+        poss = mt5.positions_get(symbol=SYMBOL) or []
+        if not poss:
+            return
+        
+        tick = mt5.symbol_info_tick(SYMBOL)
+        if tick is None:
+            return
+        
+        for p in poss:
+            ticket = p.ticket
+            
+            # Skip if not our magic number
+            if p.magic != MAGIC:
+                continue
+            
+            # Skip if already activated breakeven
+            if ticket_breakeven_activated.get(ticket, False):
+                continue
+            
+            # Skip if no TP1 level tracked
+            if ticket not in ticket_tp_levels or not ticket_tp_levels[ticket]:
+                continue
+            
+            tp1_price = ticket_tp_levels[ticket].get(1)  # Get TP1
+            entry_price = ticket_entry_prices.get(ticket)
+            
+            if tp1_price is None or entry_price is None:
+                continue
+            
+            # Determine side from position
+            side = "BUY" if p.type == mt5.POSITION_TYPE_BUY else "SELL"
+            
+            # Get current market price
+            current_price = tick.ask if side == "BUY" else tick.bid
+            
+            # Check if TP1 has been passed
+            if not price_passes_tp1(side, current_price, entry_price, tp1_price):
+                continue
+            
+            # TP1 HAS BEEN PASSED! Move SL to breakeven
+            dbg(f"🎯 TP1 PASSED! Ticket {ticket} | Current: ${fmt(current_price, 5)} | TP1: ${fmt(tp1_price, 5)}", style="bold green")
+            
+            # Get current TP
+            current_tp = float(p.tp) if p.tp > 0 else None
+            
+            if current_tp is None:
+                dbg(f"⚠️ No TP set for ticket {ticket}. Skipping SL update.", style="yellow")
+                continue
+            
+            # Move SL to entry price (breakeven)
+            breakeven_sl = entry_price
+            
+            dbg(f"📍 Moving SL to BREAKEVEN: Ticket {ticket} | SL: ${fmt(p.sl, 5)} → ${fmt(breakeven_sl, 5)} | TP: ${fmt(current_tp, 5)}", style="bold yellow")
+            
+            request = {
+                "action": mt5.TRADE_ACTION_SLTP,
+                "symbol": SYMBOL,
+                "position": ticket,
+                "sl": float(breakeven_sl),
+                "tp": float(current_tp),
+                "magic": MAGIC,
+                "comment": "breakeven_sl",
+            }
+            
+            r = mt5.order_send(request)
+            rc = getattr(r, "retcode", -1) if r is not None else -1
+            
+            if retcode_is_ok(rc):
+                dbg(f"✅ Breakeven SL activated for ticket {ticket}", style="bold green")
+                ticket_breakeven_activated[ticket] = True
+            else:
+                dbg(f"❌ Failed to activate breakeven SL: retcode={rc}", style="bold red")
+    
+    except Exception as e:
+        dbg(f"⚠️ Exception in monitor_and_activate_breakeven: {str(e)}", style="yellow")
 
 
 # ===================== RUN LOOP WITH AUTO-RECONNECT =====================
@@ -1129,6 +1349,21 @@ async def run_forever():
     
     banner("🤖 TRADING BOT ACTIVE", style="bold white on green")
     dbg(f"Listening to Telegram channel for signals...", style="bright_white")
+    dbg(f"Strategy: Target TP{TARGET_TP_LEVEL}, Move SL to Breakeven when TP{BREAKEVEN_ACTIVATION_TP} is passed", style="bold cyan")
+    
+    # Start background monitor task
+    async def monitor_task():
+        """Background task to monitor and activate breakeven SL"""
+        while True:
+            try:
+                monitor_and_activate_breakeven()
+                await asyncio.sleep(2)  # Check every 2 seconds
+            except Exception as e:
+                dbg(f"⚠️ Monitor task error: {str(e)}", style="yellow")
+                await asyncio.sleep(2)
+    
+    # Create monitor task
+    monitor = asyncio.create_task(monitor_task())
     
     while True:
         try:
