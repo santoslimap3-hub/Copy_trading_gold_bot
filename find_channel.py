@@ -2,6 +2,7 @@ from telethon import TelegramClient
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
+import asyncio
 
 api_id = 34597981
 api_hash = "2cd59609b6cacb56da261e43fdb897ea"
@@ -11,6 +12,8 @@ console = Console()
 
 async def main():
     """Fetch and display all available Telegram channels"""
+    await client.start()
+    
     banner_panel = Panel(
         "[bold cyan]📡 TELEGRAM CHANNEL SCANNER[/bold cyan]",
         style="bold green on dark_green",
@@ -32,6 +35,8 @@ async def main():
     
     console.print(table)
     console.print(f"\n✅ Found [bold green]{count}[/bold green] channel(s)\n")
+    
+    await client.disconnect()
 
-with client:
-    client.loop.run_until_complete(main())
+if __name__ == "__main__":
+    asyncio.run(main())
