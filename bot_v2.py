@@ -241,6 +241,29 @@ def set_stop_loss(ticket: int, sl_price: float) -> bool:
     return success
 
 
+def can_update_stop_loss(ticket: int, sl_price: float) -> Tuple[bool, str]:
+    """Validate SL update based on breakeven protection and trade side."""
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        return False, "position not found"
+
+    side = "BUY" if pos[0].type == mt5.ORDER_TYPE_BUY else "SELL"
+    current_sl = float(pos[0].sl) if pos[0].sl > 0 else 0.0
+    entry = entry_prices.get(ticket)
+
+    if current_sl > 0 and abs(current_sl - sl_price) < 1e-6:
+        return False, "no changes"
+
+    # If breakeven is active, never allow SL to move back into loss.
+    if breakeven_activated.get(ticket, False) and entry is not None:
+        if side == "BUY" and sl_price < entry:
+            return False, "breakeven protected (BUY)"
+        if side == "SELL" and sl_price > entry:
+            return False, "breakeven protected (SELL)"
+
+    return True, "ok"
+
+
 def set_take_profit(ticket: int, tp_price: float) -> bool:
     """Update position take profit - preserves current SL"""
     log(f"🎯 Updating TP for ticket {ticket} to ${tp_price:.5f}...", "INFO")
@@ -490,7 +513,11 @@ async def main():
             # Update SL if found
             if sl:
                 log(f"📊 Found SL in message: ${sl:.5f}", "DEBUG")
-                set_stop_loss(ticket, sl)
+                can_update, reason = can_update_stop_loss(ticket, sl)
+                if can_update:
+                    set_stop_loss(ticket, sl)
+                else:
+                    log(f"⚠️ SL update skipped: {reason}", "WARN")
             else:
                 log(f"⚠️ No SL found in message", "DEBUG")
             
@@ -553,7 +580,11 @@ async def main():
             sl = parse_stop_loss(text)
             if sl:
                 log(f"📊 Found SL in edit: ${sl:.5f}", "DEBUG")
-                set_stop_loss(ticket, sl)
+                can_update, reason = can_update_stop_loss(ticket, sl)
+                if can_update:
+                    set_stop_loss(ticket, sl)
+                else:
+                    log(f"⚠️ SL update skipped: {reason}", "WARN")
             else:
                 log(f"⚠️ No SL in edit message", "DEBUG")
             
