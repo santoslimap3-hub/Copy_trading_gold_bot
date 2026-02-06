@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 from collections import defaultdict
 
-from pyrogram import Client
+from telethon import TelegramClient
 
 # Fix Windows encoding for emoji support
 if sys.platform == "win32":
@@ -42,7 +42,7 @@ class TradeAnalyzer:
         self.api_id = api_id
         self.api_hash = api_hash
         self.channel_id = channel_id
-        self.client = Client('analyzer_session', api_id=api_id, api_hash=api_hash)
+        self.client = TelegramClient('analyzer_session_telethon', api_id=api_id, api_hash=api_hash)
         self.trades: List[Dict] = []
         self.results: List[Dict] = []
 
@@ -53,7 +53,7 @@ class TradeAnalyzer:
 
     async def disconnect(self):
         """Disconnect from Telegram"""
-        await self.client.stop()
+        await self.client.disconnect()
         print("✓ Disconnected from Telegram")
 
     async def fetch_previous_month_messages(self) -> List:
@@ -67,7 +67,7 @@ class TradeAnalyzer:
         print(f"📅 Fetching messages from: {first_day_prev_month.date()} to {last_day_prev_month.date()}")
 
         messages = []
-        async for message in self.client.get_chat_history(
+        async for message in self.client.iter_messages(
             self.channel_id,
             offset_date=last_day_prev_month,
             reverse=True
@@ -143,7 +143,7 @@ class TradeAnalyzer:
 
         # First pass: extract all trades
         for msg in messages:
-            text = msg.text or msg.caption
+            text = msg.message
             if text:
                 trade = self.parse_trade_signal(text, msg.id, msg.date)
                 if trade:
@@ -152,7 +152,7 @@ class TradeAnalyzer:
 
         # Second pass: match results to trades
         for msg in messages:
-            text = msg.text or msg.caption
+            text = msg.message
             if text:
                 result = self.parse_result_message(text, msg.id, msg.date)
                 if result:

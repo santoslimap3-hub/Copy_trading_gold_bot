@@ -4,7 +4,7 @@ import asyncio
 from datetime import datetime
 
 import MetaTrader5 as mt5
-from pyrogram import Client
+from telethon import TelegramClient
 
 SYMBOL = "XAUUSD"
 
@@ -63,7 +63,7 @@ async def send_to_telegram(signal_text: str, send: bool) -> None:
         return
     
     # Use separate session to avoid lock conflicts with script.py
-    client = Client("zinra_test_session", api_id=api_id, api_hash=api_hash)
+    client = TelegramClient("zinra_test_session_telethon", api_id=api_id, api_hash=api_hash)
     
     try:
         await client.start()
@@ -83,14 +83,14 @@ async def send_to_telegram(signal_text: str, send: bool) -> None:
         await asyncio.sleep(5)
         
         # Step 3: Edit message with full details
-        await client.edit_message_text(TEST_CHANNEL, message.id, signal_text)
+        await client.edit_message(TEST_CHANNEL, message.id, signal_text)
         print(f"[STEP 3] Message edited with full signal details")
         print(f"[SUCCESS] Signal sent and edited successfully!")
         
     except Exception as e:
         print(f"[ERROR] Failed: {e}")
     finally:
-        await client.stop()
+        await client.disconnect()
 
 
 def main() -> None:

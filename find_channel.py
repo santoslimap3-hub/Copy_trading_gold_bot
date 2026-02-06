@@ -1,5 +1,6 @@
-from pyrogram import Client
-from pyrogram.enums import ChatType
+from telethon import TelegramClient
+from telethon.tl.types import Channel
+from telethon.utils import get_peer_id
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -8,7 +9,7 @@ import asyncio
 api_id = 34597981
 api_hash = "2cd59609b6cacb56da261e43fdb897ea"
 
-client = Client("zinra_session", api_id=api_id, api_hash=api_hash)
+client = TelegramClient("zinra_session_telethon", api_id=api_id, api_hash=api_hash)
 console = Console()
 
 async def main():
@@ -28,17 +29,18 @@ async def main():
     table.add_column("Type", style="yellow")
     
     count = 0
-    async for dialog in client.get_dialogs():
-        chat = dialog.chat
-        if chat and chat.type in (ChatType.CHANNEL, ChatType.SUPERGROUP):
-            channel_type = "Megagroup" if chat.type == ChatType.SUPERGROUP else "Channel"
-            table.add_row(chat.title or "(no title)", str(chat.id), channel_type)
+    async for dialog in client.iter_dialogs():
+        entity = dialog.entity
+        if isinstance(entity, Channel):
+            channel_type = "Megagroup" if getattr(entity, "megagroup", False) else "Channel"
+            channel_id = get_peer_id(entity)
+            table.add_row(entity.title or "(no title)", str(channel_id), channel_type)
             count += 1
     
     console.print(table)
     console.print(f"\n✅ Found [bold green]{count}[/bold green] channel(s)\n")
     
-    await client.stop()
+    await client.disconnect()
 
 if __name__ == "__main__":
     asyncio.run(main())

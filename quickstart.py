@@ -15,8 +15,7 @@ def check_requirements():
     print("="*60 + "\n")
     
     packages = {
-        "pyrogram": "Telegram client",
-        "tgcrypto": "Telegram crypto backend",
+        "telethon": "Telegram client",
         "MetaTrader5": "Trading platform API",
         "rich": "Beautiful terminal UI",
     }
