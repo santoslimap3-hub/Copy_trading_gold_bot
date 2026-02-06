@@ -8,6 +8,7 @@ import asyncio
 from typing import Optional, Tuple, Dict
 
 from pyrogram import Client, filters, idle
+from pyrogram.errors import FloodWait, RPCError
 import MetaTrader5 as mt5
 import pnl_logger
 from rich.console import Console
@@ -760,7 +761,7 @@ def should_block_trade_by_hard_caps(acc, risk_loss_money: float) -> Tuple[bool, 
 
 
 # ===================== TELEGRAM HANDLERS =====================
-@client.on_message(filters.channel | filters.supergroup)
+@client.on_message(filters.channel | filters.group)
 async def on_new(_, message):
     # Debug: Log all incoming messages with their chat IDs
     if DEBUG_DUMP_EVERY_EVENT:
@@ -1031,7 +1032,7 @@ async def on_new(_, message):
         dbg(f"❌ ENTRY FAILED: {str(e)}", style="bold red")
 
 
-@client.on_edited_message(filters.channel | filters.supergroup)
+@client.on_edited_message(filters.channel | filters.group)
 async def on_edit(_, message):
     # Filter by current CHANNEL (may change in test mode)
     if not message.chat or message.chat.id != CHANNEL:
@@ -1444,6 +1445,13 @@ async def run_forever():
         try:
             await client.start()
             await idle()
+        except FloodWait as e:
+            dbg(f"⛔ Telegram rate limit (FLOOD_WAIT). Wait {e.value} seconds before retrying.", style="bold red")
+            await asyncio.sleep(max(e.value, 1))
+        except RPCError as e:
+            dbg(f"⛔ Telegram RPC error during login: {e.__class__.__name__} | {str(e)}", style="bold red")
+            dbg("⏳ If this persists, wait 1-24 hours before retrying login.", style="yellow")
+            await asyncio.sleep(10)
         except Exception as e:
             dbg(f"⚠️ Telegram connection lost: {str(e)}", style="bold yellow")
             dbg("🔄 Reconnecting in 5 seconds...", style="yellow")
