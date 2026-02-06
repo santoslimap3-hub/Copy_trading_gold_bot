@@ -53,7 +53,8 @@ Your Copy Trading Gold Bot has been completely transformed with a **stunning pro
 
 ### Configuration Files
 3. **`requirements.txt`**
-   - telethon (Telegram client)
+   - pyrogram (Telegram client)
+   - tgcrypto (Telegram crypto backend)
    - MetaTrader5 (Trading API)
    - **rich** (Beautiful UI) ← NEW
 

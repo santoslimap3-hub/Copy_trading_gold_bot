@@ -13,8 +13,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 from collections import defaultdict
 
-from telethon import TelegramClient
-from telethon.tl.types import MessageEmpty
+from pyrogram import Client
 
 # Fix Windows encoding for emoji support
 if sys.platform == "win32":
@@ -43,7 +42,7 @@ class TradeAnalyzer:
         self.api_id = api_id
         self.api_hash = api_hash
         self.channel_id = channel_id
-        self.client = TelegramClient('analyzer_session', api_id, api_hash)
+        self.client = Client('analyzer_session', api_id=api_id, api_hash=api_hash)
         self.trades: List[Dict] = []
         self.results: List[Dict] = []
 
@@ -54,7 +53,7 @@ class TradeAnalyzer:
 
     async def disconnect(self):
         """Disconnect from Telegram"""
-        await self.client.disconnect()
+        await self.client.stop()
         print("✓ Disconnected from Telegram")
 
     async def fetch_previous_month_messages(self) -> List:
@@ -68,7 +67,7 @@ class TradeAnalyzer:
         print(f"📅 Fetching messages from: {first_day_prev_month.date()} to {last_day_prev_month.date()}")
 
         messages = []
-        async for message in self.client.iter_messages(
+        async for message in self.client.get_chat_history(
             self.channel_id,
             offset_date=last_day_prev_month,
             reverse=True
@@ -144,16 +143,18 @@ class TradeAnalyzer:
 
         # First pass: extract all trades
         for msg in messages:
-            if msg.text:
-                trade = self.parse_trade_signal(msg.text, msg.id, msg.date)
+            text = msg.text or msg.caption
+            if text:
+                trade = self.parse_trade_signal(text, msg.id, msg.date)
                 if trade:
                     trade_map[msg.id] = trade
                     self.trades.append(trade)
 
         # Second pass: match results to trades
         for msg in messages:
-            if msg.text:
-                result = self.parse_result_message(msg.text, msg.id, msg.date)
+            text = msg.text or msg.caption
+            if text:
+                result = self.parse_result_message(text, msg.id, msg.date)
                 if result:
                     # Try to find the most recent trade before this result
                     best_trade_id = None

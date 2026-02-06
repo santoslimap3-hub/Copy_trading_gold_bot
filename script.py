@@ -7,7 +7,7 @@ import os
 import asyncio
 from typing import Optional, Tuple, Dict
 
-from telethon import TelegramClient, events
+from pyrogram import Client, filters, idle
 import MetaTrader5 as mt5
 from rich.console import Console
 from rich.table import Table
@@ -74,7 +74,7 @@ TARGET_TP_LEVEL = 3                           # Always target TP3
 BREAKEVEN_ACTIVATION_TP = 1                   # Activate breakeven SL when TP1 is passed
 
 # ===================== INTERNAL STATE =====================
-client = TelegramClient("zinra_session", api_id, api_hash)
+client = Client("zinra_session", api_id=api_id, api_hash=api_hash)
 
 # Map Telegram message id -> MT5 position ticket
 msgid_to_ticket: Dict[int, int] = {}
@@ -109,6 +109,10 @@ def dbg(msg: str, style: str = "cyan"):
     if DEBUG:
         timestamp = f"[{now_ts()}]"
         console.print(f"{timestamp} {msg}", style=style)
+
+
+def extract_message_text(message) -> str:
+    return (getattr(message, "text", None) or getattr(message, "caption", None) or "").strip()
 
 
 def banner(title: str, style: str = "bold yellow on dark_blue"):
@@ -712,24 +716,25 @@ def should_block_trade_by_hard_caps(acc, risk_loss_money: float) -> Tuple[bool, 
 
 
 # ===================== TELEGRAM HANDLERS =====================
-@client.on(events.NewMessage())
-async def on_new(event):
+@client.on_message(filters.channel | filters.supergroup)
+async def on_new(_, message):
     # Debug: Log all incoming messages with their chat IDs
     if DEBUG_DUMP_EVERY_EVENT:
-        banner(f"📨 EVENT RECEIVED: chat_id={event.chat_id}, CHANNEL={CHANNEL}", style="bold magenta on dark_magenta")
+        chat_id = message.chat.id if message.chat else None
+        banner(f"📨 EVENT RECEIVED: chat_id={chat_id}, CHANNEL={CHANNEL}", style="bold magenta on dark_magenta")
     
     # Filter by current CHANNEL (may change in test mode)
-    if event.chat_id != CHANNEL:
+    if not message.chat or message.chat.id != CHANNEL:
         if DEBUG_DUMP_EVERY_EVENT:
-            dbg(f"⏭️ Ignoring message from chat_id={event.chat_id} (expecting {CHANNEL})", style="dim yellow")
+            dbg(f"⏭️ Ignoring message from chat_id={message.chat.id if message.chat else None} (expecting {CHANNEL})", style="dim yellow")
         return
     
-    text_raw = (event.raw_text or "").strip()
+    text_raw = extract_message_text(message)
     if not text_raw:
         return
 
     if DEBUG_DUMP_EVERY_EVENT:
-        banner(f"📨 NEW TELEGRAM MESSAGE (ID: {event.message.id})", style="bold magenta on dark_magenta")
+        banner(f"📨 NEW TELEGRAM MESSAGE (ID: {message.id})", style="bold magenta on dark_magenta")
         dbg(text_raw, style="white")
 
     # First check if this is a TP/SL update for the last trade
@@ -843,7 +848,7 @@ async def on_new(event):
         dbg("❌ No BUY NOW / SELL NOW found. Ignoring.", style="yellow")
         return
 
-    tg_id = event.message.id
+    tg_id = message.id
     side_u = side.upper()
 
     banner(f"🎯 NEW SIGNAL RECEIVED: {side_u}", style="bold yellow on dark_blue")
@@ -978,25 +983,25 @@ async def on_new(event):
         dbg(f"❌ ENTRY FAILED: {str(e)}", style="bold red")
 
 
-@client.on(events.MessageEdited())
-async def on_edit(event):
+@client.on_edited_message(filters.channel | filters.supergroup)
+async def on_edit(_, message):
     # Filter by current CHANNEL (may change in test mode)
-    if event.chat_id != CHANNEL:
+    if not message.chat or message.chat.id != CHANNEL:
         return
     
-    text = (event.raw_text or "").strip()
+    text = extract_message_text(message)
     if not text:
         return
 
     if DEBUG_DUMP_EVERY_EVENT:
-        banner(f"📝 TELEGRAM EDIT MESSAGE (ID: {event.message.id})", style="bold cyan on dark_cyan")
+        banner(f"📝 TELEGRAM EDIT MESSAGE (ID: {message.id})", style="bold cyan on dark_cyan")
         dbg(text, style="white")
 
     if is_noise_message(text):
         dbg("❌ Noise message detected. Ignoring.", style="yellow")
         return
 
-    tg_id = event.message.id
+    tg_id = message.id
 
     # avoid re-processing identical edit payloads
     prev = last_seen_event_text.get(tg_id)
@@ -1368,11 +1373,14 @@ async def run_forever():
     while True:
         try:
             await client.start()
-            await client.run_until_disconnected()
+            await idle()
         except Exception as e:
             dbg(f"⚠️ Telegram connection lost: {str(e)}", style="bold yellow")
             dbg("🔄 Reconnecting in 5 seconds...", style="yellow")
             await asyncio.sleep(5)
+        finally:
+            if client.is_connected:
+                await client.stop()
 
 
 if __name__ == "__main__":

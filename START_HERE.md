@@ -23,7 +23,8 @@ Your **Copy Trading Gold Bot** has been successfully transformed with a **profes
 
 ### Configuration & Dependencies
 3. **`requirements.txt`** - Python package dependencies
-   - telethon 1.34.0 (Telegram)
+   - pyrogram 2.0.106 (Telegram)
+   - tgcrypto 1.2.5 (Telegram crypto backend)
    - MetaTrader5 5.0.45 (Trading)
    - rich 13.7.0 (Beautiful UI) ← NEW
 

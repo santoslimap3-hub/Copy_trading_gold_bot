@@ -32,7 +32,8 @@ Your Copy Trading Gold Bot has been transformed into a **professional-grade trad
 ### Configuration & Setup
 - **`requirements.txt`**
   - Python dependencies
-  - telethon (Telegram)
+   - pyrogram (Telegram)
+   - tgcrypto (Telegram crypto backend)
   - MetaTrader5 (Trading)
   - rich (Beautiful UI) ← NEW
 
@@ -243,7 +244,7 @@ pip install -r requirements.txt
 
 Or manually:
 ```bash
-pip install telethon==1.34.0
+pip install pyrogram==2.0.106 tgcrypto==1.2.5
 pip install MetaTrader5==5.0.45
 pip install rich==13.7.0
 ```

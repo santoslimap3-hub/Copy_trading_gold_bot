@@ -35,7 +35,8 @@ Your Copy Trading Gold Bot has been completely transformed with a professional, 
 
 ### New Files
 1. **`requirements.txt`** - Python dependencies
-   - telethon (Telegram client)
+   - pyrogram (Telegram client)
+   - tgcrypto (Telegram crypto backend)
    - MetaTrader5 (Trading platform)
    - rich (Beautiful terminal UI) ← NEW
 

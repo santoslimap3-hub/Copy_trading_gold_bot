@@ -102,7 +102,8 @@ Welcome to the Copy Trading Gold Bot - Beautiful Edition! Here's a complete guid
 
 ### [requirements.txt](requirements.txt) - Dependencies
 ```
-telethon==1.34.0       # Telegram client
+pyrogram==2.0.106      # Telegram client
+tgcrypto==1.2.5        # Telegram crypto backend
 MetaTrader5==5.0.45    # Trading platform
 rich==13.7.0           # Beautiful terminal UI
 ```
@@ -266,7 +267,8 @@ python script.py
 ## 🛠️ Technical Information
 
 ### Dependencies
-- **telethon 1.34.0** - Telegram client library
+- **pyrogram 2.0.106** - Telegram client library
+- **tgcrypto 1.2.5** - Telegram crypto backend
 - **MetaTrader5 5.0.45** - MT5 Python API
 - **rich 13.7.0** - Beautiful terminal UI library
 
