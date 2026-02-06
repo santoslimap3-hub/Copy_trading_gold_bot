@@ -9,6 +9,7 @@ from typing import Optional, Tuple, Dict
 
 from telethon import TelegramClient, events
 import MetaTrader5 as mt5
+import pnl_logger
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -478,6 +479,29 @@ def get_position_side(ticket: int) -> Optional[str]:
     return None
 
 
+def get_most_recent_position_ticket(symbol: str) -> Optional[int]:
+    """
+    Return the ticket id of the most recently opened position for `symbol`
+    that matches our `MAGIC`. Returns None if no matching position found.
+    """
+    poss = mt5.positions_get(symbol=symbol) or []
+    if not poss:
+        return None
+
+    # Filter by magic and pick the one with greatest open time
+    filtered = [p for p in poss if getattr(p, 'magic', None) == MAGIC]
+    if not filtered:
+        return None
+
+    # Some MT5 builds expose `time` on position objects
+    try:
+        latest = max(filtered, key=lambda p: getattr(p, 'time', 0))
+    except Exception:
+        latest = filtered[0]
+
+    return int(getattr(latest, 'ticket', None) or 0)
+
+
 # ===================== LOT SIZING (PRICE DISTANCE) =====================
 def round_down_to_step(x: float, step: float) -> float:
     return math.floor(x / step) * step
@@ -546,6 +570,10 @@ def calc_max_lot_for_risk_price_dist(
 
 
 # ===================== PARSING HELPERS =====================
+# Minimum reasonable price to accept when parsing TP/SL from Telegram
+# This avoids capturing stray small integers from messages like "TP1,2,3,4 HIT"
+MIN_REASONABLE_PRICE_DEFAULT = 50.0
+
 def parse_entry_side(text: str) -> Optional[str]:
     t = (text or "").upper()
     if "BUY NOW" in t:
@@ -563,12 +591,22 @@ def parse_tp1_sl(text: str) -> Tuple[Optional[float], Optional[float]]:
     # TP1 can be "TP1" or "TP 1" or "Tp1"
     m = re.search(r"\bTP\s*1\b[^0-9]*([0-9]+(?:\.[0-9]+)?)", t, re.IGNORECASE)
     if m:
-        tp1 = float(m.group(1))
+        try:
+            val = float(m.group(1))
+            if val >= MIN_REASONABLE_PRICE_DEFAULT:
+                tp1 = val
+        except Exception:
+            tp1 = None
 
     # SL can appear with emojis; search for "SL" letters anywhere, not strict \b boundaries.
     m = re.search(r"SL[^0-9]*([0-9]+(?:\.[0-9]+)?)", t, re.IGNORECASE)
     if m:
-        sl = float(m.group(1))
+        try:
+            val = float(m.group(1))
+            if val >= MIN_REASONABLE_PRICE_DEFAULT:
+                sl = val
+        except Exception:
+            sl = None
 
     return tp1, sl
 
@@ -602,11 +640,17 @@ def parse_all_tp_levels(text: str) -> Dict[int, float]:
     
     # Pattern: TP followed by digits, followed by price
     # Matches: "TP1 4705", "TP 2 4715", "TP3 4725", etc.
-    matches = re.finditer(r"\bTP\s*(\d+)\b[^0-9]*([0-9]+(?:\.[0-9]+)?)", t, re.IGNORECASE)
+    # We require the parsed price to be a reasonable market price (not a single digit like '2')
+    matches = re.finditer(r"\bTP\s*(\d+)\b[^0-9\n\r]*([0-9]+(?:\.[0-9]+)?)", t, re.IGNORECASE)
     for match in matches:
-        tp_num = int(match.group(1))
-        tp_price = float(match.group(2))
-        tp_levels[tp_num] = tp_price
+        try:
+            tp_num = int(match.group(1))
+            tp_price = float(match.group(2))
+            # Filter out implausible tiny prices (e.g. '2' captured from "TP1,2,3,4 HIT")
+            if tp_price >= MIN_REASONABLE_PRICE_DEFAULT:
+                tp_levels[tp_num] = tp_price
+        except Exception:
+            continue
     
     return tp_levels
 
@@ -740,13 +784,11 @@ async def on_new(event):
         # This message contains TP/SL - update the last open trade
         dbg(f"✅ Detected TP/SL update in new message: TP1={tp1} | SL={sl} | TPs={all_tp_levels}", style="green")
         
-        # Get the most recent open position
-        poss = mt5.positions_get(symbol=SYMBOL)
-        if not poss:
+        # Get the most recent open position for this symbol (fallback when msg mapping absent)
+        ticket = get_most_recent_position_ticket(SYMBOL)
+        if not ticket:
             dbg("❌ No open position found to update. Ignoring.", style="yellow")
             return
-        
-        ticket = poss[0].ticket
         dbg(f"🔍 Updating last open position: Ticket {ticket}", style="cyan")
         
         ensure_symbol(SYMBOL)
@@ -957,6 +999,12 @@ async def on_new(event):
                         dbg(f"✅ Failsafe SL SET: SL=${fmt(adj_sl, 5)} (Attempt {attempt})", style="bold green")
                         ticket_last_targets[ticket] = (0.0, float(adj_sl))
                         dump_positions(SYMBOL)
+                        try:
+                            acc_now = mt5.account_info()
+                            if acc_now is not None:
+                                pnl_logger.logger.record(balance=getattr(acc_now,'balance',0.0), equity=getattr(acc_now,'equity',0.0))
+                        except Exception:
+                            pass
                         sltp_set_success = True
                     elif rc in RETRYABLE_RETCODES:
                         dbg(f"⏳ SL/TP retryable error (code {rc}). Retry {attempt}/{int(SLTP_RETRY_SECONDS/SLTP_RETRY_DELAY)}", style="yellow")
@@ -1019,10 +1067,9 @@ async def on_edit(event):
         # (We don't have a direct message ID -> ticket mapping for this new message)
         ticket = find_position_ticket(SYMBOL, tg_id)
         if not ticket:
-            # Try to get any open position
-            poss = mt5.positions_get(symbol=SYMBOL)
-            if poss:
-                ticket = poss[0].ticket
+            # Fallback: try most recent open position for this symbol
+            ticket = get_most_recent_position_ticket(SYMBOL)
+            if ticket:
                 dbg(f"🔍 Using most recent position: Ticket {ticket}", style="yellow")
             else:
                 dbg("❌ No open position found for this update. Ignoring.", style="yellow")
@@ -1118,8 +1165,14 @@ async def on_edit(event):
             msgid_to_ticket[tg_id] = ticket
             dbg(f"🔍 Late-found ticket {ticket} for msg_id {tg_id}", style="yellow")
         else:
-            dbg("⏳ No ticket for this msg_id yet. Waiting for position confirmation.", style="yellow")
-            return
+            # Final fallback: associate this message to the most recently opened matching position
+            ticket = get_most_recent_position_ticket(SYMBOL)
+            if ticket:
+                msgid_to_ticket[tg_id] = ticket
+                dbg(f"🔍 Fallback: using most recent ticket {ticket} for msg_id {tg_id}", style="yellow")
+            else:
+                dbg("⏳ No ticket for this msg_id yet. Waiting for position confirmation.", style="yellow")
+                return
 
     tp1, sl = parse_tp1_sl(text)
     
@@ -1346,6 +1399,16 @@ async def run_forever():
     
     mt5_connect()
     ensure_symbol(SYMBOL)
+
+    # Initialize PnL logger using current account balance as initial reference
+    try:
+        acc_init = mt5.account_info()
+        if acc_init is not None:
+            initial = float(acc_init.balance if getattr(acc_init, 'balance', None) is not None else getattr(acc_init, 'equity', 0.0))
+            pnl_logger.logger.init(initial)
+            dbg(f"📈 PnL logger initialized with initial balance: ${fmt(initial,2)}", style="cyan")
+    except Exception as e:
+        dbg(f"⚠️ Failed to init PnL logger: {str(e)}", style="yellow")
     
     banner("🤖 TRADING BOT ACTIVE", style="bold white on green")
     dbg(f"Listening to Telegram channel for signals...", style="bright_white")
@@ -1357,6 +1420,13 @@ async def run_forever():
         while True:
             try:
                 monitor_and_activate_breakeven()
+                # Record PnL snapshot periodically
+                try:
+                    acc = mt5.account_info()
+                    if acc is not None:
+                        pnl_logger.logger.record(balance=getattr(acc,'balance',0.0), equity=getattr(acc,'equity',0.0))
+                except Exception:
+                    pass
                 await asyncio.sleep(2)  # Check every 2 seconds
             except Exception as e:
                 dbg(f"⚠️ Monitor task error: {str(e)}", style="yellow")
