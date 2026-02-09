@@ -18,7 +18,7 @@ from typing import Optional, Dict, Tuple
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
 CHANNEL_ID = -1003349563414  # Main trading channel
-TEST_CHANNEL_ID = -1003860296364  # Test channel for manual signals
+TEST_CHANNEL_ID = -1003732211798  # Test channel for manual signals
 SESSION_FILE = "trading_bot_session"
 
 # Trading
