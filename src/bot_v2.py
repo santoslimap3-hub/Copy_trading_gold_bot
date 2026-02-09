@@ -18,7 +18,7 @@ from typing import Optional, Dict, Tuple
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
 CHANNEL_ID = -1003349563414  # Main trading channel
-TEST_CHANNEL_ID = -1003860296364  # Test channel for manual signals
+TEST_CHANNEL_ID = -1003732211798  # Test channel for manual signals
 SESSION_FILE = "trading_bot_session"
 
 # Trading
@@ -205,6 +205,53 @@ def open_position(side: str, lot: float) -> Optional[int]:
     return ticket
 
 
+def close_position(ticket: int) -> bool:
+    """Close an open position immediately at market price (TP3 HIT safety exit)"""
+    log(f"🚨 Closing position {ticket} - TP3 HIT SAFETY EXIT", "INFO")
+    
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        log(f"❌ Position {ticket} not found (may already be closed)", "WARN")
+        return False
+    
+    p = pos[0]
+    side = "BUY" if p.type == mt5.ORDER_TYPE_BUY else "SELL"
+    close_type = mt5.ORDER_TYPE_SELL if side == "BUY" else mt5.ORDER_TYPE_BUY
+    
+    tick = mt5.symbol_info_tick(SYMBOL)
+    if tick is None:
+        log(f"❌ No tick data for {SYMBOL}", "ERROR")
+        return False
+    
+    price = float(tick.bid if side == "BUY" else tick.ask)
+    
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": SYMBOL,
+        "volume": float(p.volume),
+        "type": close_type,
+        "position": ticket,
+        "price": price,
+        "magic": MAGIC,
+        "comment": "TP3 HIT - SAFETY EXIT",
+        "type_time": mt5.ORDER_TIME_GTC,
+        "type_filling": mt5.ORDER_FILLING_IOC,
+    }
+    
+    log(f"   Closing {side} position: Ticket {ticket} | Volume {p.volume:.3f} | Price ${price:.5f}", "DEBUG")
+    result = mt5.order_send(request)
+    
+    success = result.retcode == mt5.TRADE_RETCODE_DONE
+    
+    if success:
+        log(f"✅ Position {ticket} CLOSED successfully", "INFO")
+    else:
+        log(f"❌ Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
+        log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
+    
+    return success
+
+
 def set_stop_loss(ticket: int, sl_price: float) -> bool:
     """Update position stop loss - preserves current TP"""
     log(f"🛡️ Updating SL for ticket {ticket} to ${sl_price:.5f}...", "INFO")
@@ -330,6 +377,13 @@ def price_crossed_tp1(ticket: int, tp1: float, current_price: float) -> bool:
 
 # ===================== PARSING =====================
 
+def is_tp3_hit_message(text: str) -> bool:
+    """Check if message is a TP3 HIT signal (safety exit trigger)"""
+    t = (text or "").upper()
+    # Match "TP3 HIT" or "TP 3 HIT" with flexible spacing
+    return bool(re.search(r"\bTP\s*3\s+HIT\b", t))
+
+
 def parse_signal(text: str) -> Optional[Tuple[str, str]]:
     """
     Parse "XAUUSD BUY NOW" or "XAUUSD SELL NOW"
@@ -446,6 +500,32 @@ async def main():
             
             log(f"📨 {channel_name} New message (ID: {msg_id}): {text[:80]}", "INFO")
             
+            # CHECK FOR TP3 HIT - SAFETY EXIT (highest priority)
+            if is_tp3_hit_message(text):
+                log("=" * 70, "INFO")
+                log("🚨 TP3 HIT DETECTED - SAFETY EXIT!", "INFO")
+                log("=" * 70, "INFO")
+                
+                # Find and close all open positions for this symbol
+                positions = mt5.positions_get(symbol=SYMBOL)
+                if positions:
+                    closed_count = 0
+                    for p in positions:
+                        if p.magic == MAGIC:
+                            log(f"🎯 Closing position: Ticket {p.ticket} | Volume {p.volume:.3f}", "INFO")
+                            if close_position(p.ticket):
+                                closed_count += 1
+                    
+                    if closed_count > 0:
+                        log("=" * 70, "INFO")
+                        log(f"✅ CLOSED {closed_count} POSITION(S) on TP3 HIT", "INFO")
+                        log("=" * 70, "INFO")
+                    else:
+                        log("⚠️ Failed to close positions on TP3 HIT", "WARN")
+                else:
+                    log("⚠️ TP3 HIT detected but no open positions found", "WARN")
+                return
+            
             # Check if this is a trade signal
             signal = parse_signal(text)
             
@@ -550,7 +630,33 @@ async def main():
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
             
-            log(f"✏️ {channel_name} Message edited (ID: {msg_id}): {text[:80]}", "INFO")
+            log(f"📝 {channel_name} Edited message (ID: {msg_id}): {text[:80]}", "INFO")
+            
+            # CHECK FOR TP3 HIT - SAFETY EXIT (highest priority)
+            if is_tp3_hit_message(text):
+                log("=" * 70, "INFO")
+                log("🚨 TP3 HIT DETECTED (EDIT) - SAFETY EXIT!", "INFO")
+                log("=" * 70, "INFO")
+                
+                # Find and close all open positions for this symbol
+                positions = mt5.positions_get(symbol=SYMBOL)
+                if positions:
+                    closed_count = 0
+                    for p in positions:
+                        if p.magic == MAGIC:
+                            log(f"🎯 Closing position: Ticket {p.ticket} | Volume {p.volume:.3f}", "INFO")
+                            if close_position(p.ticket):
+                                closed_count += 1
+                    
+                    if closed_count > 0:
+                        log("=" * 70, "INFO")
+                        log(f"✅ CLOSED {closed_count} POSITION(S) on TP3 HIT", "INFO")
+                        log("=" * 70, "INFO")
+                    else:
+                        log("⚠️ Failed to close positions on TP3 HIT", "WARN")
+                else:
+                    log("⚠️ TP3 HIT detected but no open positions found", "WARN")
+                return
             
             # Find position for this message
             if msg_id not in position_map:
