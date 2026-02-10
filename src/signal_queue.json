@@ -1,0 +1,76 @@
+{
+  "queue": [
+    {
+      "id": 3110,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5037.03,
+      "sl_price": 5029.03,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "XAU USD BUY NOW",
+      "timestamp": "2026-02-10T20:43:29.125985",
+      "executed": true
+    },
+    {
+      "id": 53,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5035.44,
+      "sl_price": 5027.44,
+      "lot_size": 0.21,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW",
+      "timestamp": "2026-02-10T21:08:18.994231",
+      "executed": true
+    },
+    {
+      "id": 54,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5035.47,
+      "sl_price": 5027.47,
+      "lot_size": 0.21,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW",
+      "timestamp": "2026-02-10T21:08:39.290053",
+      "executed": true
+    },
+    {
+      "id": 56,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5042.43,
+      "sl_price": 5034.43,
+      "lot_size": 0.21,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW",
+      "timestamp": "2026-02-10T21:14:31.363925",
+      "executed": true
+    },
+    {
+      "id": 57,
+      "signal_type": "TRADE",
+      "side": "SELL",
+      "entry_price": 5042.83,
+      "sl_price": 5050.83,
+      "lot_size": 0.21,
+      "tp_levels": {},
+      "msg_text": "EGN GOLD\nXAU USD SELL NOW",
+      "timestamp": "2026-02-10T21:17:04.831067",
+      "executed": true
+    },
+    {
+      "id": 58,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5045.96,
+      "sl_price": 5037.96,
+      "lot_size": 0.2,
+      "tp_levels": {},
+      "msg_text": "EGN GOLD\nXAU USD BUY NOW",
+      "timestamp": "2026-02-10T21:18:19.424500",
+      "executed": true
+    }
+  ]
+}
