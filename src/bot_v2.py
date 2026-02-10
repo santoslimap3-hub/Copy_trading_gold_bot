@@ -40,12 +40,122 @@ entry_prices: Dict[int, float] = {}
 # Track if breakeven has been activated: ticket -> bool
 breakeven_activated: Dict[int, bool] = {}
 
+# Signal attempt log: list of (timestamp, signal, result, details)
+signal_log: list = []
+
 # ===================== HELPERS =====================
 
 def log(msg: str, level: str = "INFO"):
     """Print with timestamp and level"""
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{ts}] [{level}] {msg}")
+
+
+def get_error_message(retcode: int) -> str:
+    """Map MT5 return codes to human-readable messages"""
+    error_map = {
+        1: "Generic error",
+        2: "Invalid request",
+        3: "Invalid order volume",
+        4: "Invalid order price",
+        5: "Invalid stops",
+        6: "Trade disabled",
+        7: "Market closed",
+        8: "No money",
+        9: "Price changed",
+        10: "Requote",
+        11: "Order expired",
+        12: "Order cancelled",
+        13: "Invalid response",
+        14: "Invalid request",
+        15: "Request timeout",
+        16: "Invalid request repeat",
+        17: "Reference error",
+        18: "Unknown order",
+        19: "Order duplicate",
+        20: "Trade busy",
+        21: "No connection",
+        22: "No money",
+        23: "Too frequent requests",
+        24: "Malfunctional price",
+        25: "Broker busy",
+        26: "Account suspended",
+        27: "Account forbidden",
+        28: "Unknown symbol",
+        29: "Wrong order type",
+        30: "Wrong order size",
+        31: "Wrong order price",
+        32: "Wrong stop level",
+        33: "Wrong filling",
+        34: "Request rejected",
+        35: "Order partial filled",
+        10004: "Trade disabled by administrator",
+        10005: "Trade forbidden by another manager",
+        10006: "Trade disabled by experts",
+        10009: "Request in progress",
+        10011: "Order locked",
+        10012: "Only buy allowed",
+        10013: "Only sell allowed",
+        10014: "Position by symbol locked",
+        10015: "Close only allowed",
+        10016: "Fifo rule restrictions",
+        10017: "Account disabled",
+        10018: "Pending orders limit exceeded",
+        10019: "Order locked for modification",
+        10020: "Order locked for deletion",
+        10021: "Order too close to market",
+        10022: "Pending orders count exceeded",
+        10023: "Hedge operations prohibited",
+        10024: "Prohibited operation",
+        10025: "Invalid order state",
+        10026: "Order state changed",
+        10027: "AutoTrading DISABLED by client - enable in Terminal settings!",
+        10028: "Trade context busy",
+        10029: "Orders limit exceeded",
+        10030: "Volume limit exceeded",
+        10031: "Orders on symbol limit",
+        10032: "Invalid expiration",
+        10033: "Trade type invalid",
+        10034: "Wrong color",
+        10035: "Disabled by client",
+        10036: "Permission denied",
+        10038: "Order closed by system",
+        10039: "Order closed by broker",
+        10040: "Invalid take profit",
+        10041: "Invalid stop loss",
+        10042: "Invalid magic",
+        10043: "Invalid expiration type",
+        10044: "Too many requests",
+        10047: "Order not found",
+        10048: "Order status changed",
+        10049: "Order info not available",
+        10050: "Depth of market not available",
+    }
+    return error_map.get(retcode, f"Unknown error code {retcode}")
+
+
+def check_autotrading_status():
+    """Check if AutoTrading is enabled and warn if disabled"""
+    log("🔍 Checking AutoTrading status...", "DEBUG")
+    
+    # Try a test order to see if AutoTrading is available
+    # We'll do a dummy check with a very small test
+    tick = mt5.symbol_info_tick(SYMBOL)
+    if tick is None:
+        log("⚠️ Cannot check AutoTrading - no tick data", "WARN")
+        return
+    
+    # Check via account settings (AutoTrading flag)
+    account = mt5.account_info()
+    if account:
+        if account.trade_allowed:
+            log("✅ AutoTrading is ENABLED and allowed", "INFO")
+        else:
+            log("❌ AutoTrading is DISABLED - trading is forbidden!", "ERROR")
+            log("   FIX: Enable AutoTrading in Terminal > Tools > Options > Expert Advisors", "ERROR")
+            log("   Also enable 'Allow automated trading' checkbox", "ERROR")
+    else:
+        log("⚠️ Cannot check AutoTrading status", "WARN")
 
 
 def ensure_mt5_connection():
@@ -69,6 +179,9 @@ def ensure_mt5_connection():
         log(f"   Balance: ${account.balance:.2f} | Equity: ${account.equity:.2f}", "DEBUG")
     else:
         log(f"⚠️ Could not retrieve account info", "WARN")
+    
+    # Check if AutoTrading is enabled
+    check_autotrading_status()
 
 
 def get_account_balance() -> float:
@@ -170,39 +283,77 @@ def get_filling_mode() -> int:
 
 def open_position(side: str, lot: float) -> Optional[int]:
     """
-    Open market position. Returns ticket number or None.
+    Open market position with retry logic. Returns ticket number or None.
+    Automatically retries on AutoTrading disabled (retcode 10027).
     """
-    log(f"🚀 Opening {side} position with lot size {lot:.4f}...", "INFO")
+    max_retries = 3
+    retry_delay = 2  # seconds
     
-    order_type = mt5.ORDER_TYPE_BUY if side == "BUY" else mt5.ORDER_TYPE_SELL
-    filling_mode = get_filling_mode()
-    
-    request = {
-        "action": mt5.TRADE_ACTION_DEAL,
-        "symbol": SYMBOL,
-        "volume": lot,
-        "type": order_type,
-        "type_filling": filling_mode,
-        "magic": MAGIC,
-        "comment": f"Signal {side}",
-    }
-    
-    log(f"   Request: {request}", "DEBUG")
-    
-    result = mt5.order_send(request)
-    
-    log(f"   Response retcode: {result.retcode}", "DEBUG")
-    log(f"   Response: {result}", "DEBUG")
-    
-    if result.retcode != mt5.TRADE_RETCODE_DONE:
-        log(f"❌ Order FAILED - Retcode: {result.retcode}", "ERROR")
-        log(f"   Error message: {result.comment}", "ERROR")
+    for attempt in range(1, max_retries + 1):
+        log(f"🚀 Opening {side} position with lot size {lot:.4f} (attempt {attempt}/{max_retries})...", "INFO")
+        
+        order_type = mt5.ORDER_TYPE_BUY if side == "BUY" else mt5.ORDER_TYPE_SELL
+        filling_mode = get_filling_mode()
+        
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": SYMBOL,
+            "volume": lot,
+            "type": order_type,
+            "type_filling": filling_mode,
+            "magic": MAGIC,
+            "comment": f"Signal {side}",
+        }
+        
+        log(f"   Request: {request}", "DEBUG")
+        
+        result = mt5.order_send(request)
+        
+        log(f"   Response retcode: {result.retcode}", "DEBUG")
+        log(f"   Error message: {result.comment}", "DEBUG")
+        
+        # SUCCESS - order executed
+        if result.retcode == mt5.TRADE_RETCODE_DONE:
+            ticket = result.order
+            log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
+            return ticket
+        
+        # CRITICAL ERROR - AutoTrading disabled
+        if result.retcode == 10027:
+            log(f"🚨 CRITICAL: AutoTrading is DISABLED in MetaTrader!", "ERROR")
+            log(f"   Error: {get_error_message(result.retcode)}", "ERROR")
+            
+            if attempt < max_retries:
+                log(f"⏳ Retrying in {retry_delay} seconds (attempt {attempt}/{max_retries})...", "WARN")
+                time.sleep(retry_delay)
+                continue
+            else:
+                log(f"❌ All {max_retries} retries exhausted - AutoTrading still disabled!", "ERROR")
+                log(f"   ⚠️ FIX: Enable AutoTrading in Terminal > Tools > Options > Expert Advisors", "ERROR")
+                return None
+        
+        # OTHER ERRORS - retry some, give up on others
+        log(f"❌ Order FAILED - Retcode: {result.retcode} ({get_error_message(result.retcode)})", "ERROR")
         log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
-        return None
+        
+        # Check if error is retryable
+        retryable_codes = {
+            10009,  # Request in progress
+            10028,  # Trade context busy
+            10044,  # Too many requests
+            9,      # Price changed (requote)
+        }
+        
+        if result.retcode in retryable_codes and attempt < max_retries:
+            log(f"⏳ Retrying in {retry_delay} seconds (attempt {attempt}/{max_retries})...", "WARN")
+            time.sleep(retry_delay)
+            continue
+        else:
+            # Non-retryable or final attempt
+            log(f"❌ Order failed with non-retryable error or max retries reached", "ERROR")
+            return None
     
-    ticket = result.order
-    log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
-    return ticket
+    return None
 
 
 def close_position(ticket: int) -> bool:
@@ -468,6 +619,19 @@ def extract_message_text(message) -> str:
     return ""
 
 
+def log_signal_attempt(side: str, result: str, detail: str = ""):
+    """Log a signal attempt for debugging"""
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+    entry = {
+        "timestamp": ts,
+        "signal": side,
+        "result": result,
+        "detail": detail
+    }
+    signal_log.append(entry)
+    log(f"📋 Signal log: {side} | {result} | {detail}", "DEBUG")
+
+
 # ===================== TELEGRAM HANDLERS =====================
 
 def init_telegram():
@@ -532,17 +696,20 @@ async def main():
             if signal:
                 symbol, side = signal
                 log(f"🎯 SIGNAL DETECTED: {side} {symbol}", "INFO")
+                log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id}")
                 
                 # Get current market price
                 entry_price = get_market_price(side)
                 if entry_price is None:
                     log(f"❌ Cannot get market price - aborting trade", "ERROR")
+                    log_signal_attempt(side, "FAILED", "Cannot get market price")
                     return
                 
                 # Calculate lot size
                 balance = get_account_balance()
                 if balance <= 0:
                     log(f"❌ Invalid balance: ${balance:.2f} - aborting trade", "ERROR")
+                    log_signal_attempt(side, "FAILED", f"Invalid balance: ${balance:.2f}")
                     return
                 
                 failsafe_sl = entry_price - FAILSAFE_SL_DISTANCE if side == "BUY" else entry_price + FAILSAFE_SL_DISTANCE
@@ -553,6 +720,7 @@ async def main():
                 
                 if lot <= 0:
                     log(f"❌ Invalid lot size: {lot} - aborting trade", "ERROR")
+                    log_signal_attempt(side, "FAILED", f"Invalid lot size: {lot}")
                     return
                 
                 log(f"📊 Trade parameters: Entry=${entry_price:.5f} | SL=${failsafe_sl:.5f} | Lot={lot:.4f}", "INFO")
@@ -562,6 +730,7 @@ async def main():
                 
                 if ticket:
                     log(f"✅ POSITION OPENED: Ticket={ticket} | Side={side} | Entry=${entry_price:.5f} | Lot={lot:.4f}", "INFO")
+                    log_signal_attempt(side, "SUCCESS", f"Ticket={ticket} | Entry=${entry_price:.5f}")
                     position_map[msg_id] = ticket
                     entry_prices[ticket] = entry_price
                     breakeven_activated[ticket] = False
@@ -573,6 +742,7 @@ async def main():
                     set_stop_loss(ticket, failsafe_sl)
                 else:
                     log(f"❌ POSITION OPEN FAILED - returning", "ERROR")
+                    log_signal_attempt(side, "FAILED", "Position open failed (see above for details)")
                 
                 return
             
@@ -790,10 +960,30 @@ async def main():
                 log(f"   {traceback.format_exc()}", "ERROR")
                 await asyncio.sleep(2)
     
+    # Signal log printer for debugging
+    async def print_signal_log():
+        """Print signal log every 30 seconds for debugging"""
+        while True:
+            try:
+                await asyncio.sleep(30)
+                if signal_log:
+                    log("=" * 70, "INFO")
+                    log("📋 SIGNAL LOG (Last 10 attempts)", "INFO")
+                    log("=" * 70, "INFO")
+                    for entry in signal_log[-10:]:
+                        msg = f"  {entry['timestamp']} | {entry['signal']:4s} | {entry['result']:10s} | {entry['detail']}"
+                        log(msg, "INFO")
+            except Exception as e:
+                log(f"⚠️ Exception in print_signal_log: {str(e)}", "ERROR")
+    
     # Start monitoring in background
     log("🔄 Starting breakeven monitor background task...", "INFO")
     asyncio.create_task(monitor_breakeven())
     log("✅ Breakeven monitor background task created", "INFO")
+    
+    log("🔄 Starting signal log printer background task...", "INFO")
+    asyncio.create_task(print_signal_log())
+    log("✅ Signal log printer background task created", "INFO")
     
     # Connect and run
     log("📡 Connecting to Telegram...", "INFO")
