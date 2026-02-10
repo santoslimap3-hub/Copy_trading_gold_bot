@@ -11,7 +11,7 @@ SYMBOL = "XAUUSD"
 # Telegram config
 api_id = 34597981
 api_hash = "2cd59609b6cacb56da261e43fdb897ea"
-TEST_CHANNEL = -1003860296364  # test channel
+TEST_CHANNEL = -1003732211798  # test channel
 
 
 def fmt(price: float) -> str:

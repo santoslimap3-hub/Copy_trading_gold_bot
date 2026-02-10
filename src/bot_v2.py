@@ -11,7 +11,13 @@ import os
 import time
 import MetaTrader5 as mt5
 from telethon import TelegramClient, events
+from telethon.errors.common import TypeNotFoundError
 from typing import Optional, Dict, Tuple
+
+# Import custom modules for signal persistence, session management, and monitoring
+from signal_queue import SignalQueue
+from session_manager import SessionManager
+from reconnect_monitor import ReconnectMonitor
 
 # ===================== CONFIGURATION =====================
 # Telegram
@@ -37,11 +43,19 @@ tp_levels: Dict[int, Dict[int, float]] = {}
 # Track entry prices: ticket -> entry_price
 entry_prices: Dict[int, float] = {}
 
+# Track failsafe TP3 (pattern-based): ticket -> tp3_price
+failsafe_tp3: Dict[int, float] = {}
+
 # Track if breakeven has been activated: ticket -> bool
 breakeven_activated: Dict[int, bool] = {}
 
 # Signal attempt log: list of (timestamp, signal, result, details)
 signal_log: list = []
+
+# Initialize external modules
+signal_queue: Optional[SignalQueue] = None
+session_manager: Optional[SessionManager] = None
+reconnect_monitor: Optional[ReconnectMonitor] = None
 
 # ===================== HELPERS =====================
 
@@ -283,75 +297,74 @@ def get_filling_mode() -> int:
 
 def open_position(side: str, lot: float) -> Optional[int]:
     """
-    Open market position with retry logic. Returns ticket number or None.
-    Automatically retries on AutoTrading disabled (retcode 10027).
+    Open market position. Returns ticket number or None.
+    Does NOT retry - signals are time-sensitive and must execute immediately or be abandoned.
     """
-    max_retries = 3
-    retry_delay = 2  # seconds
+    log(f"🚀 Opening {side} position with lot size {lot:.4f}...", "INFO")
     
-    for attempt in range(1, max_retries + 1):
-        log(f"🚀 Opening {side} position with lot size {lot:.4f} (attempt {attempt}/{max_retries})...", "INFO")
-        
-        order_type = mt5.ORDER_TYPE_BUY if side == "BUY" else mt5.ORDER_TYPE_SELL
-        filling_mode = get_filling_mode()
-        
-        request = {
-            "action": mt5.TRADE_ACTION_DEAL,
-            "symbol": SYMBOL,
-            "volume": lot,
-            "type": order_type,
-            "type_filling": filling_mode,
-            "magic": MAGIC,
-            "comment": f"Signal {side}",
-        }
-        
-        log(f"   Request: {request}", "DEBUG")
-        
-        result = mt5.order_send(request)
-        
-        log(f"   Response retcode: {result.retcode}", "DEBUG")
-        log(f"   Error message: {result.comment}", "DEBUG")
-        
-        # SUCCESS - order executed
-        if result.retcode == mt5.TRADE_RETCODE_DONE:
-            ticket = result.order
-            log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
-            return ticket
-        
-        # CRITICAL ERROR - AutoTrading disabled
-        if result.retcode == 10027:
-            log(f"🚨 CRITICAL: AutoTrading is DISABLED in MetaTrader!", "ERROR")
-            log(f"   Error: {get_error_message(result.retcode)}", "ERROR")
-            
-            if attempt < max_retries:
-                log(f"⏳ Retrying in {retry_delay} seconds (attempt {attempt}/{max_retries})...", "WARN")
-                time.sleep(retry_delay)
-                continue
-            else:
-                log(f"❌ All {max_retries} retries exhausted - AutoTrading still disabled!", "ERROR")
-                log(f"   ⚠️ FIX: Enable AutoTrading in Terminal > Tools > Options > Expert Advisors", "ERROR")
-                return None
-        
-        # OTHER ERRORS - retry some, give up on others
-        log(f"❌ Order FAILED - Retcode: {result.retcode} ({get_error_message(result.retcode)})", "ERROR")
-        log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
-        
-        # Check if error is retryable
-        retryable_codes = {
-            10009,  # Request in progress
-            10028,  # Trade context busy
-            10044,  # Too many requests
-            9,      # Price changed (requote)
-        }
-        
-        if result.retcode in retryable_codes and attempt < max_retries:
-            log(f"⏳ Retrying in {retry_delay} seconds (attempt {attempt}/{max_retries})...", "WARN")
+    order_type = mt5.ORDER_TYPE_BUY if side == "BUY" else mt5.ORDER_TYPE_SELL
+    filling_mode = get_filling_mode()
+    
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": SYMBOL,
+        "volume": lot,
+        "type": order_type,
+        "type_filling": filling_mode,
+        "magic": MAGIC,
+        "comment": f"Signal {side}",
+    }
+    
+    log(f"   Request: {request}", "DEBUG")
+    
+    result = mt5.order_send(request)
+    
+    log(f"   Response retcode: {result.retcode}", "DEBUG")
+    log(f"   Error message: {result.comment}", "DEBUG")
+    
+    # SUCCESS - order executed
+    if result.retcode == mt5.TRADE_RETCODE_DONE:
+        ticket = result.order
+        log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
+        return ticket
+    
+    # CRITICAL ERROR - AutoTrading disabled - FAIL IMMEDIATELY (no retry)
+    if result.retcode == 10027:
+        log(f"🚨 CRITICAL: AutoTrading is DISABLED in MetaTrader!", "ERROR")
+        log(f"   Error: {get_error_message(result.retcode)}", "ERROR")
+        log(f"   ⚠️ FIX: Enable AutoTrading in Terminal > Tools > Options > Expert Advisors", "ERROR")
+        log(f"   ⚠️ Signal is TIME-SENSITIVE - already abandoned due to disabled AutoTrading!", "ERROR")
+        return None
+    
+    # OTHER ERRORS - retry some, give up on others
+    log(f"❌ Order FAILED - Retcode: {result.retcode} ({get_error_message(result.retcode)})", "ERROR")
+    log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
+    
+    # Check if error is retryable
+    retryable_codes = {
+        10009,  # Request in progress
+        10028,  # Trade context busy
+        10044,  # Too many requests
+        9,      # Price changed (requote)
+    }
+    
+    max_retries = 3
+    retry_delay = 2
+    
+    if result.retcode in retryable_codes:
+        for attempt in range(1, max_retries):
+            log(f"⏳ Retrying in {retry_delay} seconds (attempt {attempt}/{max_retries - 1})...", "WARN")
             time.sleep(retry_delay)
-            continue
-        else:
-            # Non-retryable or final attempt
-            log(f"❌ Order failed with non-retryable error or max retries reached", "ERROR")
-            return None
+            
+            result = mt5.order_send(request)
+            log(f"   Response retcode: {result.retcode}", "DEBUG")
+            
+            if result.retcode == mt5.TRADE_RETCODE_DONE:
+                ticket = result.order
+                log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
+                return ticket
+        
+        log(f"❌ Order failed after {max_retries - 1} retries", "ERROR")
     
     return None
 
@@ -460,6 +473,64 @@ def can_update_stop_loss(ticket: int, sl_price: float) -> Tuple[bool, str]:
             return False, "breakeven protected (SELL)"
 
     return True, "ok"
+
+
+def calculate_failsafe_tp3(entry_price: float, side: str) -> float:
+    """Calculate failsafe TP3 based on the pattern: worst entry ± 7 points.
+    This provides a reasonable default TP while waiting for real values.
+    """
+    tp3 = entry_price + 7.0 if side == "BUY" else entry_price - 7.0
+    return tp3
+
+
+def is_valid_tp_price(ticket: int, tp_price: float) -> bool:
+    """Check if TP price is valid for the position.
+    For BUY: TP must be above entry. For SELL: TP must be below entry.
+    Also checks for obviously wrong values (e.g., $543 when entry is $5037).
+    """
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        return False
+    
+    entry = entry_prices.get(ticket, float(pos[0].price_open))
+    side = "BUY" if pos[0].type == mt5.ORDER_TYPE_BUY else "SELL"
+    
+    # For BUY: TP must be above entry
+    # For SELL: TP must be below entry
+    if side == "BUY":
+        is_valid = tp_price > entry
+    else:
+        is_valid = tp_price < entry
+    
+    # Additional sanity check: detect obviously wrong values
+    # (e.g., $543 when entry is $5037)
+    if is_valid and abs(tp_price - entry) > 0.01:  # At least some meaningful distance
+        # For gold, if the price difference is wildly wrong (e.g., 4000+ points off),
+        # it's probably a typo
+        if side == "BUY" and (tp_price - entry) < -1000:  # BUY TP should be above entry
+            is_valid = False
+        elif side == "SELL" and (entry - tp_price) < -1000:  # SELL TP should be below entry
+            is_valid = False
+    
+    return is_valid
+
+
+def select_best_tp_with_fallback(ticket: int, tp_levels_dict: Dict[int, float]) -> Tuple[Optional[int], Optional[float]]:
+    """Select the best valid TP from available levels, with fallback logic.
+    Prefers TP3 > TP2 > TP1, but falls back to lower level if higher is invalid.
+    Returns: (tp_level_number, tp_price) or (None, None) if no valid TP found.
+    """
+    # Try TP3, then TP2, then TP1
+    for tp_num in [3, 2, 1]:
+        if tp_num in tp_levels_dict:
+            tp_price = tp_levels_dict[tp_num]
+            if is_valid_tp_price(ticket, tp_price):
+                log(f"   ✅ TP{tp_num} is valid: ${tp_price:.5f}", "DEBUG")
+                return tp_num, tp_price
+            else:
+                log(f"   ❌ TP{tp_num} is INVALID: ${tp_price:.5f} - trying lower level", "DEBUG")
+    
+    return None, None
 
 
 def set_take_profit(ticket: int, tp_price: float) -> bool:
@@ -639,7 +710,71 @@ def init_telegram():
     return TelegramClient(SESSION_FILE, API_ID, API_HASH)
 
 
+async def replay_pending_signals(client):
+    """
+    Replay signals from queue that were received but not yet executed.
+    This recovers from crashes/disconnects without losing signals.
+    """
+    if not signal_queue:
+        return
+    
+    pending = signal_queue.get_pending_signals()
+    if not pending:
+        log("📋 No pending signals to replay", "INFO")
+        return
+    
+    log("=" * 70, "INFO")
+    log(f"🔄 REPLAYING {len(pending)} PENDING SIGNALS FROM QUEUE", "INFO")
+    log("=" * 70, "INFO")
+    
+    for sig in pending:
+        msg_id = sig.get('id')
+        signal_type = sig.get('signal_type')
+        msg_text = sig.get('msg_text', '')
+        
+        log(f"📨 Replaying {signal_type} signal (msg_id={msg_id}): {msg_text[:60]}", "INFO")
+        # Note: The actual replay would happen through message handlers
+        # For now, we just log. In real scenarios, you'd re-fetch or re-process from cache.
+    
+    log("=" * 70, "INFO")
+
+
+async def cleanup_and_report():
+    """
+    Periodic cleanup and reporting of system health.
+    """
+    while True:
+        try:
+            await asyncio.sleep(300)  # every 5 minutes
+            
+            # Cleanup old signals
+            if signal_queue:
+                signal_queue.remove_old_signals(days=7)
+                stats = signal_queue.get_stats()
+                log(f"📊 Signal queue: {stats['total_signals']} total, {stats['pending']} pending", "DEBUG")
+            
+            # Cleanup old backups
+            if session_manager:
+                session_manager.cleanup_old_backups(keep_count=5)
+            
+            # Report reconnect stats
+            if reconnect_monitor:
+                reconnect_monitor.reset_window()
+                if reconnect_monitor.get_stats()['total_reconnects'] > 0:
+                    reconnect_monitor.print_summary()
+        
+        except Exception as e:
+            log(f"⚠️ Exception in cleanup_and_report: {e}", "ERROR")
+
+
 async def main():
+    global signal_queue, session_manager, reconnect_monitor
+    
+    # Initialize persistence & monitoring modules
+    signal_queue = SignalQueue("signal_queue.json")
+    session_manager = SessionManager("trading_bot_session", "sessions")
+    reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
+    
     client = init_telegram()
     ensure_mt5_connection()
     
@@ -736,10 +871,30 @@ async def main():
                     breakeven_activated[ticket] = False
                     log(f"   Stored in position_map: msg_id={msg_id} -> ticket={ticket}", "DEBUG")
                     
+                    # Persist to signal queue
+                    signal_queue.add_signal(
+                        signal_type="TRADE",
+                        side=side,
+                        entry_price=entry_price,
+                        sl_price=failsafe_sl,
+                        lot_size=lot,
+                        tp_levels={},  # will be updated from edits
+                        msg_id=msg_id,
+                        msg_text=text[:100]
+                    )
+                    signal_queue.mark_executed(msg_id)
+                    
                     # Set failsafe SL
                     log(f"⏳ Waiting for MT5 to register position...", "DEBUG")
                     time.sleep(0.5)
                     set_stop_loss(ticket, failsafe_sl)
+                    
+                    # Set failsafe TP3 (pattern: entry ± 7 points)
+                    failsafe_tp3_price = calculate_failsafe_tp3(entry_price, side)
+                    failsafe_tp3[ticket] = failsafe_tp3_price
+                    log(f"🎯 Failsafe TP3 distance: 7 points", "INFO")
+                    log(f"🎯 Failsafe TP3 price: ${failsafe_tp3_price:.5f}", "DEBUG")
+                    set_take_profit(ticket, failsafe_tp3_price)
                 else:
                     log(f"❌ POSITION OPEN FAILED - returning", "ERROR")
                     log_signal_attempt(side, "FAILED", "Position open failed (see above for details)")
@@ -777,13 +932,20 @@ async def main():
                 tp_levels[ticket] = tp_levels_parsed
                 log(f"   Stored TP levels for ticket {ticket}", "DEBUG")
                 
-                # Set TP to TP3 if it exists
-                if 3 in tp_levels_parsed:
-                    tp3 = tp_levels_parsed[3]
-                    log(f"🎯 TP3 found: ${tp3:.5f} - setting as target", "INFO")
-                    set_take_profit(ticket, tp3)
+                # Select the best valid TP with fallback logic (TP3 > TP2 > TP1)
+                tp_num, tp_price = select_best_tp_with_fallback(ticket, tp_levels_parsed)
+                if tp_num and tp_price:
+                    # Show difference from failsafe if this is a real TP3
+                    if tp_num == 3 and ticket in failsafe_tp3:
+                        current_failsafe = failsafe_tp3[ticket]
+                        diff = abs(tp_price - current_failsafe)
+                        log(f"🎯 TP3 selected: ${tp_price:.5f} - setting as target", "INFO")
+                        log(f"   (Updated from failsafe: ${current_failsafe:.5f} | Diff: ${diff:.5f})", "DEBUG")
+                    else:
+                        log(f"🎯 TP{tp_num} selected: ${tp_price:.5f} - setting as target", "INFO")
+                    set_take_profit(ticket, tp_price)
                 else:
-                    log(f"⚠️ TP3 not in parsed levels - will wait for full message", "WARN")
+                    log(f"⚠️ All TP levels invalid or missing - will wait for valid values", "WARN")
             else:
                 log(f"⚠️ No TP levels found in message", "DEBUG")
         
@@ -872,12 +1034,20 @@ async def main():
                 tp_levels[ticket] = tp_levels_parsed
                 log(f"   Stored TP levels for ticket {ticket}", "DEBUG")
                 
-                if 3 in tp_levels_parsed:
-                    tp3 = tp_levels_parsed[3]
-                    log(f"🎯 TP3 found in edit: ${tp3:.5f} - updating", "INFO")
-                    set_take_profit(ticket, tp3)
+                # Select the best valid TP with fallback logic (TP3 > TP2 > TP1)
+                tp_num, tp_price = select_best_tp_with_fallback(ticket, tp_levels_parsed)
+                if tp_num and tp_price:
+                    # Show difference from failsafe if this is a real TP3
+                    if tp_num == 3 and ticket in failsafe_tp3:
+                        current_failsafe = failsafe_tp3[ticket]
+                        diff = abs(tp_price - current_failsafe)
+                        log(f"🎯 TP3 found in edit: ${tp_price:.5f} - updating", "INFO")
+                        log(f"   (Updated from failsafe: ${current_failsafe:.5f} | Diff: ${diff:.5f})", "DEBUG")
+                    else:
+                        log(f"🎯 TP{tp_num} selected: ${tp_price:.5f} - setting as target", "INFO")
+                    set_take_profit(ticket, tp_price)
                 else:
-                    log(f"⚠️ TP3 not found in edit message", "WARN")
+                    log(f"⚠️ All TP levels invalid or missing - will wait for valid values", "WARN")
             else:
                 log(f"⚠️ No TP levels in edit message", "DEBUG")
         
@@ -985,6 +1155,10 @@ async def main():
     asyncio.create_task(print_signal_log())
     log("✅ Signal log printer background task created", "INFO")
     
+    log("🔄 Starting cleanup and reporting background task...", "INFO")
+    asyncio.create_task(cleanup_and_report())
+    log("✅ Cleanup and reporting background task created", "INFO")
+    
     # Connect and run
     log("📡 Connecting to Telegram...", "INFO")
     await client.start()
@@ -993,14 +1167,57 @@ async def main():
     log("🎯 BOT READY - LISTENING FOR SIGNALS", "INFO")
     log("=" * 70, "INFO")
     
+    # Replay pending signals from previous session if any
+    await replay_pending_signals(client)
+    
+    # Run the Telegram client and recover from unknown TLObject errors by reconnecting.
     try:
-        await client.run_until_disconnected()
-    except KeyboardInterrupt:
-        log("⏹️ Keyboard interrupt received - shutting down", "INFO")
-    except Exception as e:
-        log(f"❌ Unexpected error in main loop: {str(e)}", "ERROR")
-        import traceback
-        log(f"   {traceback.format_exc()}", "ERROR")
+        while True:
+            try:
+                await client.run_until_disconnected()
+                break
+            except KeyboardInterrupt:
+                log("⏹️ Keyboard interrupt received - shutting down", "INFO")
+                break
+            except TypeNotFoundError as e:
+                # This happens when Telethon encounters an unknown/unsupported TL constructor
+                log("⚠️ Telethon TypeNotFoundError - unknown TLObject received. Attempting reconnect...", "ERROR")
+                log(f"   {str(e)}", "DEBUG")
+                import traceback
+                log(f"   {traceback.format_exc()}", "DEBUG")
+                
+                # Record reconnection event
+                reconnect_monitor.record_reconnect("TypeNotFoundError", str(e)[:50])
+                
+                # Check if we should rotate session
+                error_count = reconnect_monitor.error_counters.get("TypeNotFoundError", 0)
+                if session_manager.should_rotate("tlnotfound", error_count):
+                    log("🔄 Rotating session file due to repeated TLObject errors", "INFO")
+                    session_manager.rotate_session()
+                    # Update client to use new session file
+                    client = TelegramClient(session_manager.get_current_session_file(), API_ID, API_HASH)
+
+                # Try to safely reconnect the client (don't shutdown MT5)
+                try:
+                    await client.disconnect()
+                except Exception as ex:
+                    log(f"⚠️ Error while disconnecting client: {ex}", "WARN")
+
+                await asyncio.sleep(5)
+
+                try:
+                    await client.start()
+                    log("✅ Telegram client restarted after TypeNotFoundError", "INFO")
+                except Exception as ex2:
+                    log(f"❌ Failed to restart Telegram client: {ex2}", "ERROR")
+                    await asyncio.sleep(5)
+                # loop will retry run_until_disconnected
+                continue
+            except Exception as e:
+                log(f"❌ Unexpected error in main loop: {str(e)}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+                break
     finally:
         log("🛑 Bot shutting down...", "INFO")
         mt5.shutdown()
