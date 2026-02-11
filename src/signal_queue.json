@@ -71,6 +71,18 @@
       "msg_text": "EGN GOLD\nXAU USD BUY NOW",
       "timestamp": "2026-02-10T21:18:19.424500",
       "executed": true
+    },
+    {
+      "id": 5683,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5048.4,
+      "sl_price": 5040.4,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy Zone Now",
+      "timestamp": "2026-02-11T16:32:59.736653",
+      "executed": true
     }
   ]
 }
