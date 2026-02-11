@@ -9,6 +9,7 @@ import shutil
 import time
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 
 
 class SessionManager:

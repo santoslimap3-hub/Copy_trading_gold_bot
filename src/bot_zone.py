@@ -22,8 +22,8 @@ from reconnect_monitor import ReconnectMonitor
 # Telegram
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
-CHANNEL_ID = -1003142865169  # Zone trading channel
-TEST_CHANNEL_ID = -1003732211798  # Test channel for manual signals
+CHANNEL_ID = -1003142865169  # Zone trading channel (Gold Scalping - Analysis & Zones) - UPDATE THIS if needed
+TEST_CHANNEL_ID = -1003817819872  # Test channel for manual signals (test_bot)
 SESSION_FILE = "trading_bot_session"
 
 # Trading
@@ -31,6 +31,13 @@ SYMBOL = "XAUUSD"
 MAGIC = 777
 RISK_PCT = 0.05  # 5% risk per trade
 FAILSAFE_SL_DISTANCE = 8.0  # price units away from entry
+
+# Telegram filters
+ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
+DEBUG_LOG_ALL_MESSAGES = True
+
+# Logging
+LOG_LEVEL = "INFO"  # Options: "DEBUG" (verbose), "INFO" (normal), "WARN" (quiet - errors only)
 
 # ===================== STATE =====================
 # Track open positions: message_id -> ticket
@@ -62,9 +69,16 @@ reconnect_monitor: Optional[ReconnectMonitor] = None
 # ===================== HELPERS =====================
 
 def log(msg: str, level: str = "INFO"):
-    """Print with timestamp and level"""
-    ts = time.strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{ts}] [{level}] {msg}")
+    """Print with timestamp and level, respecting LOG_LEVEL setting"""
+    # Map log levels to priority
+    levels = {"DEBUG": 0, "INFO": 1, "WARN": 2, "ERROR": 3}
+    current_priority = levels.get(LOG_LEVEL, 1)
+    msg_priority = levels.get(level, 1)
+    
+    # Only print if message priority >= current LOG_LEVEL priority
+    if msg_priority >= current_priority:
+        ts = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{ts}] [{level}] {msg}")
 
 
 def get_error_message(retcode: int) -> str:
@@ -643,8 +657,14 @@ def parse_invalid_sl(text: str) -> Optional[float]:
 
 def extract_message_text(message) -> str:
     """Extract text from Telegram message"""
+    if hasattr(message, "raw_text") and message.raw_text:
+        return message.raw_text
+    if hasattr(message, "message") and message.message:
+        return message.message
     if hasattr(message, "text") and message.text:
         return message.text
+    if hasattr(message, "caption") and message.caption:
+        return message.caption
     return ""
 
 
@@ -799,22 +819,43 @@ def try_execute_pending_zone():
     zone_low = float(pending_zone["zone_low"])
     zone_high = float(pending_zone["zone_high"])
 
-    current_price = get_market_price(side)
-    if current_price is None:
+    # Get market tick data
+    tick = mt5.symbol_info_tick(SYMBOL)
+    if tick is None:
+        log(f"❌ Cannot get tick data for zone check", "ERROR")
         return
 
-    if zone_price_in_range(current_price, zone_low, zone_high):
-        log(f"🎯 Price entered zone {zone_low:.2f}-{zone_high:.2f} - executing trade", "INFO")
+    bid = float(tick.bid)
+    ask = float(tick.ask)
+    
+    # For zone detection, check if BID is in the zone
+    # This is more realistic: we trigger when market touches the zone
+    # But we'll enter at ASK (for BUY) or BID (for SELL)
+    zone_check_price = bid if side == "BUY" else ask
+    entry_price = ask if side == "BUY" else bid
+    
+    log(f"🔍 Zone check: {side} | Zone: {zone_low:.2f}-{zone_high:.2f} | Bid: ${bid:.5f} | Ask: ${ask:.5f} | ZoneCheckPrice: ${zone_check_price:.5f}", "DEBUG")
+
+    if zone_price_in_range(zone_check_price, zone_low, zone_high):
+        log(f"✅ ZONE TRIGGER: {side} zone {zone_low:.2f}-{zone_high:.2f} - executing trade at ${entry_price:.5f}", "INFO")
         pending_zone["executed"] = True
         execute_zone_trade(
             side=side,
-            entry_price=current_price,
+            entry_price=entry_price,
             msg_id=int(pending_zone["msg_id"]),
             msg_text=str(pending_zone["msg_text"]),
             sl_price=pending_zone.get("sl"),
             targets=pending_zone.get("targets", []),
         )
         clear_pending_zone("executed")
+    else:
+        # Log more detail about why zone wasn't triggered
+        distance_to_low = zone_check_price - zone_low if zone_check_price < zone_low else 0
+        distance_to_high = zone_check_price - zone_high if zone_check_price > zone_high else 0
+        if distance_to_low > 0:
+            log(f"   Zone not reached: ${distance_to_low:.5f} above zone", "DEBUG")
+        elif distance_to_high > 0:
+            log(f"   Zone overshot: ${distance_to_high:.5f} above zone", "DEBUG")
 
 
 async def replay_pending_signals(client):
@@ -869,9 +910,19 @@ async def cleanup_and_report():
 async def monitor_pending_zone():
     """Continuously watch for price entering a pending zone."""
     log("🔄 Zone monitor started", "INFO")
+    ZONE_TIMEOUT = 600  # 10 minutes - clear old zones
     while True:
         try:
             await asyncio.sleep(2)
+            
+            # Check if zone has expired
+            if pending_zone and not pending_zone.get("executed"):
+                age = time.time() - pending_zone.get("created_at", time.time())
+                if age > ZONE_TIMEOUT:
+                    log(f"⏰ Zone expired (age: {age:.0f}s) - clearing pending zone", "INFO")
+                    clear_pending_zone("timeout")
+                    continue
+            
             try_execute_pending_zone()
         except Exception as e:
             log(f"⚠️ Exception in monitor_pending_zone: {str(e)}", "ERROR")
@@ -898,11 +949,20 @@ async def main():
     log(f"📊 Magic number: {MAGIC}", "INFO")
     log("=" * 70, "INFO")
 
-    @client.on(events.NewMessage(chats=[CHANNEL_ID, TEST_CHANNEL_ID]))
+    @client.on(events.NewMessage())
     async def on_new_message(event):
         """Handle new Telegram messages from main or test channel"""
         global pending_zone
         try:
+            if DEBUG_LOG_ALL_MESSAGES:
+                chat = await event.get_chat()
+                chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
+                preview = extract_message_text(event.message).strip()[:80]
+                log(f"📥 [RAW] chat_id={event.chat_id} | {chat_title} | {preview}", "DEBUG")
+
+            if event.chat_id not in ALLOWED_CHAT_IDS:
+                return
+
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
@@ -960,6 +1020,26 @@ async def main():
                 try_execute_pending_zone()
                 return
 
+            if side and not zone_range:
+                # Immediate execution: "Buy zone now" or "Sell zone now" without a specific range
+                log(f"⚡ IMMEDIATE ZONE ENTRY: {side} zone (no range specified)", "INFO")
+                log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id} - IMMEDIATE ENTRY")
+
+                current_price = get_market_price(side)
+                if current_price:
+                    execute_zone_trade(
+                        side=side,
+                        entry_price=current_price,
+                        msg_id=msg_id,
+                        msg_text=text,
+                        sl_price=None,  # Use failsafe SL distance (8.0)
+                        targets=[],  # Use failsafe TP3
+                    )
+                else:
+                    log("❌ Cannot get market price for immediate zone entry", "ERROR")
+                    log_signal_attempt(side, "FAILED", "Cannot get market price")
+                return
+
             if is_active_message(text):
                 log("🟡 Zone marked active", "INFO")
                 try_execute_pending_zone()
@@ -984,11 +1064,20 @@ async def main():
             import traceback
             log(f"   {traceback.format_exc()}", "ERROR")
 
-    @client.on(events.MessageEdited(chats=[CHANNEL_ID, TEST_CHANNEL_ID]))
+    @client.on(events.MessageEdited())
     async def on_edit(event):
         """Handle edited messages from main or test channel"""
         global pending_zone
         try:
+            if DEBUG_LOG_ALL_MESSAGES:
+                chat = await event.get_chat()
+                chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
+                preview = extract_message_text(event.message).strip()[:80]
+                log(f"📝 [RAW EDIT] chat_id={event.chat_id} | {chat_title} | {preview}", "DEBUG")
+
+            if event.chat_id not in ALLOWED_CHAT_IDS:
+                return
+
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
