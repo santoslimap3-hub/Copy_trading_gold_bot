@@ -71,6 +71,42 @@
       "msg_text": "EGN GOLD\nXAU USD BUY NOW",
       "timestamp": "2026-02-10T21:18:19.424500",
       "executed": true
+    },
+    {
+      "id": 3117,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5048.09,
+      "sl_price": 5040.09,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "XAU USD BUY NOW",
+      "timestamp": "2026-02-11T16:33:16.657907",
+      "executed": true
+    },
+    {
+      "id": 3126,
+      "signal_type": "TRADE",
+      "side": "SELL",
+      "entry_price": 5060.78,
+      "sl_price": 5068.78,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "XAU USD SELL NOW",
+      "timestamp": "2026-02-11T17:35:58.194841",
+      "executed": true
+    },
+    {
+      "id": 3131,
+      "signal_type": "TRADE",
+      "side": "SELL",
+      "entry_price": 5070.06,
+      "sl_price": 5078.06,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "XAU USD SELL NOW",
+      "timestamp": "2026-02-11T17:47:21.457854",
+      "executed": true
     }
   ]
 }
