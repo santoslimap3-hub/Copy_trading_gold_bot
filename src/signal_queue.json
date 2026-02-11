@@ -83,6 +83,82 @@
       "msg_text": "Buy Zone Now",
       "timestamp": "2026-02-11T16:32:59.736653",
       "executed": true
+    },
+    {
+      "id": 5690,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5047.59,
+      "sl_price": 5039.59,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy zone now",
+      "timestamp": "2026-02-11T17:07:07.236230",
+      "executed": true
+    },
+    {
+      "id": 5700,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5060.48,
+      "sl_price": 5065.0,
+      "lot_size": 0.03,
+      "tp_levels": {
+        "1": 5057.0,
+        "2": 5055.0,
+        "3": 5053.0,
+        "4": 5051.0,
+        "5": 5049.0
+      },
+      "msg_text": "Sell zone now\n\n5059-5064\n\nTargets \n\n5057\n5055\n5053\n5051\n5049\n5047\n\nInvalid / SL 5065",
+      "timestamp": "2026-02-11T17:44:16.825863",
+      "executed": true
+    },
+    {
+      "id": 5703,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5062.63,
+      "sl_price": 5070.63,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell Zone Now",
+      "timestamp": "2026-02-11T17:58:02.819825",
+      "executed": true
+    },
+    {
+      "id": 5708,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5069.87,
+      "sl_price": 5076.0,
+      "lot_size": 0.02,
+      "tp_levels": {
+        "1": 5068.0,
+        "2": 5066.0,
+        "3": 5076.0
+      },
+      "msg_text": "Sell zone  now\n\n5070-5075\n\nTargets \n\n5068\n5066\n\nInvalid / SL 5076",
+      "timestamp": "2026-02-11T18:15:17.515950",
+      "executed": true
+    },
+    {
+      "id": 5713,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5075.77,
+      "sl_price": 5082.0,
+      "lot_size": 0.02,
+      "tp_levels": {
+        "1": 5074.0,
+        "2": 5072.0,
+        "3": 5070.0,
+        "4": 5068.0,
+        "5": 5066.0
+      },
+      "msg_text": "Sell zone \n\n5076-5081\n\nTargets \n\n5074\n5072\n5070\n\nInvalid/ SL 5082",
+      "timestamp": "2026-02-11T18:24:39.554878",
+      "executed": true
     }
   ]
 }
