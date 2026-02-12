@@ -1,174 +1,119 @@
 # 🤖 Copy Trading Gold Bot
 
-A sophisticated automated trading bot that monitors Telegram signals and executes trades on MetaTrader 5 with intelligent risk management.
+A high-performance trading bot that monitors Telegram signals and executes automated trades on MetaTrader 5 with intelligent risk management.
 
-## ✨ Features
+## ✨ Core Components
 
-- **📡 Real-time Telegram Integration**: Listens to trading signals from your Telegram channel
-- **💰 Intelligent Risk Management**: Automatic position sizing based on account equity and risk tolerance
-- **🛡️ Safety Kill-Switches**: Hard caps on loss percentage and monetary loss per trade
-- **🔄 Auto-Reconnect**: Automatically reconnects if Telegram connection drops
-- **📊 Beautiful Terminal UI**: Color-coded output with tables and panels for easy monitoring
-- **⚡ Retry Logic**: Intelligent retry mechanism for SL/TP modifications with broker rejections
-- **🔍 Position Tracking**: Maps Telegram message IDs to MT5 position tickets
-- **📈 Real-time Market Snapshots**: Displays bid/ask, market conditions, and position status
+### 🎯 Trading Bots
+- **`bot_zone.py`** - Zone-based signal trading bot (zone ranges from Telegram)
+- **`bot_v2.py`** - Signal-based trading bot (exact entry/TP/SL from Telegram)
+- **`my_bot.py`** - Minimal trading bot example
+- **`mt5_account_analysis.py`** - MT5 account and position analysis utility
 
-## 📋 Requirements
+### 📊 Trade Tracking & Analytics
+- **`bot_trade_logger.py`** - Core trade logging and P&L calculation engine
+- **`bot_trade_analyzer.py`** - CLI dashboard for viewing trade statistics
+- **`bot_trade_dashboard.py`** - Web dashboard with interactive charts
 
-- Python 3.8+
-- MetaTrader 5 terminal with AutoTrading enabled
-- Active Telegram channel for signal reception
-- Valid trading account with the MT5 broker
+### 🔧 Infrastructure
+- **`signal_queue.py`** - Persistent signal queue for reliable signal processing
+- **`session_manager.py`** - Telegram session management and security
+- **`reconnect_monitor.py`** - Auto-reconnect and connection monitoring
 
-## 🚀 Installation
+## 🚀 Quick Start
 
-1. **Clone or download this repository**
-
-2. **Install dependencies**:
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Configure your credentials** in `script.py`:
-```python
-api_id = YOUR_TELEGRAM_API_ID
-api_hash = "YOUR_TELEGRAM_API_HASH"
-CHANNEL = YOUR_CHANNEL_ID  # Get this using find_channel.py
+### 2. Run a Trading Bot
+```bash
+# Zone-based bot
+python src/bot_zone.py
+
+# Signal-based bot
+python src/bot_v2.py
 ```
 
-4. **Find your Telegram channel ID**:
+### 3. Monitor Trades
 ```bash
-python find_channel.py
+# CLI analytics
+python src/bot_trade_analyzer.py
+
+# Web dashboard
+python src/bot_trade_dashboard.py
+# Opens at http://localhost:8764
+```
+
+### 4. Analyze Account
+```bash
+python src/mt5_account_analysis.py
 ```
 
 ## ⚙️ Configuration
 
-Edit `script.py` to customize:
-
-### Risk Management
+Edit the bot file before running:
 ```python
-RISK_PCT = 0.10                 # Risk 10% of account per trade
-ASSUMED_SL_PRICE_DIST = 8.0     # Assume SL is $8 away (for sizing)
-MAX_LOT = 1.0                   # Hard cap on lot size
-HARD_MAX_LOSS_MONEY = 25.0      # Never risk more than $25 per trade
-HARD_MAX_LOSS_PCT = 0.15        # Never risk more than 15% of account
+# Telegram
+API_ID = "YOUR_API_ID"
+API_HASH = "YOUR_API_HASH"
+CHANNEL_ID = "YOUR_CHANNEL_ID"
+
+# Trading
+SYMBOL = "XAUUSD"
+RISK_PCT = 0.05  # 5% risk per trade
+MAGIC = 777      # Order magic number
 ```
 
-### Trading Parameters
-```python
-SYMBOL = "XAUUSD"              # Symbol to trade
-MAGIC = 777                     # Magic number for order identification
-DEVIATION = 20                  # Slippage tolerance
+## 📊 Trade Tracking
+
+The bot automatically logs all trades with:
+- Entry price, stop loss, take profit levels
+- Lot size and risk/reward ratio
+- Close price and reason (TP hit, SL hit, manual close)
+- Calculated P&L based on actual lot size
+
+**Key Formula**: `P&L = (price_difference × lot_size × 100)`
+
+View statistics anytime:
+```bash
+python src/bot_trade_analyzer.py
 ```
-
-### Logging & Debug
-```python
-DEBUG = True                    # Enable debug output
-DEBUG_SHOW_MARKET_SNAPSHOT = True
-DEBUG_SHOW_RISK_MATH = True
-DEBUG_SHOW_POSITION_STATE = True
-```
-
-## 🎯 How It Works
-
-### Signal Format
-The bot listens for messages in this format:
-
-```
-BUY NOW @ 2050.00
-TP 1 2055.50
-SL 2045.00
-```
-
-### Entry Execution
-1. Bot detects "BUY NOW" or "SELL NOW" in the message
-2. Calculates position size based on:
-   - Account equity/balance
-   - Risk percentage (default 10%)
-   - Assumed stop-loss distance
-   - Broker margin requirements
-3. Executes market order and tracks position ticket
-4. Waits for TP1 and SL in edited message
-
-### Stop Loss & Take Profit Update
-1. Bot detects message edit with TP1 and SL prices
-2. Validates prices against current market (sanity check)
-3. Clamps stops to broker minimum distance
-4. Retries modification if broker rejects (up to 45 seconds)
-5. Confirms successful update with terminal display
-
-## 📊 Terminal Output
-
-The bot displays rich, color-coded output:
-
-- 🎯 **Green**: Successful operations
-- 🔴 **Red**: Errors and failures  
-- 🟡 **Yellow**: Warnings and retries
-- 🔵 **Cyan**: Information and debug logs
-- 📊 **Tables**: Account info, positions, risk calculations
 
 ## 🛑 Safety Features
 
-- **Equity Check**: Uses current equity (not just balance) for risk sizing
-- **Symbol Mismatch Detection**: Refuses to set SL if too far from market
-- **Min Lot Check**: Skips trade if minimum lot exceeds hard caps
-- **Margin Verification**: Ensures sufficient margin before trading
-- **Multi-Position Warning**: Alerts if stacking multiple positions
-- **Duplicate Prevention**: Ignores duplicate signal edits
-
-## 🔧 Troubleshooting
-
-### "Trading is NOT allowed in MT5"
-✅ Enable AutoTrading in MetaTrader 5:
-   - Click "Tools" → "Options"
-   - Enable "Allow automated trading"
-
-### "Symbol not available after retries"
-✅ Ensure SYMBOL is correct and visible in MT5:
-   - Check symbol name matches exactly
-   - Symbol must be visible in Market Watch
-
-### "No tick data for symbol"
-✅ Market is closed or symbol not tradeable:
-   - Wait for market open
-   - Check trading hours for the symbol
-
-### Bot won't connect to Telegram
-✅ Verify credentials in script.py:
-   - Check API ID and API Hash
-   - Ensure session file isn't corrupted (delete `zinra_session.session`)
-
-## 📝 Example Telegram Message
-
-```
-🔱 Gold Trading Signal 🔱
-
-BUY NOW @ 2050.25
-
-Target: TP 1 2055.75
-Stop: SL 2045.00
-
-Risk:Reward = 1:2.2
-```
+- ✅ Automatic position sizing based on risk percentage
+- ✅ Hard caps on maximum loss per trade
+- ✅ Symbol and price validation
+- ✅ Margin verification before trading
+- ✅ Auto-reconnect on connection loss
+- ✅ Signal persistence (survives crashes)
 
 ## ⚠️ Disclaimer
 
-**This bot is for educational purposes.** Use at your own risk. 
+**Use at your own risk.** Test on a demo account first. 
 
-- Test on demo account first
-- Verify all settings before live trading
 - Monitor bot activity closely
 - Maintain adequate account capital
-- Trading involves risk of loss
+- Enable AutoTrading in MT5 before running bot
+- Trading involves risk of significant loss
 
-## 📄 License
+## 📝 Files Overview
 
-Private - Use only as authorized
-
-## 💬 Support
-
-For issues or questions, review the debug output in the terminal. Enable all DEBUG flags for detailed logging.
+| File | Purpose |
+|------|---------|
+| `bot_zone.py` | Main trading bot for zone-based signals |
+| `bot_v2.py` | Alternative bot for exact entry signals |
+| `my_bot.py` | Minimal example bot |
+| `bot_trade_logger.py` | Trade logging engine |
+| `bot_trade_analyzer.py` | CLI analytics |
+| `bot_trade_dashboard.py` | Web analytics with charts |
+| `mt5_account_analysis.py` | Account analysis utility |
+| `signal_queue.py` | Persistent signal storage |
+| `session_manager.py` | Telegram session manager |
+| `reconnect_monitor.py` | Connection monitoring |
 
 ---
 
-**Made with ❤️ for automated trading**
+**Made for automated trading 📈**
