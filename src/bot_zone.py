@@ -30,7 +30,7 @@ SESSION_FILE = "trading_bot_session"
 
 # Trading
 SYMBOL = "XAUUSD"
-MAGIC = 777
+MAGIC = 778
 RISK_PCT = 0.05  # 5% risk per trade
 FAILSAFE_SL_DISTANCE = 8.0  # price units away from entry
 
