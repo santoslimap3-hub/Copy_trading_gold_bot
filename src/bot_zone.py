@@ -69,6 +69,25 @@ session_manager: Optional[SessionManager] = None
 reconnect_monitor: Optional[ReconnectMonitor] = None
 trade_logger: Optional[BotTradeLogger] = None
 
+# ===================== HEALTH MONITORING =====================
+# Bot health metrics
+bot_start_time: float = 0
+messages_received: int = 0
+messages_processed: int = 0
+messages_ignored: int = 0
+trades_executed: int = 0
+trades_failed: int = 0
+mt5_connection_losses: int = 0
+telegram_connection_losses: int = 0
+last_message_time: float = 0
+last_telegram_activity: float = 0
+last_mt5_check: float = 0
+mt5_connected: bool = False
+telegram_connected: bool = False
+zone_monitor_alive: bool = False
+breakeven_monitor_alive: bool = False
+heartbeat_counter: int = 0
+
 # ===================== HELPERS =====================
 
 def log(msg: str, level: str = "INFO"):
@@ -81,7 +100,12 @@ def log(msg: str, level: str = "INFO"):
     # Only print if message priority >= current LOG_LEVEL priority
     if msg_priority >= current_priority:
         ts = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{ts}] [{level}] {msg}")
+        try:
+            print(f"[{ts}] [{level}] {msg}", flush=True)
+        except UnicodeEncodeError:
+            # Fallback: Remove emoji/unicode characters for Windows console
+            msg_ascii = msg.encode('ascii', 'ignore').decode('ascii')
+            print(f"[{ts}] [{level}] {msg_ascii}", flush=True)
 
 
 def get_error_message(retcode: int) -> str:
@@ -190,14 +214,19 @@ def check_autotrading_status():
 
 def ensure_mt5_connection():
     """Initialize MT5 if not connected"""
+    global mt5_connected, mt5_connection_losses
+    
     log("📡 Attempting MT5 initialization...", "DEBUG")
 
     if not mt5.initialize():
         log("❌ MT5 initialization FAILED", "ERROR")
         log(f"   Last error: {mt5.last_error()}", "ERROR")
+        mt5_connected = False
+        mt5_connection_losses += 1
         sys.exit(1)
 
     log("✅ MT5 initialized successfully", "INFO")
+    mt5_connected = True
 
     version = mt5.version()
     log(f"   MT5 Version: {version}", "DEBUG")
@@ -210,6 +239,50 @@ def ensure_mt5_connection():
         log("⚠️ Could not retrieve account info", "WARN")
 
     check_autotrading_status()
+
+
+def check_mt5_health() -> bool:
+    """Check if MT5 connection is still alive"""
+    global mt5_connected, mt5_connection_losses, last_mt5_check
+    
+    last_mt5_check = time.time()
+    
+    # Try to get tick data as health check
+    tick = mt5.symbol_info_tick(SYMBOL)
+    if tick is None:
+        log("⚠️ MT5 Health Check FAILED - No tick data", "WARN")
+        mt5_connected = False
+        mt5_connection_losses += 1
+        return False
+    
+    account = mt5.account_info()
+    if account is None:
+        log("⚠️ MT5 Health Check FAILED - No account info", "WARN")
+        mt5_connected = False
+        mt5_connection_losses += 1
+        return False
+    
+    mt5_connected = True
+    return True
+
+
+def recover_mt5_connection() -> bool:
+    """Attempt to recover MT5 connection"""
+    log("🔄 Attempting MT5 reconnection...", "WARN")
+    
+    try:
+        mt5.shutdown()
+        time.sleep(2)
+        
+        if mt5.initialize():
+            log("✅ MT5 reconnection successful", "INFO")
+            return True
+        else:
+            log("❌ MT5 reconnection failed", "ERROR")
+            return False
+    except Exception as e:
+        log(f"❌ MT5 reconnection exception: {e}", "ERROR")
+        return False
 
 
 def get_account_balance() -> float:
@@ -416,7 +489,16 @@ def close_position(ticket: int, close_reason: str = "SAFETY_EXIT") -> bool:
         log(f"✅ Position {ticket} CLOSED successfully", "INFO")
         # Log the trade close to trade_logger
         if trade_logger:
-            trade_logger.log_trade_close(ticket, close_price, close_reason, tp_hit="3")
+            try:
+                result_trade = trade_logger.log_trade_close(ticket, close_price, close_reason, tp_hit="3")
+                if result_trade:
+                    log(f"✅ Trade logged to bot_trades.json: Ticket {ticket} | P&L: ${result_trade['pnl']:.2f}", "INFO")
+                else:
+                    log(f"⚠️ Trade {ticket} was not found in bot_trades.json (may not have been logged on open)", "WARN")
+            except Exception as e:
+                log(f"❌ Error logging trade close to bot_trades.json: {e}", "ERROR")
+        else:
+            log(f"⚠️ trade_logger is None - cannot log close to bot_trades.json", "WARN")
     else:
         log(f"❌ Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
         log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
@@ -676,6 +758,8 @@ def extract_message_text(message) -> str:
 
 def log_signal_attempt(side: str, result: str, detail: str = ""):
     """Log a signal attempt for debugging"""
+    global trades_executed, trades_failed, messages_processed
+    
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
     entry = {
         "timestamp": ts,
@@ -685,6 +769,73 @@ def log_signal_attempt(side: str, result: str, detail: str = ""):
     }
     signal_log.append(entry)
     log(f"📋 Signal log: {side} | {result} | {detail}", "DEBUG")
+    
+    if result == "SUCCESS":
+        trades_executed += 1
+        messages_processed += 1
+    elif result == "FAILED":
+        trades_failed += 1
+        messages_processed += 1
+
+
+def get_bot_metrics() -> Dict:
+    """Get current bot health metrics"""
+    uptime_seconds = time.time() - bot_start_time if bot_start_time > 0 else 0
+    uptime_hours = uptime_seconds / 3600
+    
+    time_since_last_msg = time.time() - last_message_time if last_message_time > 0 else 0
+    
+    return {
+        "uptime_hours": uptime_hours,
+        "uptime_seconds": uptime_seconds,
+        "messages_received": messages_received,
+        "messages_processed": messages_processed,
+        "messages_ignored": messages_ignored,
+        "trades_executed": trades_executed,
+        "trades_failed": trades_failed,
+        "mt5_connection_losses": mt5_connection_losses,
+        "telegram_connection_losses": telegram_connection_losses,
+        "seconds_since_last_message": time_since_last_msg,
+        "mt5_connected": mt5_connected,
+        "telegram_connected": telegram_connected,
+        "zone_monitor_alive": zone_monitor_alive,
+        "breakeven_monitor_alive": breakeven_monitor_alive,
+        "active_positions": len(position_map),
+        "pending_zone": pending_zone is not None,
+    }
+
+
+def print_bot_status():
+    """Print comprehensive bot status"""
+    metrics = get_bot_metrics()
+    
+    log("=" * 70, "INFO")
+    log("📊 BOT HEALTH STATUS", "INFO")
+    log("=" * 70, "INFO")
+    log(f"⏱️  Uptime: {metrics['uptime_hours']:.2f} hours ({metrics['uptime_seconds']:.0f}s)", "INFO")
+    log(f"📨 Messages: Received={metrics['messages_received']} | Processed={metrics['messages_processed']} | Ignored={metrics['messages_ignored']}", "INFO")
+    log(f"📈 Trades: Executed={metrics['trades_executed']} | Failed={metrics['trades_failed']}", "INFO")
+    log(f"🔌 Connections: MT5={('✅' if metrics['mt5_connected'] else '❌')} | Telegram={('✅' if metrics['telegram_connected'] else '❌')}", "INFO")
+    log(f"🔄 Connection Losses: MT5={metrics['mt5_connection_losses']} | Telegram={metrics['telegram_connection_losses']}", "INFO")
+    log(f"🤖 Monitors: Zone={('✅' if metrics['zone_monitor_alive'] else '❌')} | Breakeven={('✅' if metrics['breakeven_monitor_alive'] else '❌')}", "INFO")
+    log(f"💼 Active Positions: {metrics['active_positions']}", "INFO")
+    
+    # Trade logging status
+    if trade_logger:
+        open_count = len(trade_logger.get_all_trades(status="OPEN"))
+        closed_count = len(trade_logger.get_all_trades(status="CLOSED"))
+        log(f"📝 Trade Log: {open_count} open | {closed_count} closed | ✅ Logging active", "INFO")
+    else:
+        log(f"📝 Trade Log: ⚠️ Logger not initialized", "WARN")
+    
+    log(f"🧭 Pending Zone: {('YES' if metrics['pending_zone'] else 'NO')}", "INFO")
+    
+    if last_message_time > 0:
+        log(f"📬 Last Message: {metrics['seconds_since_last_message']:.0f}s ago", "INFO")
+    else:
+        log(f"📬 Last Message: Never", "INFO")
+    
+    log("=" * 70, "INFO")
 
 
 # ===================== TELEGRAM HANDLERS =====================
@@ -692,6 +843,34 @@ def log_signal_attempt(side: str, result: str, detail: str = ""):
 def init_telegram():
     """Create Telegram client"""
     return TelegramClient(SESSION_FILE, API_ID, API_HASH)
+
+
+async def catch_up_messages(client, lookback_minutes: int = 5):
+    """Manually fetch recent messages from allowed channels to catch up on missed messages."""
+    try:
+        log(f"🔍 Catching up on messages from last {lookback_minutes} minutes...", "INFO")
+        cutoff_time = time.time() - (lookback_minutes * 60)
+        
+        for chat_id in ALLOWED_CHAT_IDS:
+            try:
+                # Fetch recent messages
+                messages = await client.get_messages(chat_id, limit=20)
+                caught_up = 0
+                
+                for msg in reversed(messages):  # Process oldest first
+                    if msg.date.timestamp() >= cutoff_time:
+                        # Check if we've already processed this message
+                        # (This is a simple check - you might want more sophisticated tracking)
+                        caught_up += 1
+                        log(f"   📥 Caught up message {msg.id} from {msg.date.strftime('%H:%M:%S')}", "DEBUG")
+                
+                if caught_up > 0:
+                    log(f"✅ Caught up {caught_up} message(s) from chat {chat_id}", "INFO")
+            except Exception as e:
+                log(f"⚠️ Failed to catch up messages from chat {chat_id}: {e}", "WARN")
+                
+    except Exception as e:
+        log(f"⚠️ Error during message catch-up: {e}", "WARN")
 
 
 def set_pending_zone(side: str, zone_low: float, zone_high: float, targets: List[float], sl: Optional[float], msg_id: int, msg_text: str):
@@ -789,15 +968,23 @@ def execute_zone_trade(side: str, entry_price: float, msg_id: int, msg_text: str
 
         # Log trade open to trade_logger
         if trade_logger:
-            trade_logger.log_trade_open(
-                ticket=ticket,
-                side=side,
-                entry_price=entry_price,
-                stop_loss=chosen_sl,
-                targets=targets,
-                lot_size=lot,
-                message_id=msg_id
-            )
+            try:
+                trade_logger.log_trade_open(
+                    ticket=ticket,
+                    side=side,
+                    entry_price=entry_price,
+                    stop_loss=chosen_sl,
+                    targets=targets,
+                    lot_size=lot,
+                    message_id=msg_id
+                )
+                log(f"✅ Trade logged to bot_trades.json: Ticket {ticket} (OPEN)", "INFO")
+            except Exception as e:
+                log(f"❌ Error logging trade open to bot_trades.json: {e}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+        else:
+            log(f"⚠️ trade_logger is None - cannot log open to bot_trades.json", "WARN")
 
         signal_queue.add_signal(
             signal_type="ZONE",
@@ -902,11 +1089,85 @@ async def replay_pending_signals(client):
     log("=" * 70, "INFO")
 
 
+async def heartbeat_monitor():
+    """Regular heartbeat to prove bot is alive - runs every 60 seconds"""
+    global heartbeat_counter
+    
+    log("💓 Heartbeat monitor started", "INFO")
+    
+    while True:
+        try:
+            await asyncio.sleep(60)  # Every minute
+            
+            heartbeat_counter += 1
+            metrics = get_bot_metrics()
+            
+            log("=" * 70, "INFO")
+            log(f"💓 HEARTBEAT #{heartbeat_counter} - BOT ALIVE", "INFO")
+            log(f"⏱️  Uptime: {metrics['uptime_hours']:.2f}h | Msgs: {metrics['messages_received']} | Trades: {metrics['trades_executed']}", "INFO")
+            log(f"🔌 MT5: {('✅' if metrics['mt5_connected'] else '❌')} | Telegram: {('✅' if metrics['telegram_connected'] else '❌')}", "INFO")
+            log("=" * 70, "INFO")
+            
+        except Exception as e:
+            log(f"❌ CRITICAL: Heartbeat monitor exception: {str(e)}", "ERROR")
+            import traceback
+            log(f"   {traceback.format_exc()}", "ERROR")
+            await asyncio.sleep(10)  # Wait before retry
+
+
+async def connection_health_monitor():
+    """Monitor MT5 and Telegram connection health - runs every 30 seconds"""
+    global mt5_connected, telegram_connected
+    
+    log("🏥 Connection health monitor started", "INFO")
+    
+    while True:
+        try:
+            await asyncio.sleep(30)  # Every 30 seconds
+            
+            log("🔍 Running connection health checks...", "DEBUG")
+            
+            # Check MT5 connection
+            mt5_healthy = check_mt5_health()
+            if not mt5_healthy:
+                log("🚨 MT5 connection unhealthy - attempting recovery", "WARN")
+                if recover_mt5_connection():
+                    log("✅ MT5 connection recovered", "INFO")
+                    mt5_connected = True
+                else:
+                    log("❌ MT5 connection recovery failed", "ERROR")
+                    mt5_connected = False
+            else:
+                log("✅ MT5 connection healthy", "DEBUG")
+            
+            # Update Telegram activity timestamp (updated by message handlers)
+            # If no activity for > 5 minutes during active trading hours, log warning
+            if last_telegram_activity > 0:
+                time_since_telegram = time.time() - last_telegram_activity
+                if time_since_telegram > 300:  # 5 minutes (reduced from 10)
+                    log(f"⚠️ No Telegram activity for {time_since_telegram:.0f}s - connection may have delays", "WARN")
+                    telegram_connected = False
+                else:
+                    telegram_connected = True
+                    
+                # Log activity status every check
+                if time_since_telegram < 120:  # Recent activity (< 2 min)
+                    log(f"✅ Telegram active ({time_since_telegram:.0f}s since last message)", "DEBUG")
+            
+        except Exception as e:
+            log(f"❌ CRITICAL: Health monitor exception: {str(e)}", "ERROR")
+            import traceback
+            log(f"   {traceback.format_exc()}", "ERROR")
+            await asyncio.sleep(10)  # Wait before retry
+
+
 async def cleanup_and_report():
     """Periodic cleanup and reporting of system health."""
     while True:
         try:
-            await asyncio.sleep(300)
+            await asyncio.sleep(300)  # Every 5 minutes
+            
+            log("🧹 Running periodic cleanup...", "DEBUG")
 
             if signal_queue:
                 signal_queue.remove_old_signals(days=7)
@@ -920,18 +1181,161 @@ async def cleanup_and_report():
                 reconnect_monitor.reset_window()
                 if reconnect_monitor.get_stats()['total_reconnects'] > 0:
                     reconnect_monitor.print_summary()
+            
+            # Print full status report
+            print_bot_status()
 
         except Exception as e:
-            log(f"⚠️ Exception in cleanup_and_report: {e}", "ERROR")
+            log(f"❌ CRITICAL: Cleanup exception: {str(e)}", "ERROR")
+            import traceback
+            log(f"   {traceback.format_exc()}", "ERROR")
+            await asyncio.sleep(10)  # Wait before retry
+
+
+async def monitor_closed_positions():
+    """Monitor for positions that closed naturally and log them to trade logger"""
+    global trades_executed, trades_failed
+    
+    log("📊 Closed position monitor started", "INFO")
+    
+    while True:
+        try:
+            await asyncio.sleep(5)  # Check every 5 seconds
+            
+            if not trade_logger:
+                continue
+            
+            # Get all open trades from our logger
+            open_trades = trade_logger.get_all_trades(status="OPEN")
+            if not open_trades:
+                continue
+            
+            # Check which ones are still actually open in MT5
+            current_positions = mt5.positions_get(symbol=SYMBOL)
+            current_tickets = set()
+            if current_positions:
+                current_tickets = {int(p.ticket) for p in current_positions if p.magic == MAGIC}
+            
+            # Find trades that are marked OPEN but no longer in MT5
+            for trade in open_trades:
+                ticket = trade["ticket"]
+                
+                if ticket in current_tickets:
+                    continue  # Still open, skip
+                
+                # Position closed! Need to get info from history and log it
+                log(f"🔍 Detected closed position: Ticket {ticket}", "INFO")
+                
+                # Query MT5 history for this ticket
+                from_date = time.time() - (86400 * 7)  # Last 7 days
+                history_deals = mt5.history_deals_get(position=ticket)
+                
+                if not history_deals:
+                    log(f"⚠️ No history found for ticket {ticket} - may be too old", "WARN")
+                    continue
+                
+                # Find the closing deal (last deal for this position)
+                closing_deal = None
+                for deal in reversed(history_deals):
+                    if deal.entry == 1:  # 1 = OUT (closing deal)
+                        closing_deal = deal
+                        break
+                
+                if not closing_deal:
+                    log(f"⚠️ No closing deal found for ticket {ticket}", "WARN")
+                    continue
+                
+                close_price = float(closing_deal.price)
+                close_time = closing_deal.time
+                profit = float(closing_deal.profit)
+                
+                # Determine close reason based on comment and profit
+                comment = closing_deal.comment if hasattr(closing_deal, 'comment') else ""
+                
+                if "tp" in comment.lower():
+                    close_reason = "TP_HIT"
+                    tp_hit = "3"  # Default to TP3 if not specified
+                    
+                    # Try to extract TP number from comment or from our TP levels
+                    if ticket in tp_levels:
+                        tps = tp_levels[ticket]
+                        for tp_num, tp_price in tps.items():
+                            if abs(close_price - tp_price) < 0.5:  # Within 50 pips
+                                tp_hit = str(tp_num)
+                                break
+                elif "sl" in comment.lower() or profit < 0:
+                    close_reason = "SL_HIT"
+                    tp_hit = None
+                elif "manual" in comment.lower() or "user" in comment.lower():
+                    close_reason = "MANUAL_CLOSE"
+                    tp_hit = None
+                else:
+                    close_reason = "UNKNOWN"
+                    tp_hit = None
+                
+                log(f"   Close Price: ${close_price:.5f} | Reason: {close_reason} | P&L: ${profit:.2f}", "INFO")
+                
+                # Log to trade logger
+                result = trade_logger.log_trade_close(
+                    ticket=ticket,
+                    close_price=close_price,
+                    close_reason=close_reason,
+                    tp_hit=tp_hit
+                )
+                
+                if result:
+                    log(f"✅ Logged closed position: Ticket {ticket} | P&L: ${result['pnl']:.2f}", "INFO")
+                    trades_executed += 1
+                    
+                    # Clean up tracking dictionaries
+                    for msg_id, t in list(position_map.items()):
+                        if t == ticket:
+                            del position_map[msg_id]
+                            break
+                    
+                    if ticket in tp_levels:
+                        del tp_levels[ticket]
+                    if ticket in entry_prices:
+                        del entry_prices[ticket]
+                    if ticket in failsafe_tp3:
+                        del failsafe_tp3[ticket]
+                    if ticket in breakeven_activated:
+                        del breakeven_activated[ticket]
+                else:
+                    log(f"❌ Failed to log closed position: Ticket {ticket}", "ERROR")
+                    trades_failed += 1
+                
+        except Exception as e:
+            log(f"❌ CRITICAL: Closed position monitor exception: {str(e)}", "ERROR")
+            import traceback
+            log(f"   {traceback.format_exc()}", "ERROR")
+            await asyncio.sleep(10)
 
 
 async def monitor_pending_zone():
     """Continuously watch for price entering a pending zone."""
+    global zone_monitor_alive
+    
     log("🔄 Zone monitor started", "INFO")
+    zone_monitor_alive = True
     ZONE_TIMEOUT = 600  # 10 minutes - clear old zones
+    
+    check_count = 0
+    
     while True:
         try:
+            zone_monitor_alive = True
             await asyncio.sleep(2)
+            
+            check_count += 1
+            
+            # Log periodic status
+            if check_count % 30 == 0:  # Every 60 seconds
+                if pending_zone and not pending_zone.get("executed"):
+                    age = time.time() - pending_zone.get("created_at", time.time())
+                    log(f"🧭 Zone monitor check #{check_count}: Active zone (age: {age:.0f}s)", "DEBUG")
+                else:
+                    log(f"🧭 Zone monitor check #{check_count}: No pending zone", "DEBUG")
             
             # Check if zone has expired
             if pending_zone and not pending_zone.get("executed"):
@@ -942,13 +1346,22 @@ async def monitor_pending_zone():
                     continue
             
             try_execute_pending_zone()
+            
         except Exception as e:
-            log(f"⚠️ Exception in monitor_pending_zone: {str(e)}", "ERROR")
+            log(f"❌ CRITICAL: Zone monitor exception: {str(e)}", "ERROR")
+            import traceback
+            log(f"   {traceback.format_exc()}", "ERROR")
+            zone_monitor_alive = False
+            await asyncio.sleep(10)  # Wait before retry
 
 
 async def main():
-    global signal_queue, session_manager, reconnect_monitor, trade_logger
+    global signal_queue, session_manager, reconnect_monitor, trade_logger, bot_start_time, telegram_connected, last_telegram_activity
 
+    # Record bot start time
+    bot_start_time = time.time()
+    start_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    
     signal_queue = SignalQueue("signal_queue.json")
     session_manager = SessionManager("trading_bot_session", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
@@ -961,33 +1374,62 @@ async def main():
     log("=" * 70, "INFO")
     log("🚀 BOT INITIALIZATION COMPLETE", "INFO")
     log("=" * 70, "INFO")
+    log(f"⏰ Bot start time: {start_timestamp}", "INFO")
     log(f"📱 Main channel ID: {CHANNEL_ID}", "INFO")
     log(f"📱 Test channel ID: {TEST_CHANNEL_ID}", "INFO")
     log(f"💎 Trading symbol: {SYMBOL}", "INFO")
     log(f"💰 Risk per trade: {RISK_PCT*100:.1f}%", "INFO")
     log(f"🛡️ Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.2f}", "INFO")
     log(f"📊 Magic number: {MAGIC}", "INFO")
+    log(f"📊 Log level: {LOG_LEVEL}", "INFO")
     log("=" * 70, "INFO")
 
-    @client.on(events.NewMessage())
+    @client.on(events.NewMessage(chats=list(ALLOWED_CHAT_IDS)))
     async def on_new_message(event):
         """Handle new Telegram messages from main or test channel"""
-        global pending_zone
+        global pending_zone, messages_received, messages_ignored, last_message_time, last_telegram_activity
+        
         try:
+            # Update activity timestamp
+            last_telegram_activity = time.time()
+            
             if DEBUG_LOG_ALL_MESSAGES:
                 chat = await event.get_chat()
                 chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
                 preview = extract_message_text(event.message).strip()[:80]
                 log(f"📥 [RAW] chat_id={event.chat_id} | {chat_title} | {preview}", "DEBUG")
 
+            # Track total messages received
+            messages_received += 1
+            
             if event.chat_id not in ALLOWED_CHAT_IDS:
+                messages_ignored += 1
+                log(f"⏭️  Message ignored - chat_id {event.chat_id} not in allowed list", "DEBUG")
                 return
+            
+            # Update last message time for tracked channels
+            last_message_time = time.time()
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
+            
+            # Calculate delivery delay
+            msg_timestamp = event.message.date.timestamp()
+            delivery_delay = time.time() - msg_timestamp
+            delay_warning = ""
+            if delivery_delay > 10:  # More than 10 seconds delay
+                delay_warning = f" ⚠️ DELAYED: {delivery_delay:.0f}s"
 
-            log(f"📨 {channel_name} New message (ID: {msg_id}): {text[:80]}", "INFO")
+            log("=" * 70, "INFO")
+            log(f"📨 {channel_name} NEW MESSAGE RECEIVED{delay_warning}", "INFO")
+            log(f"   Message ID: {msg_id}", "INFO")
+            log(f"   Chat ID: {event.chat_id}", "INFO")
+            log(f"   Length: {len(text)} chars", "INFO")
+            if delivery_delay > 10:
+                log(f"   ⏰ Sent: {event.message.date.strftime('%H:%M:%S')} | Received: {time.strftime('%H:%M:%S')} (Δ{delivery_delay:.0f}s)", "WARN")
+            log(f"   Preview: {text[:150]}", "INFO")
+            log("=" * 70, "INFO")
 
             if is_tp3_hit_message(text):
                 log("=" * 70, "INFO")
@@ -1019,12 +1461,17 @@ async def main():
 
             side = parse_zone_side(text)
             zone_range = parse_zone_range(text)
+            
+            log(f"🔍 Parsing: side={'(' + side + ')' if side else 'None'} | zone_range={zone_range}", "DEBUG")
+            
             if side and zone_range:
                 zone_low, zone_high = zone_range
                 targets = parse_targets(text)
                 sl_price = parse_invalid_sl(text)
 
                 log(f"🎯 ZONE DETECTED: {side} {zone_low:.2f}-{zone_high:.2f}", "INFO")
+                log(f"   Targets: {targets}", "DEBUG")
+                log(f"   SL: {sl_price}", "DEBUG")
                 log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id}")
 
                 set_pending_zone(
@@ -1043,6 +1490,7 @@ async def main():
             if side and not zone_range:
                 # Immediate execution: "Buy zone now" or "Sell zone now" without a specific range
                 log(f"⚡ IMMEDIATE ZONE ENTRY: {side} zone (no range specified)", "INFO")
+                log(f"   Message: {text[:100]}", "DEBUG")
                 log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id} - IMMEDIATE ENTRY")
 
                 current_price = get_market_price(side)
@@ -1062,6 +1510,7 @@ async def main():
 
             if is_active_message(text):
                 log("🟡 Zone marked active", "INFO")
+                log(f"   Message: {text[:100]}", "DEBUG")
                 try_execute_pending_zone()
                 return
 
@@ -1081,39 +1530,60 @@ async def main():
 
             targets = parse_targets(text)
             if targets:
+                log(f"📊 Found {len(targets)} target(s) in message: {targets}", "DEBUG")
                 positions = mt5.positions_get(symbol=SYMBOL)
                 if not positions:
                     log("⚠️ No open positions to update - ignoring targets", "WARN")
                     return
 
                 ticket = int(positions[-1].ticket)
-                log(f"📊 Found {len(targets)} target(s) in new message: {targets}", "DEBUG")
+                log(f"   Applying to ticket: {ticket}", "DEBUG")
                 apply_targets_to_ticket(ticket, targets)
+                return
+            
+            # If we got here, message wasn't recognized as any signal type
+            log(f"⏭️  Message not recognized as signal - ignoring", "DEBUG")
+            log(f"   Checks: TP3_HIT={is_tp3_hit_message(text)} | CANCEL={is_cancel_message(text)} | SIDE={side} | ACTIVE={is_active_message(text)}", "DEBUG")
+            messages_ignored += 1
 
         except Exception as e:
-            log(f"❌ EXCEPTION in on_new_message: {str(e)}", "ERROR")
+            log(f"❌ CRITICAL EXCEPTION in on_new_message: {str(e)}", "ERROR")
             import traceback
             log(f"   {traceback.format_exc()}", "ERROR")
+            log(f"   Message ID: {msg_id if 'msg_id' in locals() else 'unknown'}", "ERROR")
+            log(f"   Message text: {text[:200] if 'text' in locals() else 'unknown'}", "ERROR")
 
     @client.on(events.MessageEdited())
     async def on_edit(event):
         """Handle edited messages from main or test channel"""
-        global pending_zone
+        global pending_zone, messages_received, messages_ignored, last_telegram_activity
+        
         try:
+            # Update activity timestamp
+            last_telegram_activity = time.time()
+            
             if DEBUG_LOG_ALL_MESSAGES:
                 chat = await event.get_chat()
                 chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
                 preview = extract_message_text(event.message).strip()[:80]
                 log(f"📝 [RAW EDIT] chat_id={event.chat_id} | {chat_title} | {preview}", "DEBUG")
 
+            messages_received += 1
+            
             if event.chat_id not in ALLOWED_CHAT_IDS:
+                messages_ignored += 1
+                log(f"⏭️  Edit ignored - chat_id {event.chat_id} not in allowed list", "DEBUG")
                 return
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
-            log(f"📝 {channel_name} Edited message (ID: {msg_id}): {text[:80]}", "INFO")
+            log("=" * 70, "INFO")
+            log(f"📝 {channel_name} MESSAGE EDITED", "INFO")
+            log(f"   Message ID: {msg_id}", "INFO")
+            log(f"   Preview: {text[:150]}", "INFO")
+            log("=" * 70, "INFO")
 
             if is_tp3_hit_message(text):
                 log("=" * 70, "INFO")
@@ -1182,28 +1652,33 @@ async def main():
                 apply_targets_to_ticket(ticket, targets)
 
         except Exception as e:
-            log(f"❌ EXCEPTION in on_edit: {str(e)}", "ERROR")
+            log(f"❌ CRITICAL EXCEPTION in on_edit: {str(e)}", "ERROR")
             import traceback
             log(f"   {traceback.format_exc()}", "ERROR")
+            log(f"   Message ID: {msg_id if 'msg_id' in locals() else 'unknown'}", "ERROR")
 
     async def monitor_breakeven():
         """Check if TP1 has been hit and move SL to breakeven"""
+        global breakeven_monitor_alive
+        
         log("🔄 Breakeven monitor started", "INFO")
+        breakeven_monitor_alive = True
         check_count = 0
 
         while True:
             try:
+                breakeven_monitor_alive = True
                 check_count += 1
 
                 positions = mt5.positions_get(symbol=SYMBOL)
 
                 if not positions:
-                    if check_count % 10 == 0:
-                        log(f"⏳ Monitor check #{check_count}: No open positions", "DEBUG")
+                    if check_count % 30 == 0:  # Every 60 seconds
+                        log(f"⏳ Breakeven monitor check #{check_count}: No open positions", "DEBUG")
                     await asyncio.sleep(2)
                     continue
 
-                log(f"🔍 Monitor check #{check_count}: Checking {len(positions)} position(s)", "DEBUG")
+                log(f"🔍 Breakeven monitor check #{check_count}: Checking {len(positions)} position(s)", "DEBUG")
 
                 for pos in positions:
                     ticket = int(pos.ticket)
@@ -1252,16 +1727,18 @@ async def main():
                 await asyncio.sleep(2)
 
             except Exception as e:
-                log(f"⚠️ Exception in monitor_breakeven: {str(e)}", "ERROR")
+                log(f"❌ CRITICAL: Breakeven monitor exception: {str(e)}", "ERROR")
                 import traceback
                 log(f"   {traceback.format_exc()}", "ERROR")
-                await asyncio.sleep(2)
+                breakeven_monitor_alive = False
+                await asyncio.sleep(10)  # Wait longer before retry
 
     async def print_signal_log():
-        """Print signal log every 30 seconds for debugging"""
+        """Print signal log every 5 minutes for debugging"""
         while True:
             try:
-                await asyncio.sleep(30)
+                await asyncio.sleep(300)  # Every 5 minutes
+                
                 if signal_log:
                     log("=" * 70, "INFO")
                     log("📋 SIGNAL LOG (Last 10 attempts)", "INFO")
@@ -1269,31 +1746,50 @@ async def main():
                     for entry in signal_log[-10:]:
                         msg = f"  {entry['timestamp']} | {entry['signal']:4s} | {entry['result']:10s} | {entry['detail']}"
                         log(msg, "INFO")
+                    log("=" * 70, "INFO")
+                else:
+                    log("📋 Signal log empty - no signals received yet", "DEBUG")
+                    
             except Exception as e:
-                log(f"⚠️ Exception in print_signal_log: {str(e)}", "ERROR")
+                log(f"❌ CRITICAL: Signal log printer exception: {str(e)}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+                await asyncio.sleep(10)  # Wait before retry
 
-    log("🔄 Starting breakeven monitor background task...", "INFO")
+    log("🔄 Starting background monitoring tasks...", "INFO")
+    
+    asyncio.create_task(heartbeat_monitor())
+    log("✅ Heartbeat monitor task created", "INFO")
+    
+    asyncio.create_task(connection_health_monitor())
+    log("✅ Connection health monitor task created", "INFO")
+    
     asyncio.create_task(monitor_breakeven())
-    log("✅ Breakeven monitor background task created", "INFO")
+    log("✅ Breakeven monitor task created", "INFO")
 
-    log("🔄 Starting zone monitor background task...", "INFO")
     asyncio.create_task(monitor_pending_zone())
-    log("✅ Zone monitor background task created", "INFO")
+    log("✅ Zone monitor task created", "INFO")
+    
+    asyncio.create_task(monitor_closed_positions())
+    log("✅ Closed position monitor task created", "INFO")
 
-    log("🔄 Starting signal log printer background task...", "INFO")
     asyncio.create_task(print_signal_log())
-    log("✅ Signal log printer background task created", "INFO")
+    log("✅ Signal log printer task created", "INFO")
 
-    log("🔄 Starting cleanup and reporting background task...", "INFO")
     asyncio.create_task(cleanup_and_report())
-    log("✅ Cleanup and reporting background task created", "INFO")
+    log("✅ Cleanup and reporting task created", "INFO")
 
     log("📡 Connecting to Telegram...", "INFO")
     await client.start()
+    telegram_connected = True
+    last_telegram_activity = time.time()
     log("✅ Telegram connected!", "INFO")
     log("=" * 70, "INFO")
     log("🎯 BOT READY - LISTENING FOR ZONES", "INFO")
     log("=" * 70, "INFO")
+    
+    # Print initial status
+    print_bot_status()
 
     await replay_pending_signals(client)
 
@@ -1306,6 +1802,9 @@ async def main():
                 log("⏹️ Keyboard interrupt received - shutting down", "INFO")
                 break
             except TypeNotFoundError as e:
+                telegram_connected = False
+                telegram_connection_losses += 1
+                
                 log("⚠️ Telethon TypeNotFoundError - unknown TLObject received. Attempting reconnect...", "ERROR")
                 log(f"   {str(e)}", "DEBUG")
                 import traceback
@@ -1328,16 +1827,23 @@ async def main():
 
                 try:
                     await client.start()
+                    telegram_connected = True
+                    last_telegram_activity = time.time()
                     log("✅ Telegram client restarted after TypeNotFoundError", "INFO")
+                    # Catch up on any missed messages during disconnection
+                    await catch_up_messages(client, lookback_minutes=3)
                 except Exception as ex2:
+                    telegram_connected = False
                     log(f"❌ Failed to restart Telegram client: {ex2}", "ERROR")
                     await asyncio.sleep(5)
                 continue
             except Exception as e:
-                log(f"❌ Unexpected error in main loop: {str(e)}", "ERROR")
+                log(f"❌ CRITICAL: Unexpected error in main loop: {str(e)}", "ERROR")
                 import traceback
                 log(f"   {traceback.format_exc()}", "ERROR")
-                break
+                log("🔄 Bot will attempt to continue...", "WARN")
+                await asyncio.sleep(10)
+                continue
     finally:
         log("🛑 Bot shutting down...", "INFO")
         mt5.shutdown()
