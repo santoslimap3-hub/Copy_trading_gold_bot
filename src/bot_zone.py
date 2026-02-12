@@ -5,6 +5,7 @@ Uses the same execution strategy as bot_v2.py, adapted for zone-style messages.
 """
 
 import asyncio
+import os
 import re
 import sys
 import time
@@ -951,7 +952,8 @@ async def main():
     signal_queue = SignalQueue("signal_queue.json")
     session_manager = SessionManager("trading_bot_session", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
-    trade_logger = BotTradeLogger("src/bot_trades.json")
+    trades_path = os.path.join(os.path.dirname(__file__), "bot_trades.json")
+    trade_logger = BotTradeLogger(trades_path)
 
     client = init_telegram()
     ensure_mt5_connection()
