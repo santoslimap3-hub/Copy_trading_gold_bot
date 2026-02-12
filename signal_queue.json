@@ -51,6 +51,18 @@
       "msg_text": "Buy zone now \n\n\nLarger zone\n\n5062-5055\n\nTargets \n5064\n5066\n\nInvalid / SL 5054",
       "timestamp": "2026-02-12T18:33:31.218561",
       "executed": true
+    },
+    {
+      "id": 5926,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5052.54,
+      "sl_price": 5044.54,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "High Risk Buy Zone now",
+      "timestamp": "2026-02-12T20:54:13.143829",
+      "executed": true
     }
   ]
 }
