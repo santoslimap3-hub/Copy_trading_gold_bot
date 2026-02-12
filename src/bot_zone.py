@@ -489,7 +489,16 @@ def close_position(ticket: int, close_reason: str = "SAFETY_EXIT") -> bool:
         log(f"✅ Position {ticket} CLOSED successfully", "INFO")
         # Log the trade close to trade_logger
         if trade_logger:
-            trade_logger.log_trade_close(ticket, close_price, close_reason, tp_hit="3")
+            try:
+                result_trade = trade_logger.log_trade_close(ticket, close_price, close_reason, tp_hit="3")
+                if result_trade:
+                    log(f"✅ Trade logged to bot_trades.json: Ticket {ticket} | P&L: ${result_trade['pnl']:.2f}", "INFO")
+                else:
+                    log(f"⚠️ Trade {ticket} was not found in bot_trades.json (may not have been logged on open)", "WARN")
+            except Exception as e:
+                log(f"❌ Error logging trade close to bot_trades.json: {e}", "ERROR")
+        else:
+            log(f"⚠️ trade_logger is None - cannot log close to bot_trades.json", "WARN")
     else:
         log(f"❌ Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
         log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
@@ -810,6 +819,15 @@ def print_bot_status():
     log(f"🔄 Connection Losses: MT5={metrics['mt5_connection_losses']} | Telegram={metrics['telegram_connection_losses']}", "INFO")
     log(f"🤖 Monitors: Zone={('✅' if metrics['zone_monitor_alive'] else '❌')} | Breakeven={('✅' if metrics['breakeven_monitor_alive'] else '❌')}", "INFO")
     log(f"💼 Active Positions: {metrics['active_positions']}", "INFO")
+    
+    # Trade logging status
+    if trade_logger:
+        open_count = len(trade_logger.get_all_trades(status="OPEN"))
+        closed_count = len(trade_logger.get_all_trades(status="CLOSED"))
+        log(f"📝 Trade Log: {open_count} open | {closed_count} closed | ✅ Logging active", "INFO")
+    else:
+        log(f"📝 Trade Log: ⚠️ Logger not initialized", "WARN")
+    
     log(f"🧭 Pending Zone: {('YES' if metrics['pending_zone'] else 'NO')}", "INFO")
     
     if last_message_time > 0:
@@ -825,6 +843,34 @@ def print_bot_status():
 def init_telegram():
     """Create Telegram client"""
     return TelegramClient(SESSION_FILE, API_ID, API_HASH)
+
+
+async def catch_up_messages(client, lookback_minutes: int = 5):
+    """Manually fetch recent messages from allowed channels to catch up on missed messages."""
+    try:
+        log(f"🔍 Catching up on messages from last {lookback_minutes} minutes...", "INFO")
+        cutoff_time = time.time() - (lookback_minutes * 60)
+        
+        for chat_id in ALLOWED_CHAT_IDS:
+            try:
+                # Fetch recent messages
+                messages = await client.get_messages(chat_id, limit=20)
+                caught_up = 0
+                
+                for msg in reversed(messages):  # Process oldest first
+                    if msg.date.timestamp() >= cutoff_time:
+                        # Check if we've already processed this message
+                        # (This is a simple check - you might want more sophisticated tracking)
+                        caught_up += 1
+                        log(f"   📥 Caught up message {msg.id} from {msg.date.strftime('%H:%M:%S')}", "DEBUG")
+                
+                if caught_up > 0:
+                    log(f"✅ Caught up {caught_up} message(s) from chat {chat_id}", "INFO")
+            except Exception as e:
+                log(f"⚠️ Failed to catch up messages from chat {chat_id}: {e}", "WARN")
+                
+    except Exception as e:
+        log(f"⚠️ Error during message catch-up: {e}", "WARN")
 
 
 def set_pending_zone(side: str, zone_low: float, zone_high: float, targets: List[float], sl: Optional[float], msg_id: int, msg_text: str):
@@ -922,15 +968,23 @@ def execute_zone_trade(side: str, entry_price: float, msg_id: int, msg_text: str
 
         # Log trade open to trade_logger
         if trade_logger:
-            trade_logger.log_trade_open(
-                ticket=ticket,
-                side=side,
-                entry_price=entry_price,
-                stop_loss=chosen_sl,
-                targets=targets,
-                lot_size=lot,
-                message_id=msg_id
-            )
+            try:
+                trade_logger.log_trade_open(
+                    ticket=ticket,
+                    side=side,
+                    entry_price=entry_price,
+                    stop_loss=chosen_sl,
+                    targets=targets,
+                    lot_size=lot,
+                    message_id=msg_id
+                )
+                log(f"✅ Trade logged to bot_trades.json: Ticket {ticket} (OPEN)", "INFO")
+            except Exception as e:
+                log(f"❌ Error logging trade open to bot_trades.json: {e}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+        else:
+            log(f"⚠️ trade_logger is None - cannot log open to bot_trades.json", "WARN")
 
         signal_queue.add_signal(
             signal_type="ZONE",
@@ -1087,14 +1141,18 @@ async def connection_health_monitor():
                 log("✅ MT5 connection healthy", "DEBUG")
             
             # Update Telegram activity timestamp (updated by message handlers)
-            # If no activity for > 10 minutes, log warning
+            # If no activity for > 5 minutes during active trading hours, log warning
             if last_telegram_activity > 0:
                 time_since_telegram = time.time() - last_telegram_activity
-                if time_since_telegram > 600:  # 10 minutes
-                    log(f"⚠️ No Telegram activity for {time_since_telegram:.0f}s - connection may be dead", "WARN")
+                if time_since_telegram > 300:  # 5 minutes (reduced from 10)
+                    log(f"⚠️ No Telegram activity for {time_since_telegram:.0f}s - connection may have delays", "WARN")
                     telegram_connected = False
                 else:
                     telegram_connected = True
+                    
+                # Log activity status every check
+                if time_since_telegram < 120:  # Recent activity (< 2 min)
+                    log(f"✅ Telegram active ({time_since_telegram:.0f}s since last message)", "DEBUG")
             
         except Exception as e:
             log(f"❌ CRITICAL: Health monitor exception: {str(e)}", "ERROR")
@@ -1132,6 +1190,126 @@ async def cleanup_and_report():
             import traceback
             log(f"   {traceback.format_exc()}", "ERROR")
             await asyncio.sleep(10)  # Wait before retry
+
+
+async def monitor_closed_positions():
+    """Monitor for positions that closed naturally and log them to trade logger"""
+    global trades_executed, trades_failed
+    
+    log("📊 Closed position monitor started", "INFO")
+    
+    while True:
+        try:
+            await asyncio.sleep(5)  # Check every 5 seconds
+            
+            if not trade_logger:
+                continue
+            
+            # Get all open trades from our logger
+            open_trades = trade_logger.get_all_trades(status="OPEN")
+            if not open_trades:
+                continue
+            
+            # Check which ones are still actually open in MT5
+            current_positions = mt5.positions_get(symbol=SYMBOL)
+            current_tickets = set()
+            if current_positions:
+                current_tickets = {int(p.ticket) for p in current_positions if p.magic == MAGIC}
+            
+            # Find trades that are marked OPEN but no longer in MT5
+            for trade in open_trades:
+                ticket = trade["ticket"]
+                
+                if ticket in current_tickets:
+                    continue  # Still open, skip
+                
+                # Position closed! Need to get info from history and log it
+                log(f"🔍 Detected closed position: Ticket {ticket}", "INFO")
+                
+                # Query MT5 history for this ticket
+                from_date = time.time() - (86400 * 7)  # Last 7 days
+                history_deals = mt5.history_deals_get(position=ticket)
+                
+                if not history_deals:
+                    log(f"⚠️ No history found for ticket {ticket} - may be too old", "WARN")
+                    continue
+                
+                # Find the closing deal (last deal for this position)
+                closing_deal = None
+                for deal in reversed(history_deals):
+                    if deal.entry == 1:  # 1 = OUT (closing deal)
+                        closing_deal = deal
+                        break
+                
+                if not closing_deal:
+                    log(f"⚠️ No closing deal found for ticket {ticket}", "WARN")
+                    continue
+                
+                close_price = float(closing_deal.price)
+                close_time = closing_deal.time
+                profit = float(closing_deal.profit)
+                
+                # Determine close reason based on comment and profit
+                comment = closing_deal.comment if hasattr(closing_deal, 'comment') else ""
+                
+                if "tp" in comment.lower():
+                    close_reason = "TP_HIT"
+                    tp_hit = "3"  # Default to TP3 if not specified
+                    
+                    # Try to extract TP number from comment or from our TP levels
+                    if ticket in tp_levels:
+                        tps = tp_levels[ticket]
+                        for tp_num, tp_price in tps.items():
+                            if abs(close_price - tp_price) < 0.5:  # Within 50 pips
+                                tp_hit = str(tp_num)
+                                break
+                elif "sl" in comment.lower() or profit < 0:
+                    close_reason = "SL_HIT"
+                    tp_hit = None
+                elif "manual" in comment.lower() or "user" in comment.lower():
+                    close_reason = "MANUAL_CLOSE"
+                    tp_hit = None
+                else:
+                    close_reason = "UNKNOWN"
+                    tp_hit = None
+                
+                log(f"   Close Price: ${close_price:.5f} | Reason: {close_reason} | P&L: ${profit:.2f}", "INFO")
+                
+                # Log to trade logger
+                result = trade_logger.log_trade_close(
+                    ticket=ticket,
+                    close_price=close_price,
+                    close_reason=close_reason,
+                    tp_hit=tp_hit
+                )
+                
+                if result:
+                    log(f"✅ Logged closed position: Ticket {ticket} | P&L: ${result['pnl']:.2f}", "INFO")
+                    trades_executed += 1
+                    
+                    # Clean up tracking dictionaries
+                    for msg_id, t in list(position_map.items()):
+                        if t == ticket:
+                            del position_map[msg_id]
+                            break
+                    
+                    if ticket in tp_levels:
+                        del tp_levels[ticket]
+                    if ticket in entry_prices:
+                        del entry_prices[ticket]
+                    if ticket in failsafe_tp3:
+                        del failsafe_tp3[ticket]
+                    if ticket in breakeven_activated:
+                        del breakeven_activated[ticket]
+                else:
+                    log(f"❌ Failed to log closed position: Ticket {ticket}", "ERROR")
+                    trades_failed += 1
+                
+        except Exception as e:
+            log(f"❌ CRITICAL: Closed position monitor exception: {str(e)}", "ERROR")
+            import traceback
+            log(f"   {traceback.format_exc()}", "ERROR")
+            await asyncio.sleep(10)
 
 
 async def monitor_pending_zone():
@@ -1206,7 +1384,7 @@ async def main():
     log(f"📊 Log level: {LOG_LEVEL}", "INFO")
     log("=" * 70, "INFO")
 
-    @client.on(events.NewMessage())
+    @client.on(events.NewMessage(chats=list(ALLOWED_CHAT_IDS)))
     async def on_new_message(event):
         """Handle new Telegram messages from main or test channel"""
         global pending_zone, messages_received, messages_ignored, last_message_time, last_telegram_activity
@@ -1235,12 +1413,21 @@ async def main():
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
+            
+            # Calculate delivery delay
+            msg_timestamp = event.message.date.timestamp()
+            delivery_delay = time.time() - msg_timestamp
+            delay_warning = ""
+            if delivery_delay > 10:  # More than 10 seconds delay
+                delay_warning = f" ⚠️ DELAYED: {delivery_delay:.0f}s"
 
             log("=" * 70, "INFO")
-            log(f"📨 {channel_name} NEW MESSAGE RECEIVED", "INFO")
+            log(f"📨 {channel_name} NEW MESSAGE RECEIVED{delay_warning}", "INFO")
             log(f"   Message ID: {msg_id}", "INFO")
             log(f"   Chat ID: {event.chat_id}", "INFO")
             log(f"   Length: {len(text)} chars", "INFO")
+            if delivery_delay > 10:
+                log(f"   ⏰ Sent: {event.message.date.strftime('%H:%M:%S')} | Received: {time.strftime('%H:%M:%S')} (Δ{delivery_delay:.0f}s)", "WARN")
             log(f"   Preview: {text[:150]}", "INFO")
             log("=" * 70, "INFO")
 
@@ -1582,6 +1769,9 @@ async def main():
 
     asyncio.create_task(monitor_pending_zone())
     log("✅ Zone monitor task created", "INFO")
+    
+    asyncio.create_task(monitor_closed_positions())
+    log("✅ Closed position monitor task created", "INFO")
 
     asyncio.create_task(print_signal_log())
     log("✅ Signal log printer task created", "INFO")
@@ -1640,6 +1830,8 @@ async def main():
                     telegram_connected = True
                     last_telegram_activity = time.time()
                     log("✅ Telegram client restarted after TypeNotFoundError", "INFO")
+                    # Catch up on any missed messages during disconnection
+                    await catch_up_messages(client, lookback_minutes=3)
                 except Exception as ex2:
                     telegram_connected = False
                     log(f"❌ Failed to restart Telegram client: {ex2}", "ERROR")

@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "created_at": "2026-02-12T00:00:00+00:00",
+    "created_at": "2026-02-12T13:41:00.119229+00:00",
     "bot_version": "v2",
     "symbol": "XAUUSD"
   },
   "summary": {
-    "total_trades": 4,
+    "total_trades": 0,
     "total_pnl": 0.0,
     "total_wins": 0,
     "total_losses": 0,
@@ -15,81 +15,7 @@
     "max_drawdown": 0.0,
     "largest_win": 0.0,
     "largest_loss": 0.0,
-    "pending_trades": 4,
-    "last_updated": "2026-02-12T10:33:31.214564+00:00"
+    "last_updated": "2026-02-12T13:41:00.119229+00:00"
   },
-  "trades": [
-    {
-      "ticket": 24288924,
-      "status": "OPEN",
-      "side": "SELL",
-      "entry_price": 5065.39,
-      "stop_loss": 5073.39,
-      "take_profits": {},
-      "lot_size": 0.02,
-      "opened_at": "2026-02-12T08:00:38.910602+00:00",
-      "message_id": 5879,
-      "pnl": null,
-      "close_price": null,
-      "closed_at": null,
-      "close_reason": null,
-      "tp_hit": null,
-      "risk_reward": null
-    },
-    {
-      "ticket": 24363311,
-      "status": "OPEN",
-      "side": "SELL",
-      "entry_price": 5072.86,
-      "stop_loss": 5080.86,
-      "take_profits": {},
-      "lot_size": 0.02,
-      "opened_at": "2026-02-12T09:05:56.963423+00:00",
-      "message_id": 5887,
-      "pnl": null,
-      "close_price": null,
-      "closed_at": null,
-      "close_reason": null,
-      "tp_hit": null,
-      "risk_reward": null
-    },
-    {
-      "ticket": 24439274,
-      "status": "OPEN",
-      "side": "BUY",
-      "entry_price": 5068.89,
-      "stop_loss": 5060.89,
-      "take_profits": {},
-      "lot_size": 0.02,
-      "opened_at": "2026-02-12T10:11:00.682398+00:00",
-      "message_id": 5903,
-      "pnl": null,
-      "close_price": null,
-      "closed_at": null,
-      "close_reason": null,
-      "tp_hit": null,
-      "risk_reward": null
-    },
-    {
-      "ticket": 24471503,
-      "status": "OPEN",
-      "side": "BUY",
-      "entry_price": 5062.06,
-      "stop_loss": 5054.0,
-      "take_profits": {
-        "1": 5064.0,
-        "2": 5066.0,
-        "3": 5054.0
-      },
-      "lot_size": 0.02,
-      "opened_at": "2026-02-12T10:33:31.214564+00:00",
-      "message_id": 5908,
-      "pnl": null,
-      "close_price": null,
-      "closed_at": null,
-      "close_reason": null,
-      "tp_hit": null,
-      "risk_reward": null
-    }
-  ]
+  "trades": []
 }
