@@ -23,6 +23,34 @@
       "msg_text": "Sell zone now",
       "timestamp": "2026-02-12T17:05:56.967424",
       "executed": true
+    },
+    {
+      "id": 5903,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5068.89,
+      "sl_price": 5060.89,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy Zone Now",
+      "timestamp": "2026-02-12T18:11:00.686396",
+      "executed": true
+    },
+    {
+      "id": 5908,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5062.06,
+      "sl_price": 5054.0,
+      "lot_size": 0.02,
+      "tp_levels": {
+        "1": 5064.0,
+        "2": 5066.0,
+        "3": 5054.0
+      },
+      "msg_text": "Buy zone now \n\n\nLarger zone\n\n5062-5055\n\nTargets \n5064\n5066\n\nInvalid / SL 5054",
+      "timestamp": "2026-02-12T18:33:31.218561",
+      "executed": true
     }
   ]
 }
