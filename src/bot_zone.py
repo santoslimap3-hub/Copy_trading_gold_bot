@@ -17,6 +17,7 @@ from typing import Optional, Dict, Tuple, List
 from signal_queue import SignalQueue
 from session_manager import SessionManager
 from reconnect_monitor import ReconnectMonitor
+from bot_trade_logger import BotTradeLogger
 
 # ===================== CONFIGURATION =====================
 # Telegram
@@ -65,6 +66,7 @@ pending_zone: Optional[Dict[str, object]] = None
 signal_queue: Optional[SignalQueue] = None
 session_manager: Optional[SessionManager] = None
 reconnect_monitor: Optional[ReconnectMonitor] = None
+trade_logger: Optional[BotTradeLogger] = None
 
 # ===================== HELPERS =====================
 
@@ -371,9 +373,9 @@ def open_position(side: str, lot: float) -> Optional[int]:
     return None
 
 
-def close_position(ticket: int) -> bool:
+def close_position(ticket: int, close_reason: str = "SAFETY_EXIT") -> bool:
     """Close an open position immediately at market price (TP3 HIT safety exit)"""
-    log(f"🚨 Closing position {ticket} - TP3 HIT SAFETY EXIT", "INFO")
+    log(f"🚨 Closing position {ticket} - {close_reason}", "INFO")
 
     pos = mt5.positions_get(ticket=ticket)
     if not pos:
@@ -389,7 +391,7 @@ def close_position(ticket: int) -> bool:
         log(f"❌ No tick data for {SYMBOL}", "ERROR")
         return False
 
-    price = float(tick.bid if side == "BUY" else tick.ask)
+    close_price = float(tick.bid if side == "BUY" else tick.ask)
 
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
@@ -397,20 +399,23 @@ def close_position(ticket: int) -> bool:
         "volume": float(p.volume),
         "type": close_type,
         "position": ticket,
-        "price": price,
+        "price": close_price,
         "magic": MAGIC,
-        "comment": "TP3 HIT - SAFETY EXIT",
+        "comment": f"TP3 HIT - {close_reason}",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
 
-    log(f"   Closing {side} position: Ticket {ticket} | Volume {p.volume:.3f} | Price ${price:.5f}", "DEBUG")
+    log(f"   Closing {side} position: Ticket {ticket} | Volume {p.volume:.3f} | Price ${close_price:.5f}", "DEBUG")
     result = mt5.order_send(request)
 
     success = result.retcode == mt5.TRADE_RETCODE_DONE
 
     if success:
         log(f"✅ Position {ticket} CLOSED successfully", "INFO")
+        # Log the trade close to trade_logger
+        if trade_logger:
+            trade_logger.log_trade_close(ticket, close_price, close_reason, tp_hit="3")
     else:
         log(f"❌ Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
         log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
@@ -781,6 +786,18 @@ def execute_zone_trade(side: str, entry_price: float, msg_id: int, msg_text: str
         breakeven_activated[ticket] = False
         log(f"   Stored in position_map: msg_id={msg_id} -> ticket={ticket}", "DEBUG")
 
+        # Log trade open to trade_logger
+        if trade_logger:
+            trade_logger.log_trade_open(
+                ticket=ticket,
+                side=side,
+                entry_price=entry_price,
+                stop_loss=chosen_sl,
+                targets=targets,
+                lot_size=lot,
+                message_id=msg_id
+            )
+
         signal_queue.add_signal(
             signal_type="ZONE",
             side=side,
@@ -929,11 +946,12 @@ async def monitor_pending_zone():
 
 
 async def main():
-    global signal_queue, session_manager, reconnect_monitor
+    global signal_queue, session_manager, reconnect_monitor, trade_logger
 
     signal_queue = SignalQueue("signal_queue.json")
     session_manager = SessionManager("trading_bot_session", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
+    trade_logger = BotTradeLogger("src/bot_trades.json")
 
     client = init_telegram()
     ensure_mt5_connection()

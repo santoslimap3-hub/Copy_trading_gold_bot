@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "created_at": "2026-02-12T00:00:00+00:00",
+    "bot_version": "v2",
+    "symbol": "XAUUSD"
+  },
+  "summary": {
+    "total_trades": 0,
+    "total_pnl": 0.0,
+    "total_wins": 0,
+    "total_losses": 0,
+    "win_rate_percent": 0.0,
+    "avg_win": 0.0,
+    "avg_loss": 0.0,
+    "max_drawdown": 0.0,
+    "largest_win": 0.0,
+    "largest_loss": 0.0,
+    "pending_trades": 0,
+    "last_updated": "2026-02-12T03:37:40.234335+00:00"
+  },
+  "trades": []
+}
