@@ -150,51 +150,29 @@ def get_error_message(retcode: int) -> str:
 
 def check_autotrading_status():
     """Check if AutoTrading is enabled and warn if disabled"""
-    log("🔍 Checking AutoTrading status...", "DEBUG")
-    
-    # Try a test order to see if AutoTrading is available
-    # We'll do a dummy check with a very small test
-    tick = mt5.symbol_info_tick(SYMBOL)
-    if tick is None:
-        log("⚠️ Cannot check AutoTrading - no tick data", "WARN")
-        return
-    
-    # Check via account settings (AutoTrading flag)
     account = mt5.account_info()
     if account:
         if account.trade_allowed:
-            log("✅ AutoTrading is ENABLED and allowed", "INFO")
+            log("✅ AutoTrading ENABLED", "INFO")
         else:
-            log("❌ AutoTrading is DISABLED - trading is forbidden!", "ERROR")
-            log("   FIX: Enable AutoTrading in Terminal > Tools > Options > Expert Advisors", "ERROR")
-            log("   Also enable 'Allow automated trading' checkbox", "ERROR")
+            log("❌ AutoTrading DISABLED - trading forbidden!", "ERROR")
+            log("   FIX: Enable in Terminal > Tools > Options > Expert Advisors", "ERROR")
     else:
         log("⚠️ Cannot check AutoTrading status", "WARN")
 
 
 def ensure_mt5_connection():
     """Initialize MT5 if not connected"""
-    log("📡 Attempting MT5 initialization...", "DEBUG")
-    
     if not mt5.initialize():
-        log(f"❌ MT5 initialization FAILED", "ERROR")
-        log(f"   Last error: {mt5.last_error()}", "ERROR")
+        log(f"❌ MT5 initialization FAILED: {mt5.last_error()}", "ERROR")
         sys.exit(1)
-    
-    log("✅ MT5 initialized successfully", "INFO")
-    
-    # Verify connection
-    version = mt5.version()
-    log(f"   MT5 Version: {version}", "DEBUG")
     
     account = mt5.account_info()
     if account:
-        log(f"   Account: {account.login} | Server: {account.server} | Currency: {account.currency}", "DEBUG")
-        log(f"   Balance: ${account.balance:.2f} | Equity: ${account.equity:.2f}", "DEBUG")
+        log(f"✅ MT5 Ready | Acct: {account.login} | Balance: ${account.balance:.2f}", "INFO")
     else:
         log(f"⚠️ Could not retrieve account info", "WARN")
     
-    # Check if AutoTrading is enabled
     check_autotrading_status()
 
 
@@ -202,31 +180,18 @@ def get_account_balance() -> float:
     """Get current account balance"""
     acc = mt5.account_info()
     if acc is None:
-        log("❌ account_info() returned None - account not logged in?", "ERROR")
+        log("❌ account_info() failed", "ERROR")
         return 0.0
-    
-    balance = float(acc.balance)
-    equity = float(acc.equity)
-    log(f"💰 Account Balance: ${balance:.2f} | Equity: ${equity:.2f}", "DEBUG")
-    return balance
+    return float(acc.balance)
 
 
 def get_market_price(side: str) -> Optional[float]:
     """Get entry price (ask for BUY, bid for SELL)"""
-    log(f"🔍 Getting market price for {side}...", "DEBUG")
-    
     tick = mt5.symbol_info_tick(SYMBOL)
     if tick is None:
-        log(f"❌ symbol_info_tick({SYMBOL}) returned None - market data unavailable", "ERROR")
-        log(f"   Last error: {mt5.last_error()}", "ERROR")
+        log(f"❌ Cannot get market data: {mt5.last_error()}", "ERROR")
         return None
-    
-    bid = float(tick.bid)
-    ask = float(tick.ask)
-    price = float(tick.ask if side == "BUY" else tick.bid)
-    
-    log(f"   Bid: ${bid:.5f} | Ask: ${ask:.5f} | Entry ({side}): ${price:.5f}", "DEBUG")
-    return price
+    return float(tick.ask if side == "BUY" else tick.bid)
 
 
 def calculate_lot_size(entry_price: float, sl_price: float, balance: float) -> float:
@@ -234,20 +199,14 @@ def calculate_lot_size(entry_price: float, sl_price: float, balance: float) -> f
     Calculate max lot size that risks less than RISK_PCT of balance.
     lot_size = (balance * risk_pct) / (price_distance * contract_size)
     """
-    log(f"📐 Calculating lot size...", "DEBUG")
-    log(f"   Entry: ${entry_price:.5f} | SL: ${sl_price:.5f} | Balance: ${balance:.2f}", "DEBUG")
-    
     price_distance = abs(entry_price - sl_price)
-    log(f"   Price distance: ${price_distance:.5f}", "DEBUG")
-    
     if price_distance <= 0:
         log(f"❌ Invalid price distance: {price_distance}", "ERROR")
         return 0.01
     
     symbol_info = mt5.symbol_info(SYMBOL)
     if symbol_info is None:
-        log(f"❌ symbol_info({SYMBOL}) returned None", "ERROR")
-        log(f"   Last error: {mt5.last_error()}", "ERROR")
+        log(f"❌ Cannot get symbol info", "ERROR")
         return 0.01
     
     contract_size = float(symbol_info.trade_contract_size)
@@ -255,19 +214,14 @@ def calculate_lot_size(entry_price: float, sl_price: float, balance: float) -> f
     vol_max = float(symbol_info.volume_max)
     vol_step = float(symbol_info.volume_step)
     
-    log(f"   Contract size: {contract_size} | Min: {vol_min} | Max: {vol_max} | Step: {vol_step}", "DEBUG")
-    
     max_risk_money = balance * RISK_PCT
     lot = max_risk_money / (price_distance * contract_size)
-    
-    log(f"   Max risk (5%): ${max_risk_money:.2f} | Calculated lot: {lot:.4f}", "DEBUG")
     
     # Clamp to symbol limits
     lot = max(lot, vol_min)
     lot = min(lot, vol_max)
-    lot = round(lot / vol_step) * vol_step  # Round to step size
+    lot = round(lot / vol_step) * vol_step
     
-    log(f"   ✅ Final lot size: {lot:.4f}", "DEBUG")
     return lot
 
 
@@ -275,23 +229,14 @@ def get_filling_mode() -> int:
     """Get the appropriate filling mode for the symbol"""
     symbol_info = mt5.symbol_info(SYMBOL)
     if symbol_info is None:
-        log(f"⚠️ Could not get symbol info, defaulting to IOC", "WARN")
         return mt5.ORDER_FILLING_IOC
     
-    # Check what filling modes are supported
     filling = symbol_info.filling_mode
-    
-    # Try ORDER_FILLING_IOC first (most common for Forex/CFDs)
-    if filling & 2 == 2:  # 2 = SYMBOL_FILLING_IOC
-        log(f"   Using ORDER_FILLING_IOC", "DEBUG")
+    if filling & 2 == 2:
         return mt5.ORDER_FILLING_IOC
-    # Try ORDER_FILLING_FOK
-    elif filling & 1 == 1:  # 1 = SYMBOL_FILLING_FOK
-        log(f"   Using ORDER_FILLING_FOK", "DEBUG")
+    elif filling & 1 == 1:
         return mt5.ORDER_FILLING_FOK
-    # Default to RETURN mode
     else:
-        log(f"   Using ORDER_FILLING_RETURN", "DEBUG")
         return mt5.ORDER_FILLING_RETURN
 
 
@@ -300,8 +245,6 @@ def open_position(side: str, lot: float) -> Optional[int]:
     Open market position. Returns ticket number or None.
     Does NOT retry - signals are time-sensitive and must execute immediately or be abandoned.
     """
-    log(f"🚀 Opening {side} position with lot size {lot:.4f}...", "INFO")
-    
     order_type = mt5.ORDER_TYPE_BUY if side == "BUY" else mt5.ORDER_TYPE_SELL
     filling_mode = get_filling_mode()
     
@@ -315,67 +258,39 @@ def open_position(side: str, lot: float) -> Optional[int]:
         "comment": f"Signal {side}",
     }
     
-    log(f"   Request: {request}", "DEBUG")
-    
     result = mt5.order_send(request)
     
-    log(f"   Response retcode: {result.retcode}", "DEBUG")
-    log(f"   Error message: {result.comment}", "DEBUG")
-    
-    # SUCCESS - order executed
     if result.retcode == mt5.TRADE_RETCODE_DONE:
         ticket = result.order
-        log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
+        log(f"✅ {side} OPENED (Ticket {ticket})", "INFO")
         return ticket
     
-    # CRITICAL ERROR - AutoTrading disabled - FAIL IMMEDIATELY (no retry)
     if result.retcode == 10027:
-        log(f"🚨 CRITICAL: AutoTrading is DISABLED in MetaTrader!", "ERROR")
-        log(f"   Error: {get_error_message(result.retcode)}", "ERROR")
-        log(f"   ⚠️ FIX: Enable AutoTrading in Terminal > Tools > Options > Expert Advisors", "ERROR")
-        log(f"   ⚠️ Signal is TIME-SENSITIVE - already abandoned due to disabled AutoTrading!", "ERROR")
+        log(f"🚨 AutoTrading DISABLED - cannot trade!", "ERROR")
         return None
     
-    # OTHER ERRORS - retry some, give up on others
-    log(f"❌ Order FAILED - Retcode: {result.retcode} ({get_error_message(result.retcode)})", "ERROR")
-    log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
+    log(f"❌ Order failed: {result.comment}", "ERROR")
     
-    # Check if error is retryable
-    retryable_codes = {
-        10009,  # Request in progress
-        10028,  # Trade context busy
-        10044,  # Too many requests
-        9,      # Price changed (requote)
-    }
-    
-    max_retries = 3
-    retry_delay = 2
+    # Retry for certain errors
+    retryable_codes = {10009, 10028, 10044, 9}
     
     if result.retcode in retryable_codes:
-        for attempt in range(1, max_retries):
-            log(f"⏳ Retrying in {retry_delay} seconds (attempt {attempt}/{max_retries - 1})...", "WARN")
-            time.sleep(retry_delay)
-            
+        for attempt in range(1, 3):
+            time.sleep(2)
             result = mt5.order_send(request)
-            log(f"   Response retcode: {result.retcode}", "DEBUG")
-            
             if result.retcode == mt5.TRADE_RETCODE_DONE:
                 ticket = result.order
-                log(f"✅ Position opened successfully - Ticket: {ticket}", "INFO")
+                log(f"✅ {side} OPENED (Ticket {ticket}) [retry]", "INFO")
                 return ticket
-        
-        log(f"❌ Order failed after {max_retries - 1} retries", "ERROR")
     
     return None
 
 
 def close_position(ticket: int) -> bool:
     """Close an open position immediately at market price (TP3 HIT safety exit)"""
-    log(f"🚨 Closing position {ticket} - TP3 HIT SAFETY EXIT", "INFO")
-    
     pos = mt5.positions_get(ticket=ticket)
     if not pos:
-        log(f"❌ Position {ticket} not found (may already be closed)", "WARN")
+        log(f"❌ Position {ticket} not found", "WARN")
         return False
     
     p = pos[0]
@@ -384,11 +299,10 @@ def close_position(ticket: int) -> bool:
     
     tick = mt5.symbol_info_tick(SYMBOL)
     if tick is None:
-        log(f"❌ No tick data for {SYMBOL}", "ERROR")
+        log(f"❌ No tick data", "ERROR")
         return False
     
     price = float(tick.bid if side == "BUY" else tick.ask)
-    
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": SYMBOL,
@@ -397,57 +311,44 @@ def close_position(ticket: int) -> bool:
         "position": ticket,
         "price": price,
         "magic": MAGIC,
-        "comment": "TP3 HIT - SAFETY EXIT",
+        "comment": "TP3 SAFETY EXIT",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
     
-    log(f"   Closing {side} position: Ticket {ticket} | Volume {p.volume:.3f} | Price ${price:.5f}", "DEBUG")
     result = mt5.order_send(request)
-    
     success = result.retcode == mt5.TRADE_RETCODE_DONE
     
     if success:
-        log(f"✅ Position {ticket} CLOSED successfully", "INFO")
+        log(f"✅ Ticket {ticket} CLOSED (TP3 Exit)", "INFO")
     else:
-        log(f"❌ Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
-        log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
+        log(f"❌ Close failed: {result.comment}", "ERROR")
     
     return success
 
 
 def set_stop_loss(ticket: int, sl_price: float) -> bool:
     """Update position stop loss - preserves current TP"""
-    log(f"🛡️ Updating SL for ticket {ticket} to ${sl_price:.5f}...", "INFO")
-    
-    # Get current position to preserve TP
     pos = mt5.positions_get(ticket=ticket)
     if not pos:
         log(f"❌ Position {ticket} not found", "ERROR")
         return False
     
     current_tp = float(pos[0].tp) if pos[0].tp > 0 else 0.0
-    log(f"   Current TP: ${current_tp:.5f} (will preserve)", "DEBUG")
-    
     request = {
         "action": mt5.TRADE_ACTION_SLTP,
         "position": ticket,
         "sl": sl_price,
-        "tp": current_tp,  # Preserve current TP
+        "tp": current_tp,
     }
     
-    log(f"   Request: {request}", "DEBUG")
-    
     result = mt5.order_send(request)
-    log(f"   Response retcode: {result.retcode}", "DEBUG")
-    
     success = result.retcode == mt5.TRADE_RETCODE_DONE
     
     if success:
-        log(f"✅ SL updated - Ticket {ticket}: ${sl_price:.5f}", "INFO")
+        log(f"✅ Ticket {ticket} SL updated", "INFO")
     else:
-        log(f"⚠️ SL update FAILED - Retcode: {result.retcode} | Error: {result.comment}", "WARN")
-        log(f"   Last MT5 error: {mt5.last_error()}", "WARN")
+        log(f"⚠️ SL update failed: {result.comment}", "WARN")
     
     return success
 
@@ -720,23 +621,13 @@ async def replay_pending_signals(client):
     
     pending = signal_queue.get_pending_signals()
     if not pending:
-        log("📋 No pending signals to replay", "INFO")
         return
     
-    log("=" * 70, "INFO")
-    log(f"🔄 REPLAYING {len(pending)} PENDING SIGNALS FROM QUEUE", "INFO")
-    log("=" * 70, "INFO")
-    
+    log(f"🔄 Replaying {len(pending)} pending signals", "INFO")
     for sig in pending:
         msg_id = sig.get('id')
         signal_type = sig.get('signal_type')
-        msg_text = sig.get('msg_text', '')
-        
-        log(f"📨 Replaying {signal_type} signal (msg_id={msg_id}): {msg_text[:60]}", "INFO")
-        # Note: The actual replay would happen through message handlers
-        # For now, we just log. In real scenarios, you'd re-fetch or re-process from cache.
-    
-    log("=" * 70, "INFO")
+        log(f"  {signal_type} signal (ID {msg_id})", "INFO")
 
 
 async def cleanup_and_report():
@@ -750,18 +641,14 @@ async def cleanup_and_report():
             # Cleanup old signals
             if signal_queue:
                 signal_queue.remove_old_signals(days=7)
-                stats = signal_queue.get_stats()
-                log(f"📊 Signal queue: {stats['total_signals']} total, {stats['pending']} pending", "DEBUG")
             
             # Cleanup old backups
             if session_manager:
                 session_manager.cleanup_old_backups(keep_count=5)
             
-            # Report reconnect stats
-            if reconnect_monitor:
-                reconnect_monitor.reset_window()
-                if reconnect_monitor.get_stats()['total_reconnects'] > 0:
-                    reconnect_monitor.print_summary()
+            # Report reconnect stats if any
+            if reconnect_monitor and reconnect_monitor.get_stats()['total_reconnects'] > 0:
+                reconnect_monitor.print_summary()
         
         except Exception as e:
             log(f"⚠️ Exception in cleanup_and_report: {e}", "ERROR")
@@ -902,52 +789,36 @@ async def main():
                 return
             
             # Check for TP/SL update (if no signal found)
-            log(f"🔍 Checking for TP/SL updates in message...", "DEBUG")
             sl = parse_stop_loss(text)
             tp_levels_parsed = parse_tp_levels(text)
             
             # Find which position to update (most recent open position)
             positions = mt5.positions_get(symbol=SYMBOL)
             if not positions:
-                log(f"⚠️ No open positions to update - ignoring message", "WARN")
+                log(f"⚠️ No open positions to update", "WARN")
                 return
             
-            ticket = int(positions[-1].ticket)  # most recent
-            log(f"🔄 Found {len(positions)} open position(s) | Will update ticket {ticket}", "DEBUG")
+            ticket = int(positions[-1].ticket)
             
             # Update SL if found
             if sl:
-                log(f"📊 Found SL in message: ${sl:.5f}", "DEBUG")
                 can_update, reason = can_update_stop_loss(ticket, sl)
                 if can_update:
                     set_stop_loss(ticket, sl)
                 else:
-                    log(f"⚠️ SL update skipped: {reason}", "WARN")
-            else:
-                log(f"⚠️ No SL found in message", "DEBUG")
+                    log(f"⚠️ SL skipped: {reason}", "WARN")
             
             # Update TP levels if found
             if tp_levels_parsed:
-                log(f"📊 Found {len(tp_levels_parsed)} TP level(s): {tp_levels_parsed}", "DEBUG")
                 tp_levels[ticket] = tp_levels_parsed
-                log(f"   Stored TP levels for ticket {ticket}", "DEBUG")
                 
                 # Select the best valid TP with fallback logic (TP3 > TP2 > TP1)
                 tp_num, tp_price = select_best_tp_with_fallback(ticket, tp_levels_parsed)
                 if tp_num and tp_price:
-                    # Show difference from failsafe if this is a real TP3
-                    if tp_num == 3 and ticket in failsafe_tp3:
-                        current_failsafe = failsafe_tp3[ticket]
-                        diff = abs(tp_price - current_failsafe)
-                        log(f"🎯 TP3 selected: ${tp_price:.5f} - setting as target", "INFO")
-                        log(f"   (Updated from failsafe: ${current_failsafe:.5f} | Diff: ${diff:.5f})", "DEBUG")
-                    else:
-                        log(f"🎯 TP{tp_num} selected: ${tp_price:.5f} - setting as target", "INFO")
+                    log(f"✅ TP{tp_num} set (${tp_price:.5f})", "INFO")
                     set_take_profit(ticket, tp_price)
                 else:
-                    log(f"⚠️ All TP levels invalid or missing - will wait for valid values", "WARN")
-            else:
-                log(f"⚠️ No TP levels found in message", "DEBUG")
+                    log(f"⚠️ TP levels invalid - waiting for valid values", "WARN")
         
         except Exception as e:
             log(f"❌ EXCEPTION in on_new_message: {str(e)}", "ERROR")
@@ -1014,42 +885,26 @@ async def main():
                 return
             
             # Update SL if present
-            log(f"🔍 Parsing edited message for SL...", "DEBUG")
             sl = parse_stop_loss(text)
             if sl:
-                log(f"📊 Found SL in edit: ${sl:.5f}", "DEBUG")
                 can_update, reason = can_update_stop_loss(ticket, sl)
                 if can_update:
                     set_stop_loss(ticket, sl)
                 else:
-                    log(f"⚠️ SL update skipped: {reason}", "WARN")
-            else:
-                log(f"⚠️ No SL in edit message", "DEBUG")
+                    log(f"⚠️ SL skipped: {reason}", "WARN")
             
             # Update TP levels if present
-            log(f"🔍 Parsing edited message for TP levels...", "DEBUG")
             tp_levels_parsed = parse_tp_levels(text)
             if tp_levels_parsed:
-                log(f"📊 Found {len(tp_levels_parsed)} TP level(s): {tp_levels_parsed}", "DEBUG")
                 tp_levels[ticket] = tp_levels_parsed
-                log(f"   Stored TP levels for ticket {ticket}", "DEBUG")
                 
                 # Select the best valid TP with fallback logic (TP3 > TP2 > TP1)
                 tp_num, tp_price = select_best_tp_with_fallback(ticket, tp_levels_parsed)
                 if tp_num and tp_price:
-                    # Show difference from failsafe if this is a real TP3
-                    if tp_num == 3 and ticket in failsafe_tp3:
-                        current_failsafe = failsafe_tp3[ticket]
-                        diff = abs(tp_price - current_failsafe)
-                        log(f"🎯 TP3 found in edit: ${tp_price:.5f} - updating", "INFO")
-                        log(f"   (Updated from failsafe: ${current_failsafe:.5f} | Diff: ${diff:.5f})", "DEBUG")
-                    else:
-                        log(f"🎯 TP{tp_num} selected: ${tp_price:.5f} - setting as target", "INFO")
+                    log(f"✅ TP{tp_num} set (${tp_price:.5f})", "INFO")
                     set_take_profit(ticket, tp_price)
                 else:
-                    log(f"⚠️ All TP levels invalid or missing - will wait for valid values", "WARN")
-            else:
-                log(f"⚠️ No TP levels in edit message", "DEBUG")
+                    log(f"⚠️ TP levels invalid - waiting for valid values", "WARN")
         
         except Exception as e:
             log(f"❌ EXCEPTION in on_edit: {str(e)}", "ERROR")
@@ -1060,41 +915,28 @@ async def main():
     async def monitor_breakeven():
         """Check if TP1 has been hit and move SL to breakeven"""
         log("🔄 Breakeven monitor started", "INFO")
-        check_count = 0
         
         while True:
             try:
-                check_count += 1
-                
                 positions = mt5.positions_get(symbol=SYMBOL)
                 
                 if not positions:
-                    # Only log every 10 checks to avoid spam
-                    if check_count % 10 == 0:
-                        log(f"⏳ Monitor check #{check_count}: No open positions", "DEBUG")
                     await asyncio.sleep(2)
                     continue
-                
-                log(f"🔍 Monitor check #{check_count}: Checking {len(positions)} position(s)", "DEBUG")
                 
                 for pos in positions:
                     ticket = int(pos.ticket)
                     
                     # Skip if not in our tracking
                     if ticket not in entry_prices:
-                        log(f"   Ticket {ticket}: NOT in our tracking (entry_prices)", "DEBUG")
                         continue
-                    
-                    log(f"   Ticket {ticket}: Checking...", "DEBUG")
                     
                     # Skip if breakeven already activated
                     if breakeven_activated.get(ticket, False):
-                        log(f"   Ticket {ticket}: Breakeven already activated", "DEBUG")
                         continue
                     
                     # Skip if no TP1 stored
                     if ticket not in tp_levels or 1 not in tp_levels[ticket]:
-                        log(f"   Ticket {ticket}: No TP1 stored yet", "DEBUG")
                         continue
                     
                     tp1 = tp_levels[ticket][1]
@@ -1102,62 +944,44 @@ async def main():
                     side = get_position_side(ticket)
                     
                     if side is None:
-                        log(f"   Ticket {ticket}: Position side is None (closed?)", "WARN")
                         continue
                     
                     # Get current price
                     tick = mt5.symbol_info_tick(SYMBOL)
                     if tick is None:
-                        log(f"   Ticket {ticket}: Cannot get tick data", "WARN")
                         continue
                     
                     current = float(tick.bid if side == "SELL" else tick.ask)
                     
                     # Check if TP1 crossed
                     if price_crossed_tp1(ticket, tp1, current):
-                        log(f"🎯 TP1 HIT! Ticket {ticket} | Current=${current:.5f} vs TP1=${tp1:.5f} ({side})", "INFO")
-                        log(f"   >>> MOVING SL TO BREAKEVEN: ${entry:.5f}", "INFO")
+                        log(f"🎯 TP1 HIT! Moving SL to breakeven (${entry:.5f})", "INFO")
                         set_stop_loss(ticket, entry)
                         breakeven_activated[ticket] = True
-                    else:
-                        log(f"   Ticket {ticket}: TP1 not yet reached | Current=${current:.5f} | TP1=${tp1:.5f}", "DEBUG")
                 
                 await asyncio.sleep(2)  # Check every 2 seconds
             
             except Exception as e:
                 log(f"⚠️ Exception in monitor_breakeven: {str(e)}", "ERROR")
-                import traceback
-                log(f"   {traceback.format_exc()}", "ERROR")
-                await asyncio.sleep(2)
     
-    # Signal log printer for debugging
+    # Signal log printer for debugging - minimal logging
     async def print_signal_log():
-        """Print signal log every 30 seconds for debugging"""
+        """Print signal log occasionally for debugging"""
         while True:
             try:
-                await asyncio.sleep(30)
-                if signal_log:
-                    log("=" * 70, "INFO")
-                    log("📋 SIGNAL LOG (Last 10 attempts)", "INFO")
-                    log("=" * 70, "INFO")
-                    for entry in signal_log[-10:]:
-                        msg = f"  {entry['timestamp']} | {entry['signal']:4s} | {entry['result']:10s} | {entry['detail']}"
-                        log(msg, "INFO")
+                await asyncio.sleep(60)  # Check every 60 seconds
+                # Only log if there were recent failed attempts
+                if signal_log and any(e['result'] == 'FAILED' for e in signal_log[-5:]):
+                    recent = [f"{e['signal']}/{e['result']}" for e in signal_log[-3:]]
+                    log(f"📋 Recent attempts: {recent}", "INFO")
             except Exception as e:
                 log(f"⚠️ Exception in print_signal_log: {str(e)}", "ERROR")
     
     # Start monitoring in background
-    log("🔄 Starting breakeven monitor background task...", "INFO")
     asyncio.create_task(monitor_breakeven())
-    log("✅ Breakeven monitor background task created", "INFO")
-    
-    log("🔄 Starting signal log printer background task...", "INFO")
     asyncio.create_task(print_signal_log())
-    log("✅ Signal log printer background task created", "INFO")
-    
-    log("🔄 Starting cleanup and reporting background task...", "INFO")
     asyncio.create_task(cleanup_and_report())
-    log("✅ Cleanup and reporting background task created", "INFO")
+    log("✅ Background tasks started", "INFO")
     
     # Connect and run
     log("📡 Connecting to Telegram...", "INFO")

@@ -131,6 +131,18 @@
       "msg_text": "The ideal buy zone would be 5035",
       "timestamp": "2026-02-11T23:29:44.105458",
       "executed": true
+    },
+    {
+      "id": 3154,
+      "signal_type": "TRADE",
+      "side": "SELL",
+      "entry_price": 5066.28,
+      "sl_price": 5074.28,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "XAU USD SELL NOW",
+      "timestamp": "2026-02-12T16:02:44.251004",
+      "executed": true
     }
   ]
 }
