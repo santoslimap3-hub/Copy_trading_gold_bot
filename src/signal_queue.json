@@ -143,6 +143,18 @@
       "msg_text": "XAU USD SELL NOW",
       "timestamp": "2026-02-12T16:02:44.251004",
       "executed": true
+    },
+    {
+      "id": 29,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5074.75,
+      "sl_price": 5066.75,
+      "lot_size": 0.3,
+      "tp_levels": {},
+      "msg_text": "buy zone now",
+      "timestamp": "2026-02-12T22:10:46.598280",
+      "executed": true
     }
   ]
 }

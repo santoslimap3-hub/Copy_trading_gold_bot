@@ -1384,35 +1384,39 @@ async def main():
     log(f"📊 Log level: {LOG_LEVEL}", "INFO")
     log("=" * 70, "INFO")
 
-    @client.on(events.NewMessage(chats=list(ALLOWED_CHAT_IDS)))
+    @client.on(events.NewMessage())
     async def on_new_message(event):
         """Handle new Telegram messages from main or test channel"""
         global pending_zone, messages_received, messages_ignored, last_message_time, last_telegram_activity
         
         try:
-            # Update activity timestamp
-            last_telegram_activity = time.time()
+            # Log ALL messages at the very start for debugging
+            log(f"🔔 INCOMING: chat_id={event.chat_id} | msg_id={event.message.id}", "INFO")
             
-            if DEBUG_LOG_ALL_MESSAGES:
-                chat = await event.get_chat()
-                chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
-                preview = extract_message_text(event.message).strip()[:80]
-                log(f"📥 [RAW] chat_id={event.chat_id} | {chat_title} | {preview}", "DEBUG")
-
-            # Track total messages received
+            # Track total messages received (before filtering)
             messages_received += 1
             
+            # Filter by allowed chat IDs
             if event.chat_id not in ALLOWED_CHAT_IDS:
                 messages_ignored += 1
-                log(f"⏭️  Message ignored - chat_id {event.chat_id} not in allowed list", "DEBUG")
+                if DEBUG_LOG_ALL_MESSAGES:
+                    chat = await event.get_chat()
+                    chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
+                    log(f"⏭️  Ignored: chat_id={event.chat_id} | {chat_title}", "DEBUG")
                 return
             
-            # Update last message time for tracked channels
+            # Update Telegram activity timestamp for allowed channels
+            last_telegram_activity = time.time()
             last_message_time = time.time()
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
+            
+            if DEBUG_LOG_ALL_MESSAGES:
+                chat = await event.get_chat()
+                chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
+                log(f"📥 [RAW] chat_id={event.chat_id} | {chat_title} | {text[:80]}", "DEBUG")
             
             # Calculate delivery delay
             msg_timestamp = event.message.date.timestamp()
@@ -1784,6 +1788,42 @@ async def main():
     telegram_connected = True
     last_telegram_activity = time.time()
     log("✅ Telegram connected!", "INFO")
+    
+    # Verify channel access
+    log("🔍 Verifying channel access...", "INFO")
+    for chat_id in ALLOWED_CHAT_IDS:
+        try:
+            entity = await client.get_entity(chat_id)
+            chat_title = getattr(entity, "title", None) or getattr(entity, "username", None) or f"Chat {chat_id}"
+            log(f"   ✅ Can access: {chat_title} (ID: {chat_id})", "INFO")
+        except Exception as e:
+            log(f"   ❌ Cannot access chat {chat_id}: {e}", "ERROR")
+            log(f"   Make sure the bot account has joined this channel!", "ERROR")
+    
+    # Fetch recent messages to catch up on anything sent during startup
+    log("🔍 Checking for recent messages (last 5 minutes)...", "INFO")
+    try:
+        five_min_ago = time.time() - 300
+        recent_count = 0
+        
+        for chat_id in ALLOWED_CHAT_IDS:
+            try:
+                messages = await client.get_messages(chat_id, limit=20)
+                for msg in reversed(messages):
+                    if msg.date and msg.date.timestamp() >= five_min_ago:
+                        recent_count += 1
+                        text = extract_message_text(msg).strip() if msg else ""
+                        log(f"   📥 Recent: [{msg.date.strftime('%H:%M:%S')}] {text[:60]}...", "INFO")
+            except Exception as e:
+                log(f"   ⚠️ Could not fetch from {chat_id}: {e}", "WARN")
+        
+        if recent_count > 0:
+            log(f"✅ Found {recent_count} recent message(s) - they will be processed as new messages arrive", "INFO")
+        else:
+            log(f"   No recent messages found in monitored channels", "INFO")
+    except Exception as e:
+        log(f"⚠️ Error checking recent messages: {e}", "WARN")
+    
     log("=" * 70, "INFO")
     log("🎯 BOT READY - LISTENING FOR ZONES", "INFO")
     log("=" * 70, "INFO")
