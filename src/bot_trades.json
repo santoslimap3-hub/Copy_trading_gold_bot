@@ -5,7 +5,7 @@
     "symbol": "XAUUSD"
   },
   "summary": {
-    "total_trades": 0,
+    "total_trades": 2,
     "total_pnl": 0.0,
     "total_wins": 0,
     "total_losses": 0,
@@ -15,8 +15,43 @@
     "max_drawdown": 0.0,
     "largest_win": 0.0,
     "largest_loss": 0.0,
-    "pending_trades": 0,
-    "last_updated": "2026-02-12T03:37:40.234335+00:00"
+    "pending_trades": 2,
+    "last_updated": "2026-02-12T09:05:56.963423+00:00"
   },
-  "trades": []
+  "trades": [
+    {
+      "ticket": 24288924,
+      "status": "OPEN",
+      "side": "SELL",
+      "entry_price": 5065.39,
+      "stop_loss": 5073.39,
+      "take_profits": {},
+      "lot_size": 0.02,
+      "opened_at": "2026-02-12T08:00:38.910602+00:00",
+      "message_id": 5879,
+      "pnl": null,
+      "close_price": null,
+      "closed_at": null,
+      "close_reason": null,
+      "tp_hit": null,
+      "risk_reward": null
+    },
+    {
+      "ticket": 24363311,
+      "status": "OPEN",
+      "side": "SELL",
+      "entry_price": 5072.86,
+      "stop_loss": 5080.86,
+      "take_profits": {},
+      "lot_size": 0.02,
+      "opened_at": "2026-02-12T09:05:56.963423+00:00",
+      "message_id": 5887,
+      "pnl": null,
+      "close_price": null,
+      "closed_at": null,
+      "close_reason": null,
+      "tp_hit": null,
+      "risk_reward": null
+    }
+  ]
 }

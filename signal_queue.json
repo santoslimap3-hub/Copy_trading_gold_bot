@@ -1,0 +1,28 @@
+{
+  "queue": [
+    {
+      "id": 5879,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5065.39,
+      "sl_price": 5073.39,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell zone now\n\n5056-5071",
+      "timestamp": "2026-02-12T16:00:38.912602",
+      "executed": true
+    },
+    {
+      "id": 5887,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5072.86,
+      "sl_price": 5080.86,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell zone now",
+      "timestamp": "2026-02-12T17:05:56.967424",
+      "executed": true
+    }
+  ]
+}
