@@ -1,3 +1,136 @@
 {
-  "queue": []
+  "queue": [
+    {
+      "id": 5719,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5083.78,
+      "sl_price": 5091.78,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell zone now",
+      "timestamp": "2026-02-11T18:43:46.781433",
+      "executed": true
+    },
+    {
+      "id": 5733,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5103.78,
+      "sl_price": 5110.0,
+      "lot_size": 0.02,
+      "tp_levels": {
+        "1": 5102.0,
+        "2": 5100.0,
+        "3": 5098.0,
+        "4": 5096.0,
+        "5": 5094.0
+      },
+      "msg_text": "Sell zone \n\n5104-5109\n\n\nInvalid / SL 5110",
+      "timestamp": "2026-02-11T19:28:53.623434",
+      "executed": true
+    },
+    {
+      "id": 5743,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5114.1,
+      "sl_price": 5122.1,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell Zone Now",
+      "timestamp": "2026-02-11T19:47:40.392203",
+      "executed": true
+    },
+    {
+      "id": 5758,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5095.32,
+      "sl_price": 5089.0,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy zone \n\n5095-5090\n\nInvalid zone/ SL 5089",
+      "timestamp": "2026-02-11T20:18:47.532415",
+      "executed": true
+    },
+    {
+      "id": 5766,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5081.58,
+      "sl_price": 5073.58,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy Zone Now High Risk",
+      "timestamp": "2026-02-11T20:36:34.479431",
+      "executed": true
+    },
+    {
+      "id": 5787,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5080.23,
+      "sl_price": 5086.0,
+      "lot_size": 0.02,
+      "tp_levels": {
+        "1": 5078.0,
+        "2": 5076.0,
+        "3": 5074.0,
+        "4": 5072.0,
+        "5": 5070.0
+      },
+      "msg_text": "Sell zone \n\n5080-5085\n\nInvalid/ SL 5086",
+      "timestamp": "2026-02-11T22:16:40.863063",
+      "executed": true
+    },
+    {
+      "id": 5795,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5047.02,
+      "sl_price": 5039.02,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy zone now",
+      "timestamp": "2026-02-11T22:39:43.696155",
+      "executed": true
+    },
+    {
+      "id": 5797,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5039.64,
+      "sl_price": 5031.64,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Buy Zone Now",
+      "timestamp": "2026-02-11T22:41:43.327903",
+      "executed": true
+    },
+    {
+      "id": 5816,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5081.3,
+      "sl_price": 5089.3,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell Zone Now",
+      "timestamp": "2026-02-11T23:09:43.783767",
+      "executed": true
+    },
+    {
+      "id": 5828,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 5049.43,
+      "sl_price": 5041.43,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "The ideal buy zone would be 5035",
+      "timestamp": "2026-02-11T23:29:44.105458",
+      "executed": true
+    }
+  ]
 }

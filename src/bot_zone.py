@@ -1059,6 +1059,17 @@ async def main():
                 else:
                     log(f"⚠️ SL update skipped: {reason}", "WARN")
 
+            targets = parse_targets(text)
+            if targets:
+                positions = mt5.positions_get(symbol=SYMBOL)
+                if not positions:
+                    log("⚠️ No open positions to update - ignoring targets", "WARN")
+                    return
+
+                ticket = int(positions[-1].ticket)
+                log(f"📊 Found {len(targets)} target(s) in new message: {targets}", "DEBUG")
+                apply_targets_to_ticket(ticket, targets)
+
         except Exception as e:
             log(f"❌ EXCEPTION in on_new_message: {str(e)}", "ERROR")
             import traceback
