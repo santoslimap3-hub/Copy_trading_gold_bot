@@ -233,10 +233,11 @@ class BotTradeLogger:
         # MT5 Gold contract value: 1 lot = 100 oz
         pnl = price_diff * lot_size * 100
         
-        # Risk/Reward ratio
-        risk = abs(entry_price - float(trade["stop_loss"]))
+        # Risk/Reward ratio (guard against missing stop_loss for legacy entries)
+        stop_loss = trade.get("stop_loss")
+        risk = abs(entry_price - float(stop_loss)) if stop_loss is not None else None
         reward = abs(close_price - entry_price)
-        risk_reward = reward / risk if risk > 0 else 0
+        risk_reward = (reward / risk) if (risk is not None and risk > 0) else None
         
         # Update trade
         trade["status"] = "CLOSED"
@@ -245,7 +246,7 @@ class BotTradeLogger:
         trade["close_reason"] = close_reason
         trade["tp_hit"] = tp_hit
         trade["pnl"] = round(pnl, 2)
-        trade["risk_reward"] = round(risk_reward, 2)
+        trade["risk_reward"] = round(risk_reward, 2) if risk_reward is not None else None
         
         data["trades"][trade_idx] = trade
         data["summary"] = self._recalculate_summary(data["trades"])

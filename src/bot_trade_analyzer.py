@@ -4,11 +4,14 @@ Bot Trade PnL Analyzer & Dashboard
 Displays trading statistics and PnL analysis from bot_trades.json
 """
 
+import argparse
 import json
 import os
 import sys
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Dict, List
+
+import MetaTrader5 as mt5
 
 def load_trades(filepath: str = "bot_trades.json") -> dict:
     """Load trade data from file"""
@@ -73,6 +76,12 @@ def display_summary(data: dict):
     print(f"Last Updated:             {summary.get('last_updated', 'N/A')}")
 
 
+def format_price(value: Optional[float]) -> str:
+    if value is None:
+        return "N/A"
+    return f"${value:.5f}"
+
+
 def display_open_trades(trades: list):
     """Display currently open trades"""
     open_trades = [t for t in trades if t.get("status") == "OPEN"]
@@ -86,14 +95,16 @@ def display_open_trades(trades: list):
     for i, trade in enumerate(open_trades, 1):
         print(f"\n{i}. Ticket {trade['ticket']}")
         print(f"   Side:      {trade['side']}")
-        print(f"   Entry:     ${trade['entry_price']:.5f}")
-        print(f"   Lot Size:  {trade['lot_size']:.4f}")
-        print(f"   Stop Loss: ${trade['stop_loss']:.5f}")
+        print(f"   Entry:     {format_price(trade.get('entry_price'))}")
+        lot_size = trade.get("lot_size")
+        lot_str = f"{lot_size:.4f}" if isinstance(lot_size, (int, float)) else "N/A"
+        print(f"   Lot Size:  {lot_str}")
+        print(f"   Stop Loss: {format_price(trade.get('stop_loss'))}")
         tps = trade.get('take_profits', {})
         if tps:
             tp_str = " | ".join([f"TP{k}: ${v:.5f}" for k, v in sorted(tps.items())])
             print(f"   Targets:   {tp_str}")
-        print(f"   Opened:    {trade['opened_at']}")
+        print(f"   Opened:    {trade.get('opened_at', 'N/A')}")
 
 
 def display_closed_trades(trades: list, limit: Optional[int] = 20):
@@ -119,10 +130,14 @@ def display_closed_trades(trades: list, limit: Optional[int] = 20):
         
         print(f"\n{i}. Ticket {trade['ticket']} | {win_loss} | P&L: {pnl_str}")
         print(f"   Side:      {trade['side']}")
-        print(f"   Entry:     ${trade['entry_price']:.5f} | Close: ${trade['close_price']:.5f}")
-        print(f"   Lot Size:  {trade['lot_size']:.4f}")
-        print(f"   Opened:    {trade['opened_at']}")
-        print(f"   Closed:    {trade['closed_at']} ({trade.get('close_reason', 'N/A')})")
+        entry_price = trade.get("entry_price")
+        close_price = trade.get("close_price")
+        print(f"   Entry:     {format_price(entry_price)} | Close: {format_price(close_price)}")
+        lot_size = trade.get("lot_size")
+        lot_str = f"{lot_size:.4f}" if isinstance(lot_size, (int, float)) else "N/A"
+        print(f"   Lot Size:  {lot_str}")
+        print(f"   Opened:    {trade.get('opened_at', 'N/A')}")
+        print(f"   Closed:    {trade.get('closed_at', 'N/A')} ({trade.get('close_reason', 'N/A')})")
         if trade.get('tp_hit'):
             print(f"   TP Hit:    TP{trade['tp_hit']}")
         print(f"   Risk/Reward: {trade.get('risk_reward', 0):.2f}")
@@ -228,13 +243,253 @@ def find_trades_file():
     return "src/bot_trades.json"  # Default to src/
 
 
+def parse_magics(value: str) -> List[int]:
+    if not value:
+        return []
+    magics = []
+    for item in value.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        try:
+            magics.append(int(item))
+        except ValueError:
+            print(f"[WARN] Skipping invalid magic number: {item}")
+    return magics
+
+
+def connect_mt5() -> bool:
+    if mt5.initialize():
+        return True
+    print(f"[ERROR] MT5 initialize failed: {mt5.last_error()}")
+    return False
+
+
+def iso_from_timestamp(ts: int) -> str:
+    return datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+
+
+def weighted_avg_price(deals: List[mt5.TradeDeal]) -> Optional[float]:
+    if not deals:
+        return None
+    total_vol = sum(d.volume for d in deals)
+    if total_vol <= 0:
+        return None
+    return sum(d.price * d.volume for d in deals) / total_vol
+
+
+def build_summary(trades: List[dict]) -> dict:
+    if not trades:
+        return {
+            "total_trades": 0,
+            "total_pnl": 0.0,
+            "total_wins": 0,
+            "total_losses": 0,
+            "win_rate_percent": 0.0,
+            "avg_win": 0.0,
+            "avg_loss": 0.0,
+            "max_drawdown": 0.0,
+            "largest_win": 0.0,
+            "largest_loss": 0.0,
+            "pending_trades": 0,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+        }
+
+    closed_trades = [t for t in trades if t.get("status") == "CLOSED" and t.get("pnl") is not None]
+    open_count = len([t for t in trades if t.get("status") == "OPEN"])
+
+    if not closed_trades:
+        return {
+            "total_trades": 0,
+            "total_pnl": 0.0,
+            "total_wins": 0,
+            "total_losses": 0,
+            "win_rate_percent": 0.0,
+            "avg_win": 0.0,
+            "avg_loss": 0.0,
+            "max_drawdown": 0.0,
+            "largest_win": 0.0,
+            "largest_loss": 0.0,
+            "pending_trades": open_count,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+        }
+
+    pnls = [t["pnl"] for t in closed_trades]
+    wins = [p for p in pnls if p > 0]
+    losses = [p for p in pnls if p < 0]
+
+    total_pnl = sum(pnls)
+    win_rate = (len(wins) / len(closed_trades)) * 100 if closed_trades else 0
+    avg_win = sum(wins) / len(wins) if wins else 0
+    avg_loss = sum(losses) / len(losses) if losses else 0
+    largest_win = max(wins) if wins else 0
+    largest_loss = min(losses) if losses else 0
+
+    cumsum = 0
+    peak = 0
+    max_dd = 0
+    for trade in closed_trades:
+        cumsum += trade["pnl"]
+        if cumsum > peak:
+            peak = cumsum
+        drawdown = peak - cumsum
+        if drawdown > max_dd:
+            max_dd = drawdown
+
+    return {
+        "total_trades": len(closed_trades),
+        "total_pnl": round(total_pnl, 2),
+        "total_wins": len(wins),
+        "total_losses": len(losses),
+        "win_rate_percent": round(win_rate, 2),
+        "avg_win": round(avg_win, 2),
+        "avg_loss": round(avg_loss, 2),
+        "max_drawdown": round(max_dd, 2),
+        "largest_win": round(largest_win, 2),
+        "largest_loss": round(largest_loss, 2),
+        "pending_trades": open_count,
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def build_trades_from_mt5(days_back: int, symbol: Optional[str], magics: List[int]) -> Dict[str, object]:
+    from_date = datetime.now() - timedelta(days=days_back)
+    to_date = datetime.now()
+
+    deals = mt5.history_deals_get(from_date, to_date)
+    if deals is None:
+        print(f"[ERROR] MT5 history_deals_get failed: {mt5.last_error()}")
+        return {}
+    if len(deals) == 0:
+        print("[WARN] No deals found for the specified period")
+        return {}
+
+    filtered_deals = []
+    for deal in deals:
+        if symbol and deal.symbol != symbol:
+            continue
+        if magics and int(deal.magic) not in magics:
+            continue
+        filtered_deals.append(deal)
+
+    if not filtered_deals:
+        print("[WARN] No bot deals found with the specified filters")
+        return {}
+
+    positions = mt5.positions_get()
+    positions_by_id = {int(p.ticket): p for p in positions} if positions else {}
+
+    deals_by_position: Dict[int, List[mt5.TradeDeal]] = {}
+    for deal in filtered_deals:
+        position_id = int(deal.position_id) if getattr(deal, "position_id", 0) else int(deal.order)
+        deals_by_position.setdefault(position_id, []).append(deal)
+
+    trades: List[dict] = []
+    for position_id, group in deals_by_position.items():
+        group.sort(key=lambda d: d.time)
+
+        entry_deals = [d for d in group if d.entry in (mt5.DEAL_ENTRY_IN, mt5.DEAL_ENTRY_INOUT)]
+        exit_deals = [d for d in group if d.entry in (mt5.DEAL_ENTRY_OUT, mt5.DEAL_ENTRY_INOUT)]
+
+        entry_price = weighted_avg_price(entry_deals)
+        close_price = weighted_avg_price(exit_deals)
+        entry_time = iso_from_timestamp(group[0].time)
+        close_time = iso_from_timestamp(exit_deals[-1].time) if exit_deals else None
+
+        side = "BUY"
+        if entry_deals:
+            side = "BUY" if entry_deals[0].type == mt5.DEAL_TYPE_BUY else "SELL"
+        elif group:
+            side = "BUY" if group[0].type == mt5.DEAL_TYPE_BUY else "SELL"
+
+        lot_size = sum(d.volume for d in entry_deals) if entry_deals else None
+        pnl = None
+        if exit_deals:
+            pnl = sum(d.profit + d.commission + d.swap for d in group)
+
+        close_reason = None
+        if exit_deals:
+            close_reason = str(exit_deals[-1].reason)
+
+        trade = {
+            "ticket": position_id,
+            "status": "CLOSED" if exit_deals else "OPEN",
+            "side": side,
+            "entry_price": round(entry_price, 5) if entry_price is not None else None,
+            "stop_loss": None,
+            "take_profits": {},
+            "lot_size": round(lot_size, 4) if lot_size is not None else None,
+            "opened_at": entry_time,
+            "message_id": None,
+            "pnl": round(pnl, 2) if pnl is not None else None,
+            "close_price": round(close_price, 5) if close_price is not None else None,
+            "closed_at": close_time,
+            "close_reason": close_reason,
+            "tp_hit": None,
+            "risk_reward": 0,
+        }
+
+        if trade["status"] == "OPEN" and position_id in positions_by_id:
+            pos = positions_by_id[position_id]
+            trade["entry_price"] = round(float(pos.price_open), 5)
+            trade["lot_size"] = round(float(pos.volume), 4)
+            trade["stop_loss"] = round(float(pos.sl), 5) if pos.sl > 0 else None
+            trade["take_profits"] = {"1": round(float(pos.tp), 5)} if pos.tp > 0 else {}
+
+        trades.append(trade)
+
+    trades.sort(key=lambda t: t.get("opened_at", ""))
+    return {
+        "summary": build_summary(trades),
+        "trades": trades,
+    }
+
+
+def build_metadata(symbol: Optional[str], magics: List[int]) -> dict:
+    return {
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "source": "mt5_history",
+        "symbol": symbol or "ALL",
+        "magics": magics,
+    }
+
+
+def save_trade_data(filepath: str, data: dict) -> None:
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    tmp_file = filepath + ".tmp"
+    with open(tmp_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+    os.replace(tmp_file, filepath)
+
+
 def main():
-    if len(sys.argv) > 1:
-        filepath = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Bot trade analyzer")
+    parser.add_argument("--file", help="Path to bot_trades.json")
+    parser.add_argument("--mt5", action="store_true", help="Analyze trades from MT5 history")
+    parser.add_argument("--days", type=int, default=120, help="Days of MT5 history to fetch")
+    parser.add_argument("--symbol", default=None, help="Symbol filter (e.g., XAUUSD)")
+    parser.add_argument("--magics", default="777,778", help="Comma-separated magic numbers")
+    parser.add_argument("--write-json", action="store_true", help="Write MT5 analysis to bot_trades.json")
+
+    args = parser.parse_args()
+
+    if args.mt5:
+        magics = parse_magics(args.magics)
+        if not connect_mt5():
+            return
+        data = build_trades_from_mt5(args.days, args.symbol, magics)
+        mt5.shutdown()
+        if data and args.write_json:
+            filepath = args.file if args.file else find_trades_file()
+            data_with_meta = {
+                "metadata": build_metadata(args.symbol, magics),
+                **data,
+            }
+            save_trade_data(filepath, data_with_meta)
     else:
-        filepath = find_trades_file()
-    
-    data = load_trades(filepath)
+        filepath = args.file if args.file else find_trades_file()
+        data = load_trades(filepath)
+
     if not data:
         return
     

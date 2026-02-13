@@ -318,6 +318,18 @@ def format_currency(value: float) -> str:
     return f"{sign}{abs(value):.2f}"
 
 
+def format_price(value) -> str:
+  if value is None:
+    return "N/A"
+  return f"${value:.5f}"
+
+
+def format_lot(value) -> str:
+  if value is None:
+    return "N/A"
+  return f"{value:.4f}"
+
+
 def build_closed_trades_table(data: dict) -> str:
     """Build HTML table for closed trades"""
     trades = data.get("trades", [])
@@ -335,12 +347,14 @@ def build_closed_trades_table(data: dict) -> str:
         pnl = trade.get("pnl", 0)
         pnl_class = "win" if pnl > 0 else "loss" if pnl < 0 else "breakeven"
         
+        entry_price = trade.get("entry_price")
+        close_price = trade.get("close_price")
         row = f"""
         <tr>
           <td><strong>{trade['ticket']}</strong></td>
           <td>{trade['side']}</td>
-          <td>${trade['entry_price']:.5f}</td>
-          <td>${trade['close_price']:.5f}</td>
+          <td>{format_price(entry_price)}</td>
+          <td>{format_price(close_price)}</td>
           <td class="{pnl_class}">{format_currency(pnl)}</td>
           <td>{trade.get('tp_hit', '-')}</td>
           <td>{trade.get('close_reason', '-')}</td>
@@ -380,13 +394,16 @@ def build_open_trades_table(data: dict) -> str:
     
     rows = []
     for trade in open_trades:
+        entry_price = trade.get("entry_price")
+        stop_loss = trade.get("stop_loss")
+        lot_size = trade.get("lot_size")
         row = f"""
         <tr>
           <td><strong>{trade['ticket']}</strong></td>
           <td>{trade['side']}</td>
-          <td>${trade['entry_price']:.5f}</td>
-          <td>${trade['stop_loss']:.5f}</td>
-          <td>{trade['lot_size']:.4f}</td>
+          <td>{format_price(entry_price)}</td>
+          <td>{format_price(stop_loss)}</td>
+          <td>{format_lot(lot_size)}</td>
           <td class="status-open">{trade.get('status', '-')}</td>
         </tr>
         """
