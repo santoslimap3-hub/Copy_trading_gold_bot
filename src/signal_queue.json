@@ -311,6 +311,18 @@
       "msg_text": "buy zone now",
       "timestamp": "2026-02-13T13:03:40.547227",
       "executed": true
+    },
+    {
+      "id": 6071,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 4987.17,
+      "sl_price": 4992.17,
+      "lot_size": 0.03,
+      "tp_levels": {},
+      "msg_text": "Sell zone now",
+      "timestamp": "2026-02-13T16:10:36.428243",
+      "executed": true
     }
   ]
 }

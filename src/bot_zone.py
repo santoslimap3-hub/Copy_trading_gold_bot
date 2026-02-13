@@ -68,6 +68,9 @@ session_manager: Optional[SessionManager] = None
 reconnect_monitor: Optional[ReconnectMonitor] = None
 
 # ===================== HEALTH MONITORING =====================
+# Global Telegram client reference (set in main(), used by health monitor for active checks)
+_telegram_client = None
+
 # Bot health metrics
 bot_start_time: float = 0
 messages_received: int = 0
@@ -85,6 +88,11 @@ telegram_connected: bool = False
 zone_monitor_alive: bool = False
 breakeven_monitor_alive: bool = False
 heartbeat_counter: int = 0
+
+# Track processed message IDs to avoid duplicate processing (push events + polling)
+_processed_msg_ids: set = set()
+_MAX_PROCESSED_IDS = 500  # Cap the set size to prevent memory leak
+POLLING_INTERVAL = 15  # seconds between polling checks
 
 # ===================== HELPERS =====================
 
@@ -550,8 +558,8 @@ def can_update_stop_loss(ticket: int, sl_price: float) -> Tuple[bool, str]:
 
 
 def calculate_failsafe_tp3(entry_price: float, side: str) -> float:
-    """Calculate failsafe TP3 based on the pattern: worst entry +/- 7 points."""
-    tp3 = entry_price + 7.0 if side == "BUY" else entry_price - 7.0
+    """Calculate failsafe TP3 based on the pattern: worst entry +/- 6 points."""
+    tp3 = entry_price + 6.0 if side == "BUY" else entry_price - 6.0
     return tp3
 
 
@@ -1011,7 +1019,7 @@ def execute_zone_trade(side: str, entry_price: float, msg_id: int, msg_text: str
 
         failsafe_tp3_price = calculate_failsafe_tp3(entry_price, side)
         failsafe_tp3[ticket] = failsafe_tp3_price
-        log("🎯 Failsafe TP3 distance: 7 points", "INFO")
+        log("🎯 Failsafe TP3 distance: 6 points", "INFO")
         log(f"🎯 Failsafe TP3 price: ${failsafe_tp3_price:.5f}", "DEBUG")
         set_take_profit(ticket, failsafe_tp3_price)
 
@@ -1147,19 +1155,49 @@ async def connection_health_monitor():
             else:
                 log("✅ MT5 connection healthy", "DEBUG")
             
-            # Update Telegram activity timestamp (updated by message handlers)
-            # If no activity for > 5 minutes during active trading hours, log warning
+            # ── Telegram connectivity check ──
+            # Phase 1: Check message activity
             if last_telegram_activity > 0:
                 time_since_telegram = time.time() - last_telegram_activity
-                if time_since_telegram > 300:  # 5 minutes (reduced from 10)
-                    log(f"⚠️ No Telegram activity for {time_since_telegram:.0f}s - connection may have delays", "WARN")
-                    telegram_connected = False
-                else:
-                    telegram_connected = True
-                    
+                
                 # Log activity status every check
                 if time_since_telegram < 120:  # Recent activity (< 2 min)
                     log(f"✅ Telegram active ({time_since_telegram:.0f}s since last message)", "DEBUG")
+                    telegram_connected = True
+                elif time_since_telegram > 300:  # 5 minutes with no messages
+                    log(f"⚠️ No Telegram activity for {time_since_telegram:.0f}s - running active connectivity check...", "WARN")
+                    
+                    # Phase 2: Active connectivity check using the actual client
+                    if _telegram_client is not None:
+                        try:
+                            # Quick check: is the client still connected?
+                            if not _telegram_client.is_connected():
+                                log("🚨 Telegram client.is_connected() = False - forcing disconnect to trigger reconnection", "WARN")
+                                telegram_connected = False
+                                try:
+                                    await _telegram_client.disconnect()
+                                except Exception:
+                                    pass  # Already disconnected, that's fine
+                            else:
+                                # Client thinks it's connected - verify with an active ping
+                                try:
+                                    await asyncio.wait_for(_telegram_client.get_me(), timeout=10)
+                                    log("✅ Telegram ping successful - connection alive, channel is just quiet", "DEBUG")
+                                    telegram_connected = True  # Connection is fine, just no messages
+                                except (asyncio.TimeoutError, Exception) as ping_err:
+                                    log(f"🚨 Telegram ping FAILED ({ping_err}) - connection is dead, forcing disconnect to trigger reconnection", "WARN")
+                                    telegram_connected = False
+                                    try:
+                                        await _telegram_client.disconnect()
+                                    except Exception:
+                                        pass
+                        except Exception as check_err:
+                            log(f"⚠️ Error during active Telegram check: {check_err}", "WARN")
+                            telegram_connected = False
+                    else:
+                        telegram_connected = False
+                else:
+                    telegram_connected = True
             
         except Exception as e:
             log(f"❌ CRITICAL: Health monitor exception: {str(e)}", "ERROR")
@@ -1270,7 +1308,9 @@ async def main():
     session_manager = SessionManager("trading_bot_session", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
 
+    global _telegram_client
     client = init_telegram()
+    _telegram_client = client  # Make accessible to health monitor for active connectivity checks
     ensure_mt5_connection()
 
     log("=" * 70, "INFO")
@@ -1293,7 +1333,16 @@ async def main():
         
         try:
             # Log ALL messages at the very start for debugging
-            log(f"🔔 INCOMING: chat_id={event.chat_id} | msg_id={event.message.id}", "INFO")
+            log(f"🔔 INCOMING (PUSH): chat_id={event.chat_id} | msg_id={event.message.id}", "INFO")
+            
+            # Deduplicate: skip if already processed by polling
+            if event.message.id in _processed_msg_ids:
+                log(f"⏭️  msg_id={event.message.id} already processed (via poll) - skipping", "DEBUG")
+                return
+            _processed_msg_ids.add(event.message.id)
+            # Cap the set size
+            if len(_processed_msg_ids) > _MAX_PROCESSED_IDS:
+                _processed_msg_ids.clear()
             
             # Track total messages received (before filtering)
             messages_received += 1
@@ -1477,6 +1526,8 @@ async def main():
         global pending_zone, messages_received, messages_ignored, last_telegram_activity
         
         try:
+            log(f"🔔 EDIT (PUSH): chat_id={event.chat_id} | msg_id={event.message.id}", "INFO")
+            
             # Update activity timestamp
             last_telegram_activity = time.time()
             
@@ -1702,7 +1753,16 @@ async def main():
     telegram_connected = True
     last_telegram_activity = time.time()
     log("✅ Telegram connected!", "INFO")
-    
+
+    # CRITICAL: Fetch dialogs to initialize Telethon's internal update state.
+    # Without this, Telethon may never deliver channel events (NewMessage/MessageEdited).
+    log("🔄 Initializing Telegram update state (get_dialogs)...", "INFO")
+    try:
+        dialogs = await client.get_dialogs()
+        log(f"✅ Loaded {len(dialogs)} dialogs - update state initialized", "INFO")
+    except Exception as e:
+        log(f"⚠️ get_dialogs failed: {e} - events may not be delivered!", "WARN")
+
     # Verify channel access
     log("🔍 Verifying channel access...", "INFO")
     for chat_id in ALLOWED_CHAT_IDS:
@@ -1742,16 +1802,224 @@ async def main():
     log("🎯 BOT READY - LISTENING FOR ZONES", "INFO")
     log("=" * 70, "INFO")
     
+    # ── Message Polling Fallback ──
+    # Telethon's push-based events can silently fail (stale session state, update gaps, etc.).
+    # This poller periodically fetches recent messages and processes any that were missed.
+    async def message_poller():
+        """Poll channels for new messages as a fallback to push events."""
+        global messages_received, messages_ignored, last_message_time, last_telegram_activity, pending_zone
+
+        log("📡 Message poller started (fallback for push events)", "INFO")
+        # Track the newest message ID we've seen per channel so we only process truly new ones
+        last_seen_ids: Dict[int, int] = {}
+
+        # Seed last_seen_ids with the current newest message in each channel
+        for chat_id in ALLOWED_CHAT_IDS:
+            try:
+                msgs = await client.get_messages(chat_id, limit=1)
+                if msgs:
+                    last_seen_ids[chat_id] = msgs[0].id
+                    log(f"   📡 Poller seed: chat {chat_id} latest msg_id={msgs[0].id}", "DEBUG")
+            except Exception as e:
+                log(f"   ⚠️ Poller seed failed for {chat_id}: {e}", "WARN")
+
+        while True:
+            try:
+                await asyncio.sleep(POLLING_INTERVAL)
+
+                for chat_id in ALLOWED_CHAT_IDS:
+                    try:
+                        msgs = await client.get_messages(chat_id, limit=5)
+                        if not msgs:
+                            continue
+
+                        min_id = last_seen_ids.get(chat_id, 0)
+
+                        for msg in reversed(msgs):  # oldest first
+                            if msg.id <= min_id:
+                                continue  # Already seen
+                            if msg.id in _processed_msg_ids:
+                                continue  # Already processed by push handler
+
+                            # Mark as processed
+                            _processed_msg_ids.add(msg.id)
+                            if len(_processed_msg_ids) > _MAX_PROCESSED_IDS:
+                                _processed_msg_ids.clear()
+
+                            last_seen_ids[chat_id] = max(last_seen_ids.get(chat_id, 0), msg.id)
+
+                            text = extract_message_text(msg).strip()
+                            if not text:
+                                continue
+
+                            # Update activity timestamps
+                            last_telegram_activity = time.time()
+                            last_message_time = time.time()
+                            messages_received += 1
+
+                            channel_name = "[TEST]" if chat_id == TEST_CHANNEL_ID else "[MAIN]"
+                            log("=" * 70, "INFO")
+                            log(f"📨 {channel_name} NEW MESSAGE (POLLED)", "INFO")
+                            log(f"   Message ID: {msg.id}", "INFO")
+                            log(f"   Chat ID: {chat_id}", "INFO")
+                            log(f"   Length: {len(text)} chars", "INFO")
+                            log(f"   Preview: {text[:150]}", "INFO")
+                            log("=" * 70, "INFO")
+
+                            # ── Process the message through the same logic as on_new_message ──
+                            if is_tp3_hit_message(text):
+                                log("🚨 TP3 HIT DETECTED (POLLED) - SAFETY EXIT!", "INFO")
+                                positions = mt5.positions_get(symbol=SYMBOL)
+                                if positions:
+                                    closed_count = 0
+                                    for p in positions:
+                                        if p.magic == MAGIC:
+                                            if close_position(p.ticket):
+                                                closed_count += 1
+                                    if closed_count > 0:
+                                        log(f"✅ CLOSED {closed_count} POSITION(S) on TP3 HIT (POLLED)", "INFO")
+                                continue
+
+                            if is_cancel_message(text):
+                                clear_pending_zone("cancel message (polled)")
+                                continue
+
+                            if is_informational_message(text):
+                                log(f"⏭️  Informational message (polled) - skipping", "INFO")
+                                messages_ignored += 1
+                                continue
+
+                            if is_high_risk_message(text):
+                                log(f"⏭️  HIGH RISK message (polled) - skipping", "WARN")
+                                messages_ignored += 1
+                                continue
+
+                            side = parse_zone_side(text)
+                            zone_range = parse_zone_range(text)
+
+                            if side and zone_range:
+                                zone_low, zone_high = zone_range
+                                targets = parse_targets(text)
+                                sl_price = parse_invalid_sl(text)
+                                log(f"🎯 ZONE DETECTED (POLLED): {side} {zone_low:.2f}-{zone_high:.2f}", "INFO")
+                                log_signal_attempt(side, "RECEIVED", f"msg_id={msg.id} (polled)")
+                                set_pending_zone(side=side, zone_low=zone_low, zone_high=zone_high,
+                                                 targets=targets, sl=sl_price, msg_id=msg.id, msg_text=text)
+                                try_execute_pending_zone()
+                                continue
+
+                            if side and not zone_range:
+                                log(f"⚡ IMMEDIATE ZONE ENTRY (POLLED): {side}", "INFO")
+                                log_signal_attempt(side, "RECEIVED", f"msg_id={msg.id} - IMMEDIATE (polled)")
+                                current_price = get_market_price(side)
+                                if current_price:
+                                    execute_zone_trade(side=side, entry_price=current_price, msg_id=msg.id,
+                                                       msg_text=text, sl_price=None, targets=[])
+                                continue
+
+                            if is_active_message(text):
+                                log("🟡 Zone marked active (polled)", "INFO")
+                                try_execute_pending_zone()
+                                continue
+
+                            sl_update = parse_invalid_sl(text)
+                            if sl_update:
+                                positions = mt5.positions_get(symbol=SYMBOL)
+                                if positions:
+                                    ticket = int(positions[-1].ticket)
+                                    can_update, reason = can_update_stop_loss(ticket, sl_update)
+                                    if can_update:
+                                        set_stop_loss(ticket, sl_update)
+                                continue
+
+                            targets = parse_targets(text)
+                            if targets:
+                                positions = mt5.positions_get(symbol=SYMBOL)
+                                if positions:
+                                    ticket = int(positions[-1].ticket)
+                                    apply_targets_to_ticket(ticket, targets)
+                                continue
+
+                            log(f"⏭️  Polled message not recognized as signal", "DEBUG")
+                            messages_ignored += 1
+
+                        # Update last_seen even if nothing new (in case the channel is quiet)
+                        if msgs:
+                            last_seen_ids[chat_id] = max(last_seen_ids.get(chat_id, 0), msgs[0].id)
+
+                    except Exception as ce:
+                        log(f"⚠️ Poller error for chat {chat_id}: {ce}", "WARN")
+
+            except Exception as e:
+                log(f"❌ Message poller exception: {e}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+                await asyncio.sleep(10)
+
+    asyncio.create_task(message_poller())
+    log("✅ Message poller fallback task created", "INFO")
+
     # Print initial status
     print_bot_status()
 
     await replay_pending_signals(client)
 
+    max_reconnect_delay = 60  # Cap backoff at 60 seconds
+    reconnect_delay = 5       # Start with 5 second delay
+    consecutive_failures = 0
+
     try:
         while True:
             try:
                 await client.run_until_disconnected()
-                break
+                # run_until_disconnected() returned normally — means connection was lost
+                # (NOT a keyboard interrupt, NOT an exception — just a clean disconnect)
+                telegram_connected = False
+                telegram_connection_losses += 1
+                log("🚨 Telegram disconnected (run_until_disconnected returned) - will reconnect...", "WARN")
+                
+                reconnect_monitor.record_reconnect("Disconnected", "run_until_disconnected returned")
+                
+                await asyncio.sleep(reconnect_delay)
+                
+                try:
+                    await client.connect()
+                    if await client.is_user_authorized():
+                        telegram_connected = True
+                        last_telegram_activity = time.time()
+                        consecutive_failures = 0
+                        reconnect_delay = 5  # Reset backoff
+                        log("✅ Telegram reconnected successfully after disconnect", "INFO")
+                        try:
+                            await client.get_dialogs()
+                            log("✅ Dialogs refreshed after reconnect", "DEBUG")
+                        except Exception:
+                            pass
+                        await catch_up_messages(client, lookback_minutes=5)
+                    else:
+                        log("⚠️ Telegram connected but not authorized - restarting client...", "WARN")
+                        await client.start()
+                        telegram_connected = True
+                        last_telegram_activity = time.time()
+                        consecutive_failures = 0
+                        reconnect_delay = 5
+                        log("✅ Telegram client restarted and authorized", "INFO")
+                        try:
+                            await client.get_dialogs()
+                            log("✅ Dialogs refreshed after restart", "DEBUG")
+                        except Exception:
+                            pass
+                        await catch_up_messages(client, lookback_minutes=5)
+                except Exception as reconn_err:
+                    consecutive_failures += 1
+                    reconnect_delay = min(reconnect_delay * 2, max_reconnect_delay)
+                    telegram_connected = False
+                    log(f"❌ Telegram reconnection failed (attempt {consecutive_failures}): {reconn_err}", "ERROR")
+                    log(f"   Next retry in {reconnect_delay}s", "WARN")
+                    await asyncio.sleep(reconnect_delay)
+                
+                continue  # Re-enter the while loop to call run_until_disconnected again
+
             except KeyboardInterrupt:
                 log("⏹️ Keyboard interrupt received - shutting down", "INFO")
                 break
@@ -1771,6 +2039,10 @@ async def main():
                     log("🔄 Rotating session file due to repeated TLObject errors", "INFO")
                     session_manager.rotate_session()
                     client = TelegramClient(session_manager.get_current_session_file(), API_ID, API_HASH)
+                    _telegram_client = client
+                    # Re-register event handlers on the new client
+                    client.on(events.NewMessage())(on_new_message)
+                    client.on(events.MessageEdited())(on_edit)
 
                 try:
                     await client.disconnect()
@@ -1784,6 +2056,11 @@ async def main():
                     telegram_connected = True
                     last_telegram_activity = time.time()
                     log("✅ Telegram client restarted after TypeNotFoundError", "INFO")
+                    try:
+                        await client.get_dialogs()
+                        log("✅ Dialogs refreshed after TypeNotFoundError restart", "DEBUG")
+                    except Exception:
+                        pass
                     # Catch up on any missed messages during disconnection
                     await catch_up_messages(client, lookback_minutes=3)
                 except Exception as ex2:
