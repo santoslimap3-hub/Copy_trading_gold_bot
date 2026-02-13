@@ -299,6 +299,18 @@
       "msg_text": "The high risk buy zone which was closed was noted as -150 pip due to the speed it moved",
       "timestamp": "2026-02-13T04:14:16.633762",
       "executed": true
+    },
+    {
+      "id": 35,
+      "signal_type": "ZONE",
+      "side": "BUY",
+      "entry_price": 4980.31,
+      "sl_price": 4975.31,
+      "lot_size": 0.49,
+      "tp_levels": {},
+      "msg_text": "buy zone now",
+      "timestamp": "2026-02-13T13:03:40.547227",
+      "executed": true
     }
   ]
 }
