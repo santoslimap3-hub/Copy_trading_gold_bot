@@ -78,9 +78,13 @@ class BotTradesExporter:
         
         # Get deals from the past N days
         from_date = datetime.now() - timedelta(days=days_back)
+        # Use end-of-tomorrow to guarantee today's latest deals are captured
+        # (MT5 server timezone may differ from local time, and recently closed
+        # deals can take a moment to appear in history)
+        to_date = datetime.now() + timedelta(days=1)
         
         # Get all deals
-        deals = mt5.history_deals_get(from_date, datetime.now())
+        deals = mt5.history_deals_get(from_date, to_date)
         
         if deals is None:
             print(f"❌ Failed to get deals: {mt5.last_error()}")
@@ -134,7 +138,8 @@ class BotTradesExporter:
         print(f"\n📥 Fetching orders from the last {days_back} days...")
 
         from_date = datetime.now() - timedelta(days=days_back)
-        orders = mt5.history_orders_get(from_date, datetime.now())
+        to_date = datetime.now() + timedelta(days=1)
+        orders = mt5.history_orders_get(from_date, to_date)
 
         if orders is None:
             print(f"❌ Failed to get orders: {mt5.last_error()}")

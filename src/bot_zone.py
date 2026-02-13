@@ -680,6 +680,18 @@ def price_crossed_tp1(ticket: int, tp1: float, current_price: float) -> bool:
 
 # ===================== PARSING =====================
 
+def is_tp1_hit_message(text: str) -> bool:
+    """Check if message indicates TP1 / Target 1 has been hit (breakeven trigger)."""
+    t = (text or "").upper()
+    return bool(re.search(r"\bTP\s*1\s+HIT\b|\bTARGET\s*1\b", t))
+
+
+def is_tp2_hit_message(text: str) -> bool:
+    """Check if message indicates TP2 / Target 2 has been hit."""
+    t = (text or "").upper()
+    return bool(re.search(r"\bTP\s*2\s+HIT\b|\bTARGET\s*2\b", t))
+
+
 def is_tp3_hit_message(text: str) -> bool:
     """Check if message is a TP3 HIT signal (safety exit trigger)."""
     t = (text or "").upper()
@@ -1397,6 +1409,39 @@ async def main():
             log(f"   Preview: {text[:150]}", "INFO")
             log("=" * 70, "INFO")
 
+            # ── TARGET 1 HIT → Move SL to breakeven ──
+            if is_tp1_hit_message(text):
+                log("=" * 70, "INFO")
+                log("🎯 TARGET 1 HIT DETECTED - MOVING SL TO BREAKEVEN!", "INFO")
+                log("=" * 70, "INFO")
+
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+                if positions:
+                    moved_count = 0
+                    for p in positions:
+                        if p.magic == MAGIC:
+                            ticket = int(p.ticket)
+                            if breakeven_activated.get(ticket, False):
+                                log(f"   Ticket {ticket}: Breakeven already active - skipping", "INFO")
+                                continue
+                            entry = entry_prices.get(ticket, float(p.price_open))
+                            log(f"🛡️ Moving SL to breakeven for ticket {ticket}: ${entry:.5f}", "INFO")
+                            await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
+                            breakeven_activated[ticket] = True
+                            moved_count += 1
+                    if moved_count > 0:
+                        log(f"✅ BREAKEVEN SET on {moved_count} position(s) after TARGET 1 HIT", "INFO")
+                    else:
+                        log("⚠️ No positions needed breakeven update", "WARN")
+                else:
+                    log("⚠️ TARGET 1 HIT but no open positions found", "WARN")
+                return
+
+            # ── TARGET 2 HIT → Acknowledge (position stays open for TP3) ──
+            if is_tp2_hit_message(text):
+                log("🎯 TARGET 2 HIT acknowledged - position remains open for TP3", "INFO")
+                return
+
             if is_tp3_hit_message(text):
                 log("=" * 70, "INFO")
                 log("🚨 TP3 HIT DETECTED - SAFETY EXIT!", "INFO")
@@ -1521,7 +1566,7 @@ async def main():
             
             # If we got here, message wasn't recognized as any signal type
             log(f"⏭️  Message not recognized as signal - ignoring", "DEBUG")
-            log(f"   Checks: TP3_HIT={is_tp3_hit_message(text)} | CANCEL={is_cancel_message(text)} | SIDE={side} | ACTIVE={is_active_message(text)}", "DEBUG")
+            log(f"   Checks: TP1={is_tp1_hit_message(text)} | TP2={is_tp2_hit_message(text)} | TP3={is_tp3_hit_message(text)} | CANCEL={is_cancel_message(text)} | SIDE={side} | ACTIVE={is_active_message(text)}", "DEBUG")
             messages_ignored += 1
 
         except Exception as e:
@@ -1564,6 +1609,26 @@ async def main():
             log(f"   Message ID: {msg_id}", "INFO")
             log(f"   Preview: {text[:150]}", "INFO")
             log("=" * 70, "INFO")
+
+            # ── TARGET 1 HIT (EDIT) → Move SL to breakeven ──
+            if is_tp1_hit_message(text):
+                log("🎯 TARGET 1 HIT DETECTED (EDIT) - MOVING SL TO BREAKEVEN!", "INFO")
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+                if positions:
+                    for p in positions:
+                        if p.magic == MAGIC:
+                            ticket = int(p.ticket)
+                            if not breakeven_activated.get(ticket, False):
+                                entry = entry_prices.get(ticket, float(p.price_open))
+                                log(f"🛡️ Moving SL to breakeven for ticket {ticket}: ${entry:.5f}", "INFO")
+                                await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
+                                breakeven_activated[ticket] = True
+                return
+
+            # ── TARGET 2 HIT (EDIT) → Acknowledge ──
+            if is_tp2_hit_message(text):
+                log("🎯 TARGET 2 HIT acknowledged (EDIT) - position remains open for TP3", "INFO")
+                return
 
             if is_tp3_hit_message(text):
                 log("=" * 70, "INFO")
@@ -1878,6 +1943,37 @@ async def main():
                             log("=" * 70, "INFO")
 
                             # ── Process the message through the same logic as on_new_message ──
+
+                            # ── TARGET 1 HIT → Move SL to breakeven ──
+                            if is_tp1_hit_message(text):
+                                log("🎯 TARGET 1 HIT DETECTED (POLLED) - MOVING SL TO BREAKEVEN!", "INFO")
+                                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+                                if positions:
+                                    moved_count = 0
+                                    for p in positions:
+                                        if p.magic == MAGIC:
+                                            ticket = int(p.ticket)
+                                            if breakeven_activated.get(ticket, False):
+                                                log(f"   Ticket {ticket}: Breakeven already active - skipping", "INFO")
+                                                continue
+                                            entry = entry_prices.get(ticket, float(p.price_open))
+                                            log(f"🛡️ Moving SL to breakeven for ticket {ticket}: ${entry:.5f}", "INFO")
+                                            await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
+                                            breakeven_activated[ticket] = True
+                                            moved_count += 1
+                                    if moved_count > 0:
+                                        log(f"✅ BREAKEVEN SET on {moved_count} position(s) after TARGET 1 HIT (POLLED)", "INFO")
+                                    else:
+                                        log("⚠️ No positions needed breakeven update", "WARN")
+                                else:
+                                    log("⚠️ TARGET 1 HIT but no open positions found", "WARN")
+                                continue
+
+                            # ── TARGET 2 HIT → Acknowledge ──
+                            if is_tp2_hit_message(text):
+                                log("🎯 TARGET 2 HIT acknowledged (POLLED) - position remains open for TP3", "INFO")
+                                continue
+
                             if is_tp3_hit_message(text):
                                 log("🚨 TP3 HIT DETECTED (POLLED) - SAFETY EXIT!", "INFO")
                                 positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
