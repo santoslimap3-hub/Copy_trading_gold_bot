@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-02-13T20:41:43.590129",
+    "created_at": "2026-02-13T23:52:30.917048",
     "days_back": 365,
     "exporter": "account_trades_exporter"
   },
@@ -8,10 +8,10 @@
     "login": 22840119,
     "server": "VantageInternational-Live 14",
     "currency": "EUR",
-    "balance": 287.63,
-    "equity": 287.63,
+    "balance": 272.35,
+    "equity": 272.35,
     "margin": 0.0,
-    "free_margin": 287.63,
+    "free_margin": 272.35,
     "margin_level": 0,
     "floating_pnl": 0.0,
     "leverage": 500,
@@ -19,24 +19,24 @@
     "open_positions_count": 0
   },
   "summary": {
-    "total_trades": 251,
-    "buy_trades": 106,
-    "sell_trades": 145,
-    "winning_trades": 145,
-    "losing_trades": 101,
+    "total_trades": 259,
+    "buy_trades": 111,
+    "sell_trades": 148,
+    "winning_trades": 148,
+    "losing_trades": 106,
     "breakeven_trades": 5,
-    "win_rate": 57.77,
-    "total_profit": 1055.01,
-    "total_loss": 917.32,
-    "net_pnl": 137.69,
+    "win_rate": 57.14,
+    "total_profit": 1087.7,
+    "total_loss": 965.29,
+    "net_pnl": 122.41,
     "total_commission": 0.0,
     "total_swap": -0.06,
     "total_fees": 0.0,
-    "net_after_costs": 137.63,
-    "profit_factor": 1.15,
-    "avg_pnl": 0.55,
-    "avg_win": 7.28,
-    "avg_loss": 9.08,
+    "net_after_costs": 122.35,
+    "profit_factor": 1.13,
+    "avg_pnl": 0.47,
+    "avg_win": 7.35,
+    "avg_loss": 9.11,
     "largest_win": 74.26,
     "largest_loss": -129.22,
     "max_consecutive_wins": 8,
@@ -44,9 +44,9 @@
     "max_drawdown": 170.31,
     "max_drawdown_pct": 84.46,
     "initial_balance": 150.0,
-    "final_balance": 287.63,
+    "final_balance": 272.35,
     "profitable_days": 18,
-    "losing_days": 11,
+    "losing_days": 12,
     "best_day": {
       "date": "2026-01-31",
       "pnl": 74.26,
@@ -61,11 +61,11 @@
       "wins": 4,
       "losses": 7
     },
-    "trades_per_day": 6.86,
-    "avg_daily_pnl": 3.76,
+    "trades_per_day": 7.05,
+    "avg_daily_pnl": 3.33,
     "trading_days": 36,
     "first_trade": "2026-01-08T08:33:53",
-    "last_trade": "2026-02-13T22:34:19",
+    "last_trade": "2026-02-14T01:50:27",
     "balance_curve": [
       {
         "time": 1767832433,
@@ -2074,6 +2074,70 @@
         "pnl": 0.46,
         "drawdown": 16.47,
         "drawdown_pct": 5.42
+      },
+      {
+        "time": 1770996970,
+        "time_str": "2026-02-13T23:36:10",
+        "balance": 302.31,
+        "pnl": 14.68,
+        "drawdown": 1.79,
+        "drawdown_pct": 0.59
+      },
+      {
+        "time": 1770999301,
+        "time_str": "2026-02-14T00:15:01",
+        "balance": 287.62,
+        "pnl": -14.69,
+        "drawdown": 16.48,
+        "drawdown_pct": 5.42
+      },
+      {
+        "time": 1770999691,
+        "time_str": "2026-02-14T00:21:31",
+        "balance": 286.76,
+        "pnl": -0.86,
+        "drawdown": 17.34,
+        "drawdown_pct": 5.7
+      },
+      {
+        "time": 1771003060,
+        "time_str": "2026-02-14T01:17:40",
+        "balance": 274.22,
+        "pnl": -12.54,
+        "drawdown": 29.88,
+        "drawdown_pct": 9.83
+      },
+      {
+        "time": 1771004208,
+        "time_str": "2026-02-14T01:36:48",
+        "balance": 255.38,
+        "pnl": -18.84,
+        "drawdown": 48.72,
+        "drawdown_pct": 16.02
+      },
+      {
+        "time": 1771004244,
+        "time_str": "2026-02-14T01:37:24",
+        "balance": 260.39,
+        "pnl": 5.01,
+        "drawdown": 43.71,
+        "drawdown_pct": 14.37
+      },
+      {
+        "time": 1771004858,
+        "time_str": "2026-02-14T01:47:38",
+        "balance": 259.35,
+        "pnl": -1.04,
+        "drawdown": 44.75,
+        "drawdown_pct": 14.72
+      },
+      {
+        "time": 1771005027,
+        "time_str": "2026-02-14T01:50:27",
+        "balance": 272.35,
+        "pnl": 13.0,
+        "drawdown": 31.75,
+        "drawdown_pct": 10.44
       }
     ],
     "daily_pnl": [
@@ -2275,10 +2339,17 @@
       },
       {
         "date": "2026-02-13",
-        "pnl": 12.83,
-        "trades": 28,
-        "wins": 16,
+        "pnl": 27.51,
+        "trades": 29,
+        "wins": 17,
         "losses": 11
+      },
+      {
+        "date": "2026-02-14",
+        "pnl": -29.96,
+        "trades": 7,
+        "wins": 2,
+        "losses": 5
       }
     ],
     "symbol_breakdown": [
@@ -2301,15 +2372,6 @@
         "win_rate": 66.7
       },
       {
-        "symbol": "XAUUSD",
-        "trades": 196,
-        "pnl": 18.6,
-        "volume": 3.47,
-        "wins": 114,
-        "losses": 77,
-        "win_rate": 58.2
-      },
-      {
         "symbol": "USDJPY",
         "trades": 2,
         "pnl": 12.7,
@@ -2326,6 +2388,15 @@
         "wins": 2,
         "losses": 2,
         "win_rate": 50.0
+      },
+      {
+        "symbol": "XAUUSD",
+        "trades": 204,
+        "pnl": 3.32,
+        "volume": 3.71,
+        "wins": 117,
+        "losses": 82,
+        "win_rate": 57.4
       },
       {
         "symbol": "USDCHF",
@@ -2383,10 +2454,10 @@
       },
       {
         "month": "2026-02",
-        "pnl": 112.24,
-        "trades": 117,
-        "wins": 65,
-        "losses": 50
+        "pnl": 96.96,
+        "trades": 125,
+        "wins": 68,
+        "losses": 55
       }
     ]
   },
@@ -7410,6 +7481,166 @@
       "fee": 0.0,
       "symbol": "XAUUSD",
       "comment": "[sl 4968.05]"
+    },
+    {
+      "ticket": 24495623,
+      "order": 26012752,
+      "position_id": 26008308,
+      "time": 1770996970,
+      "time_str": "2026-02-13T23:36:10",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 5,
+      "volume": 0.03,
+      "price": 4987.68,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 14.68,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 4987.68]"
+    },
+    {
+      "ticket": 24558357,
+      "order": 26075886,
+      "position_id": 26068605,
+      "time": 1770999301,
+      "time_str": "2026-02-14T00:15:01",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 5005.08,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -14.69,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5005.00]"
+    },
+    {
+      "ticket": 24573289,
+      "order": 26091574,
+      "position_id": 26084340,
+      "time": 1770999691,
+      "time_str": "2026-02-14T00:21:31",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 5005.4,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.86,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5004.99]"
+    },
+    {
+      "ticket": 24672431,
+      "order": 26190987,
+      "position_id": 26182866,
+      "time": 1771003060,
+      "time_str": "2026-02-14T01:17:40",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 4997.69,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -12.54,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 4997.69]"
+    },
+    {
+      "ticket": 24695211,
+      "order": 26214037,
+      "position_id": 26213379,
+      "time": 1771004208,
+      "time_str": "2026-02-14T01:36:48",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 5017.52,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -18.84,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5015.10]"
+    },
+    {
+      "ticket": 24699711,
+      "order": 26218458,
+      "position_id": 26216791,
+      "time": 1771004244,
+      "time_str": "2026-02-14T01:37:24",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 5017.25,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.01,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5017.00]"
+    },
+    {
+      "ticket": 24716088,
+      "order": 26234951,
+      "position_id": 26231494,
+      "time": 1771004858,
+      "time_str": "2026-02-14T01:47:38",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 5000.32,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -1.04,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5000.77]"
+    },
+    {
+      "ticket": 24727445,
+      "order": 26246342,
+      "position_id": 26242862,
+      "time": 1771005027,
+      "time_str": "2026-02-14T01:50:27",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 3,
+      "volume": 0.03,
+      "price": 4996.64,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 13.0,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "TP3 HIT - SAFETY"
     }
   ]
 }
