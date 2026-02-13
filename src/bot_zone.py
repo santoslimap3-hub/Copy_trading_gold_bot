@@ -509,8 +509,15 @@ def close_position(ticket: int, close_reason: str = "SAFETY_EXIT") -> bool:
     return success
 
 
-def set_stop_loss(ticket: int, sl_price: float) -> bool:
-    """Update position stop loss - preserves current TP"""
+def set_stop_loss(ticket: int, sl_price: float, retries: int = 0, retry_delay: float = 2.0) -> bool:
+    """Update position stop loss - preserves current TP.
+    
+    Args:
+        ticket: Position ticket number
+        sl_price: Desired stop loss price
+        retries: Number of retry attempts on "Invalid stops" (broker min distance)
+        retry_delay: Seconds to wait between retries
+    """
     log(f"🛡️ Updating SL for ticket {ticket} to ${sl_price:.5f}...", "INFO")
 
     pos = mt5.positions_get(ticket=ticket)
@@ -518,8 +525,23 @@ def set_stop_loss(ticket: int, sl_price: float) -> bool:
         log(f"❌ Position {ticket} not found", "ERROR")
         return False
 
+    side = "BUY" if pos[0].type == mt5.ORDER_TYPE_BUY else "SELL"
     current_tp = float(pos[0].tp) if pos[0].tp > 0 else 0.0
     log(f"   Current TP: ${current_tp:.5f} (will preserve)", "DEBUG")
+
+    # Check broker minimum stop distance
+    sym_info = mt5.symbol_info(SYMBOL)
+    if sym_info:
+        stops_level = sym_info.trade_stops_level  # in points
+        point = sym_info.point
+        min_distance = stops_level * point
+        tick = mt5.symbol_info_tick(SYMBOL)
+        if tick:
+            ref_price = tick.bid if side == "BUY" else tick.ask
+            actual_distance = abs(ref_price - sl_price)
+            log(f"   Stops check: price=${ref_price:.5f} | SL=${sl_price:.5f} | dist={actual_distance:.5f} | min={min_distance:.5f} (stops_level={stops_level})", "DEBUG")
+            if actual_distance < min_distance and min_distance > 0:
+                log(f"⚠️ SL too close to price: {actual_distance:.5f} < min {min_distance:.5f} — will retry if allowed", "WARN")
 
     request = {
         "action": mt5.TRADE_ACTION_SLTP,
@@ -540,6 +562,11 @@ def set_stop_loss(ticket: int, sl_price: float) -> bool:
     else:
         log(f"⚠️ SL update FAILED - Retcode: {result.retcode} | Error: {result.comment}", "WARN")
         log(f"   Last MT5 error: {mt5.last_error()}", "WARN")
+        # Retry on "Invalid stops" — price may move further from SL
+        if result.retcode == 10016 and retries > 0:
+            log(f"🔄 Retrying SL update in {retry_delay}s... ({retries} attempts left)", "INFO")
+            time.sleep(retry_delay)
+            return set_stop_loss(ticket, sl_price, retries=retries - 1, retry_delay=retry_delay)
 
     return success
 
@@ -1426,9 +1453,12 @@ async def main():
                                 continue
                             entry = entry_prices.get(ticket, float(p.price_open))
                             log(f"🛡️ Moving SL to breakeven for ticket {ticket}: ${entry:.5f}", "INFO")
-                            await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
-                            breakeven_activated[ticket] = True
-                            moved_count += 1
+                            ok = await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e, retries=3, retry_delay=2.0))
+                            if ok:
+                                breakeven_activated[ticket] = True
+                                moved_count += 1
+                            else:
+                                log(f"⚠️ Breakeven SL failed for ticket {ticket} after retries", "WARN")
                     if moved_count > 0:
                         log(f"✅ BREAKEVEN SET on {moved_count} position(s) after TARGET 1 HIT", "INFO")
                     else:
@@ -1621,8 +1651,11 @@ async def main():
                             if not breakeven_activated.get(ticket, False):
                                 entry = entry_prices.get(ticket, float(p.price_open))
                                 log(f"🛡️ Moving SL to breakeven for ticket {ticket}: ${entry:.5f}", "INFO")
-                                await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
-                                breakeven_activated[ticket] = True
+                                ok = await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e, retries=3, retry_delay=2.0))
+                                if ok:
+                                    breakeven_activated[ticket] = True
+                                else:
+                                    log(f"⚠️ Breakeven SL failed for ticket {ticket} after retries", "WARN")
                 return
 
             # ── TARGET 2 HIT (EDIT) → Acknowledge ──
