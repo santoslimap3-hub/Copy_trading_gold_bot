@@ -5,6 +5,7 @@ Uses the same execution strategy as bot_v2.py, adapted for zone-style messages.
 """
 
 import asyncio
+import concurrent.futures
 import os
 import re
 import sys
@@ -93,6 +94,14 @@ heartbeat_counter: int = 0
 _processed_msg_ids: set = set()
 _MAX_PROCESSED_IDS = 500  # Cap the set size to prevent memory leak
 POLLING_INTERVAL = 15  # seconds between polling checks
+
+# Thread pool for running blocking MT5 calls without freezing the async event loop
+_mt5_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="mt5")
+
+async def run_mt5(func, *args):
+    """Run a blocking MT5 function in a thread so the event loop stays responsive."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_mt5_executor, func, *args)
 
 # ===================== HELPERS =====================
 
@@ -1131,22 +1140,23 @@ async def heartbeat_monitor():
 
 
 async def connection_health_monitor():
-    """Monitor MT5 and Telegram connection health - runs every 30 seconds"""
+    """Monitor MT5 and Telegram connection health - runs every 60 seconds"""
     global mt5_connected, telegram_connected
     
     log("🏥 Connection health monitor started", "INFO")
     
     while True:
         try:
-            await asyncio.sleep(30)  # Every 30 seconds
+            await asyncio.sleep(60)  # Every 60 seconds (was 30 - reduced to avoid blocking event loop)
             
             log("🔍 Running connection health checks...", "DEBUG")
             
-            # Check MT5 connection
-            mt5_healthy = check_mt5_health()
+            # Check MT5 connection (in executor to avoid blocking)
+            mt5_healthy = await run_mt5(check_mt5_health)
             if not mt5_healthy:
                 log("🚨 MT5 connection unhealthy - attempting recovery", "WARN")
-                if recover_mt5_connection():
+                recovered = await run_mt5(recover_mt5_connection)
+                if recovered:
                     log("✅ MT5 connection recovered", "INFO")
                     mt5_connected = True
                 else:
@@ -1287,7 +1297,8 @@ async def monitor_pending_zone():
                     clear_pending_zone("timeout")
                     continue
             
-            try_execute_pending_zone()
+            # Run the potentially blocking zone check (contains MT5 calls) in executor
+            await run_mt5(try_execute_pending_zone)
             
         except Exception as e:
             log(f"❌ CRITICAL: Zone monitor exception: {str(e)}", "ERROR")
@@ -1391,13 +1402,13 @@ async def main():
                 log("🚨 TP3 HIT DETECTED - SAFETY EXIT!", "INFO")
                 log("=" * 70, "INFO")
 
-                positions = mt5.positions_get(symbol=SYMBOL)
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                 if positions:
                     closed_count = 0
                     for p in positions:
                         if p.magic == MAGIC:
                             log(f"🎯 Closing position: Ticket {p.ticket} | Volume {p.volume:.3f}", "INFO")
-                            if close_position(p.ticket):
+                            if await run_mt5(lambda: close_position(p.ticket)):
                                 closed_count += 1
 
                     if closed_count > 0:
@@ -1451,7 +1462,7 @@ async def main():
                     msg_text=text,
                 )
 
-                try_execute_pending_zone()
+                await run_mt5(try_execute_pending_zone)
                 return
 
             if side and not zone_range:
@@ -1460,16 +1471,16 @@ async def main():
                 log(f"   Message: {text[:100]}", "DEBUG")
                 log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id} - IMMEDIATE ENTRY")
 
-                current_price = get_market_price(side)
+                current_price = await run_mt5(lambda: get_market_price(side))
                 if current_price:
-                    execute_zone_trade(
+                    await run_mt5(lambda: execute_zone_trade(
                         side=side,
                         entry_price=current_price,
                         msg_id=msg_id,
                         msg_text=text,
                         sl_price=None,  # Use failsafe SL distance (8.0)
                         targets=[],  # Use failsafe TP3
-                    )
+                    ))
                 else:
                     log("❌ Cannot get market price for immediate zone entry", "ERROR")
                     log_signal_attempt(side, "FAILED", "Cannot get market price")
@@ -1478,12 +1489,12 @@ async def main():
             if is_active_message(text):
                 log("🟡 Zone marked active", "INFO")
                 log(f"   Message: {text[:100]}", "DEBUG")
-                try_execute_pending_zone()
+                await run_mt5(try_execute_pending_zone)
                 return
 
             sl_update = parse_invalid_sl(text)
             if sl_update:
-                positions = mt5.positions_get(symbol=SYMBOL)
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                 if not positions:
                     log("⚠️ No open positions to update - ignoring SL", "WARN")
                     return
@@ -1491,21 +1502,21 @@ async def main():
                 ticket = int(positions[-1].ticket)
                 can_update, reason = can_update_stop_loss(ticket, sl_update)
                 if can_update:
-                    set_stop_loss(ticket, sl_update)
+                    await run_mt5(lambda: set_stop_loss(ticket, sl_update))
                 else:
                     log(f"⚠️ SL update skipped: {reason}", "WARN")
 
             targets = parse_targets(text)
             if targets:
                 log(f"📊 Found {len(targets)} target(s) in message: {targets}", "DEBUG")
-                positions = mt5.positions_get(symbol=SYMBOL)
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                 if not positions:
                     log("⚠️ No open positions to update - ignoring targets", "WARN")
                     return
 
                 ticket = int(positions[-1].ticket)
                 log(f"   Applying to ticket: {ticket}", "DEBUG")
-                apply_targets_to_ticket(ticket, targets)
+                await run_mt5(lambda: apply_targets_to_ticket(ticket, targets))
                 return
             
             # If we got here, message wasn't recognized as any signal type
@@ -1559,13 +1570,13 @@ async def main():
                 log("🚨 TP3 HIT DETECTED (EDIT) - SAFETY EXIT!", "INFO")
                 log("=" * 70, "INFO")
 
-                positions = mt5.positions_get(symbol=SYMBOL)
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                 if positions:
                     closed_count = 0
                     for p in positions:
                         if p.magic == MAGIC:
                             log(f"🎯 Closing position: Ticket {p.ticket} | Volume {p.volume:.3f}", "INFO")
-                            if close_position(p.ticket):
+                            if await run_mt5(lambda: close_position(p.ticket)):
                                 closed_count += 1
 
                     if closed_count > 0:
@@ -1586,12 +1597,12 @@ async def main():
                 pending_zone["targets"] = parse_targets(text)
                 pending_zone["sl"] = parse_invalid_sl(text)
                 log("🔄 Pending zone updated from edit", "INFO")
-                try_execute_pending_zone()
+                await run_mt5(try_execute_pending_zone)
                 return
 
             if msg_id not in position_map:
                 log(f"⚠️ Message ID {msg_id} not in position_map - checking for recent positions", "WARN")
-                positions = mt5.positions_get(symbol=SYMBOL)
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                 if not positions:
                     log("⚠️ No open positions at all - ignoring edit", "WARN")
                     return
@@ -1601,7 +1612,7 @@ async def main():
                 ticket = position_map[msg_id]
                 log(f"   Found mapped ticket: {ticket}", "DEBUG")
 
-            pos = mt5.positions_get(ticket=ticket)
+            pos = await run_mt5(lambda: mt5.positions_get(ticket=ticket))
             if not pos:
                 log(f"❌ Position {ticket} not found - may have been closed", "WARN")
                 return
@@ -1611,14 +1622,14 @@ async def main():
                 log(f"📊 Found SL in edit: ${sl:.5f}", "DEBUG")
                 can_update, reason = can_update_stop_loss(ticket, sl)
                 if can_update:
-                    set_stop_loss(ticket, sl)
+                    await run_mt5(lambda: set_stop_loss(ticket, sl))
                 else:
                     log(f"⚠️ SL update skipped: {reason}", "WARN")
 
             targets = parse_targets(text)
             if targets:
                 log(f"📊 Found {len(targets)} target(s) in edit: {targets}", "DEBUG")
-                apply_targets_to_ticket(ticket, targets)
+                await run_mt5(lambda: apply_targets_to_ticket(ticket, targets))
 
         except Exception as e:
             log(f"❌ CRITICAL EXCEPTION in on_edit: {str(e)}", "ERROR")
@@ -1639,7 +1650,7 @@ async def main():
                 breakeven_monitor_alive = True
                 check_count += 1
 
-                positions = mt5.positions_get(symbol=SYMBOL)
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
 
                 if not positions:
                     if check_count % 30 == 0:  # Every 60 seconds
@@ -1666,13 +1677,13 @@ async def main():
 
                     tp1 = tp_levels[ticket][1]
                     entry = entry_prices[ticket]
-                    side = get_position_side(ticket)
+                    side = await run_mt5(lambda t=ticket: get_position_side(t))
 
                     if side is None:
                         log(f"   Ticket {ticket}: Position side is None (closed?)", "WARN")
                         continue
 
-                    tick = mt5.symbol_info_tick(SYMBOL)
+                    tick = await run_mt5(lambda: mt5.symbol_info_tick(SYMBOL))
                     if tick is None:
                         log(f"   Ticket {ticket}: Cannot get tick data", "WARN")
                         continue
@@ -1685,7 +1696,7 @@ async def main():
                             "INFO",
                         )
                         log(f"   >>> MOVING SL TO BREAKEVEN: ${entry:.5f}", "INFO")
-                        set_stop_loss(ticket, entry)
+                        await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
                         breakeven_activated[ticket] = True
                     else:
                         log(
@@ -1869,12 +1880,12 @@ async def main():
                             # ── Process the message through the same logic as on_new_message ──
                             if is_tp3_hit_message(text):
                                 log("🚨 TP3 HIT DETECTED (POLLED) - SAFETY EXIT!", "INFO")
-                                positions = mt5.positions_get(symbol=SYMBOL)
+                                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                                 if positions:
                                     closed_count = 0
                                     for p in positions:
                                         if p.magic == MAGIC:
-                                            if close_position(p.ticket):
+                                            if await run_mt5(lambda: close_position(p.ticket)):
                                                 closed_count += 1
                                     if closed_count > 0:
                                         log(f"✅ CLOSED {closed_count} POSITION(S) on TP3 HIT (POLLED)", "INFO")
@@ -1905,39 +1916,39 @@ async def main():
                                 log_signal_attempt(side, "RECEIVED", f"msg_id={msg.id} (polled)")
                                 set_pending_zone(side=side, zone_low=zone_low, zone_high=zone_high,
                                                  targets=targets, sl=sl_price, msg_id=msg.id, msg_text=text)
-                                try_execute_pending_zone()
+                                await run_mt5(try_execute_pending_zone)
                                 continue
 
                             if side and not zone_range:
                                 log(f"⚡ IMMEDIATE ZONE ENTRY (POLLED): {side}", "INFO")
                                 log_signal_attempt(side, "RECEIVED", f"msg_id={msg.id} - IMMEDIATE (polled)")
-                                current_price = get_market_price(side)
+                                current_price = await run_mt5(lambda: get_market_price(side))
                                 if current_price:
-                                    execute_zone_trade(side=side, entry_price=current_price, msg_id=msg.id,
-                                                       msg_text=text, sl_price=None, targets=[])
+                                    await run_mt5(lambda: execute_zone_trade(side=side, entry_price=current_price, msg_id=msg.id,
+                                                       msg_text=text, sl_price=None, targets=[]))
                                 continue
 
                             if is_active_message(text):
                                 log("🟡 Zone marked active (polled)", "INFO")
-                                try_execute_pending_zone()
+                                await run_mt5(try_execute_pending_zone)
                                 continue
 
                             sl_update = parse_invalid_sl(text)
                             if sl_update:
-                                positions = mt5.positions_get(symbol=SYMBOL)
+                                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                                 if positions:
                                     ticket = int(positions[-1].ticket)
                                     can_update, reason = can_update_stop_loss(ticket, sl_update)
                                     if can_update:
-                                        set_stop_loss(ticket, sl_update)
+                                        await run_mt5(lambda: set_stop_loss(ticket, sl_update))
                                 continue
 
                             targets = parse_targets(text)
                             if targets:
-                                positions = mt5.positions_get(symbol=SYMBOL)
+                                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                                 if positions:
                                     ticket = int(positions[-1].ticket)
-                                    apply_targets_to_ticket(ticket, targets)
+                                    await run_mt5(lambda: apply_targets_to_ticket(ticket, targets))
                                 continue
 
                             log(f"⏭️  Polled message not recognized as signal", "DEBUG")
