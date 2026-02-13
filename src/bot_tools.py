@@ -15,6 +15,11 @@ COMMANDS = {
         "description": "View trade stats in terminal",
         "command": "python src/bot_trade_analyzer.py"
     },
+    "analyze-mt5": {
+        "name": "MT5 History Analytics",
+        "description": "Analyze bot trades directly from MT5 history",
+        "command": "python src/bot_trade_analyzer.py --mt5 --days 120 --magics 777,778 --symbol XAUUSD"
+    },
     "dashboard": {
         "name": "Web Dashboard",
         "description": "Open interactive web dashboard",
@@ -49,10 +54,11 @@ def show_help():
         print(f"  {key:12} | {cmd['name']:20} | {cmd['description']}")
     
     print("\nUsage (from project root):")
-    print(f"  python src/bot_tools.py analyze      # {COMMANDS['analyze']['description']}")
-    print(f"  python src/bot_tools.py dashboard    # {COMMANDS['dashboard']['description']}")
-    print(f"  python src/bot_tools.py view         # {COMMANDS['view']['description']}")
-    print(f"  python src/bot_tools.py test         # {COMMANDS['test']['description']}")
+    print(f"  python src/bot_tools.py analyze       # {COMMANDS['analyze']['description']}")
+    print(f"  python src/bot_tools.py analyze-mt5   # {COMMANDS['analyze-mt5']['description']}")
+    print(f"  python src/bot_tools.py dashboard     # {COMMANDS['dashboard']['description']}")
+    print(f"  python src/bot_tools.py view          # {COMMANDS['view']['description']}")
+    print(f"  python src/bot_tools.py test          # {COMMANDS['test']['description']}")
     print(f"\nOr use interactive menu:")
     print(f"  python src/bot_tools.py              # Interactive menu")
     print()
