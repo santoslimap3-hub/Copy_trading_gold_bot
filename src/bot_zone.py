@@ -18,7 +18,6 @@ from typing import Optional, Dict, Tuple, List
 from signal_queue import SignalQueue
 from session_manager import SessionManager
 from reconnect_monitor import ReconnectMonitor
-from bot_trade_logger import BotTradeLogger
 
 # ===================== CONFIGURATION =====================
 # Telegram
@@ -32,7 +31,7 @@ SESSION_FILE = "trading_bot_session_zone"
 SYMBOL = "XAUUSD"
 MAGIC = 778
 RISK_PCT = 0.05  # 5% risk per trade
-FAILSAFE_SL_DISTANCE = 8.0  # price units away from entry
+FAILSAFE_SL_DISTANCE = 5.0  # price units away from entry (standard for this channel)
 
 # Telegram filters
 ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
@@ -67,7 +66,6 @@ pending_zone: Optional[Dict[str, object]] = None
 signal_queue: Optional[SignalQueue] = None
 session_manager: Optional[SessionManager] = None
 reconnect_monitor: Optional[ReconnectMonitor] = None
-trade_logger: Optional[BotTradeLogger] = None
 
 # ===================== HEALTH MONITORING =====================
 # Bot health metrics
@@ -487,18 +485,6 @@ def close_position(ticket: int, close_reason: str = "SAFETY_EXIT") -> bool:
 
     if success:
         log(f"✅ Position {ticket} CLOSED successfully", "INFO")
-        # Log the trade close to trade_logger
-        if trade_logger:
-            try:
-                result_trade = trade_logger.log_trade_close(ticket, close_price, close_reason, tp_hit="3")
-                if result_trade:
-                    log(f"✅ Trade logged to bot_trades.json: Ticket {ticket} | P&L: ${result_trade['pnl']:.2f}", "INFO")
-                else:
-                    log(f"⚠️ Trade {ticket} was not found in bot_trades.json (may not have been logged on open)", "WARN")
-            except Exception as e:
-                log(f"❌ Error logging trade close to bot_trades.json: {e}", "ERROR")
-        else:
-            log(f"⚠️ trade_logger is None - cannot log close to bot_trades.json", "WARN")
     else:
         log(f"❌ Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
         log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
@@ -696,6 +682,29 @@ def is_active_message(text: str) -> bool:
     return "active" in t
 
 
+def is_informational_message(text: str) -> bool:
+    """Check if message is informational only (closed zone, past event, etc).
+    These should NOT trigger trades."""
+    t = (text or "").lower()
+    # Keywords that indicate this is an informational message about a past event
+    informational_keywords = [
+        "closed was noted",  # "zone closed was noted as -150 pip"
+        "noted as",          # "close was noted as"
+        "due to the speed",  # "due to the speed it moved"
+        "was closed",        # past tense - zone already closed
+        "high risk buy zone wich was closed",  # specific case
+        "high risk sell zone wich was closed",  # specific case
+    ]
+    return any(keyword in t for keyword in informational_keywords)
+
+
+def is_high_risk_message(text: str) -> bool:
+    """Check if message contains high risk trading signals.
+    We want to avoid high risk trades."""
+    t = (text or "").lower()
+    return "high risk" in t and not is_informational_message(text)
+
+
 def parse_zone_side(text: str) -> Optional[str]:
     """Parse BUY or SELL side from a zone message."""
     t = (text or "").lower()
@@ -734,12 +743,39 @@ def parse_targets(text: str) -> List[float]:
 
 
 def parse_invalid_sl(text: str) -> Optional[float]:
-    """Parse invalid/SL price from text."""
-    match = re.search(r"(?:invalid|sl)\s*/?\s*(?:sl\s*)?([0-9]+(?:\.[0-9]+)?)", text or "", re.IGNORECASE)
-    if match:
-        price = float(match.group(1))
-        if price >= 100:
-            return price
+    """Parse invalid/SL price from text.
+    Handles patterns like:
+    - "Invalid 5080"
+    - "SL: 5072"
+    - "Invalid / SL 4980"
+    - "SL / 5080"
+    """
+    t = text or ""
+    
+    # Multiple patterns to try (in order of priority)
+    patterns = [
+        # Pattern 1: "SL:" followed by a number (e.g., "SL: 5072")
+        r"SL\s*:\s*([0-9]+(?:\.[0-9]+)?)",
+        # Pattern 2: "Invalid" followed by a number (e.g., "Invalid 5080", "Invalid / SL 5080")
+        r"(?:invalid|sl)\s*(?:/\s*)?(?:sl\s*)?:\s*([0-9]+(?:\.[0-9]+)?)",
+        # Pattern 3: "Invalid" at word boundary followed by number
+        r"\b(?:invalid|sl)\b\s+([0-9]+(?:\.[0-9]+)?)",
+        # Pattern 4: Fallback - just find "SL" or "invalid" followed by any number
+        r"(?:invalid|sl)\s*/?\s*(?:sl\s*)?([0-9]+(?:\.[0-9]+)?)",
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, t, re.IGNORECASE)
+        if match:
+            try:
+                price = float(match.group(1))
+                if price >= 100:  # Validate it's a reasonable price (gold is typically 1000+)
+                    log(f"✅ SL Parsed from '{pattern[:30]}...': ${price:.2f}", "DEBUG")
+                    return price
+            except (ValueError, AttributeError):
+                continue
+    
+    log(f"⚠️ No SL found in text: {t[:100]}", "DEBUG")
     return None
 
 
@@ -819,15 +855,6 @@ def print_bot_status():
     log(f"🔄 Connection Losses: MT5={metrics['mt5_connection_losses']} | Telegram={metrics['telegram_connection_losses']}", "INFO")
     log(f"🤖 Monitors: Zone={('✅' if metrics['zone_monitor_alive'] else '❌')} | Breakeven={('✅' if metrics['breakeven_monitor_alive'] else '❌')}", "INFO")
     log(f"💼 Active Positions: {metrics['active_positions']}", "INFO")
-    
-    # Trade logging status
-    if trade_logger:
-        open_count = len(trade_logger.get_all_trades(status="OPEN"))
-        closed_count = len(trade_logger.get_all_trades(status="CLOSED"))
-        log(f"📝 Trade Log: {open_count} open | {closed_count} closed | ✅ Logging active", "INFO")
-    else:
-        log(f"📝 Trade Log: ⚠️ Logger not initialized", "WARN")
-    
     log(f"🧭 Pending Zone: {('YES' if metrics['pending_zone'] else 'NO')}", "INFO")
     
     if last_message_time > 0:
@@ -965,26 +992,6 @@ def execute_zone_trade(side: str, entry_price: float, msg_id: int, msg_text: str
         entry_prices[ticket] = entry_price
         breakeven_activated[ticket] = False
         log(f"   Stored in position_map: msg_id={msg_id} -> ticket={ticket}", "DEBUG")
-
-        # Log trade open to trade_logger
-        if trade_logger:
-            try:
-                trade_logger.log_trade_open(
-                    ticket=ticket,
-                    side=side,
-                    entry_price=entry_price,
-                    stop_loss=chosen_sl,
-                    targets=targets,
-                    lot_size=lot,
-                    message_id=msg_id
-                )
-                log(f"✅ Trade logged to bot_trades.json: Ticket {ticket} (OPEN)", "INFO")
-            except Exception as e:
-                log(f"❌ Error logging trade open to bot_trades.json: {e}", "ERROR")
-                import traceback
-                log(f"   {traceback.format_exc()}", "ERROR")
-        else:
-            log(f"⚠️ trade_logger is None - cannot log open to bot_trades.json", "WARN")
 
         signal_queue.add_signal(
             signal_type="ZONE",
@@ -1193,122 +1200,19 @@ async def cleanup_and_report():
 
 
 async def monitor_closed_positions():
-    """Monitor for positions that closed naturally and log them to trade logger"""
+    """Monitor for naturally closed positions (removed - trade_logger dependency)"""
     global trades_executed, trades_failed
     
     log("📊 Closed position monitor started", "INFO")
     
+    # This function was dependent on trade_logger which has been removed.
+    # Positions are still tracked in MT5 and can be fetched via --mt5 --write-json analyzer command.
+    # Simply sleep and do nothing for backward compatibility
     while True:
         try:
-            await asyncio.sleep(5)  # Check every 5 seconds
-            
-            if not trade_logger:
-                continue
-            
-            # Get all open trades from our logger
-            open_trades = trade_logger.get_all_trades(status="OPEN")
-            if not open_trades:
-                continue
-            
-            # Check which ones are still actually open in MT5
-            current_positions = mt5.positions_get(symbol=SYMBOL)
-            current_tickets = set()
-            if current_positions:
-                current_tickets = {int(p.ticket) for p in current_positions if p.magic == MAGIC}
-            
-            # Find trades that are marked OPEN but no longer in MT5
-            for trade in open_trades:
-                ticket = trade["ticket"]
-                
-                if ticket in current_tickets:
-                    continue  # Still open, skip
-                
-                # Position closed! Need to get info from history and log it
-                log(f"🔍 Detected closed position: Ticket {ticket}", "INFO")
-                
-                # Query MT5 history for this ticket
-                from_date = time.time() - (86400 * 7)  # Last 7 days
-                history_deals = mt5.history_deals_get(position=ticket)
-                
-                if not history_deals:
-                    log(f"⚠️ No history found for ticket {ticket} - may be too old", "WARN")
-                    continue
-                
-                # Find the closing deal (last deal for this position)
-                closing_deal = None
-                for deal in reversed(history_deals):
-                    if deal.entry == 1:  # 1 = OUT (closing deal)
-                        closing_deal = deal
-                        break
-                
-                if not closing_deal:
-                    log(f"⚠️ No closing deal found for ticket {ticket}", "WARN")
-                    continue
-                
-                close_price = float(closing_deal.price)
-                close_time = closing_deal.time
-                profit = float(closing_deal.profit)
-                
-                # Determine close reason based on comment and profit
-                comment = closing_deal.comment if hasattr(closing_deal, 'comment') else ""
-                
-                if "tp" in comment.lower():
-                    close_reason = "TP_HIT"
-                    tp_hit = "3"  # Default to TP3 if not specified
-                    
-                    # Try to extract TP number from comment or from our TP levels
-                    if ticket in tp_levels:
-                        tps = tp_levels[ticket]
-                        for tp_num, tp_price in tps.items():
-                            if abs(close_price - tp_price) < 0.5:  # Within 50 pips
-                                tp_hit = str(tp_num)
-                                break
-                elif "sl" in comment.lower() or profit < 0:
-                    close_reason = "SL_HIT"
-                    tp_hit = None
-                elif "manual" in comment.lower() or "user" in comment.lower():
-                    close_reason = "MANUAL_CLOSE"
-                    tp_hit = None
-                else:
-                    close_reason = "UNKNOWN"
-                    tp_hit = None
-                
-                log(f"   Close Price: ${close_price:.5f} | Reason: {close_reason} | P&L: ${profit:.2f}", "INFO")
-                
-                # Log to trade logger
-                result = trade_logger.log_trade_close(
-                    ticket=ticket,
-                    close_price=close_price,
-                    close_reason=close_reason,
-                    tp_hit=tp_hit
-                )
-                
-                if result:
-                    log(f"✅ Logged closed position: Ticket {ticket} | P&L: ${result['pnl']:.2f}", "INFO")
-                    trades_executed += 1
-                    
-                    # Clean up tracking dictionaries
-                    for msg_id, t in list(position_map.items()):
-                        if t == ticket:
-                            del position_map[msg_id]
-                            break
-                    
-                    if ticket in tp_levels:
-                        del tp_levels[ticket]
-                    if ticket in entry_prices:
-                        del entry_prices[ticket]
-                    if ticket in failsafe_tp3:
-                        del failsafe_tp3[ticket]
-                    if ticket in breakeven_activated:
-                        del breakeven_activated[ticket]
-                else:
-                    log(f"❌ Failed to log closed position: Ticket {ticket}", "ERROR")
-                    trades_failed += 1
-                
+            await asyncio.sleep(30)
         except Exception as e:
-            log(f"❌ CRITICAL: Closed position monitor exception: {str(e)}", "ERROR")
-            import traceback
-            log(f"   {traceback.format_exc()}", "ERROR")
+            log(f"❌ Closed position monitor error: {str(e)}", "ERROR")
             await asyncio.sleep(10)
 
 
@@ -1356,7 +1260,7 @@ async def monitor_pending_zone():
 
 
 async def main():
-    global signal_queue, session_manager, reconnect_monitor, trade_logger, bot_start_time, telegram_connected, last_telegram_activity
+    global signal_queue, session_manager, reconnect_monitor, bot_start_time, telegram_connected, last_telegram_activity
 
     # Record bot start time
     bot_start_time = time.time()
@@ -1365,8 +1269,6 @@ async def main():
     signal_queue = SignalQueue("signal_queue.json")
     session_manager = SessionManager("trading_bot_session", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
-    trades_path = os.path.join(os.path.dirname(__file__), "bot_trades.json")
-    trade_logger = BotTradeLogger(trades_path)
 
     client = init_telegram()
     ensure_mt5_connection()
@@ -1461,6 +1363,18 @@ async def main():
 
             if is_cancel_message(text):
                 clear_pending_zone("cancel message")
+                return
+
+            # FILTER: Skip informational messages
+            if is_informational_message(text):
+                log(f"⏭️  Message is informational only (past event) - skipping", "INFO")
+                messages_ignored += 1
+                return
+
+            # FILTER: Skip high-risk messages
+            if is_high_risk_message(text):
+                log(f"⏭️  Message contains HIGH RISK - skipping per bot settings", "WARN")
+                messages_ignored += 1
                 return
 
             side = parse_zone_side(text)

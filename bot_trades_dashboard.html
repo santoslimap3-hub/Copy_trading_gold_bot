@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Trades Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header-subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card.positive {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .metric-card.negative {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .metric-card.neutral {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .time-filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .time-filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .time-filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .trades-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .trade-type-buy {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .trade-type-sell {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .trade-profit-positive {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .trade-profit-negative {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .trade-profit-zero {
+            color: #95a5a6;
+        }
+
+        .badge-magic {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
+        .badge-777 {
+            background-color: #3498db;
+        }
+
+        .badge-778 {
+            background-color: #9b59b6;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .table-info {
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 15px 20px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .sort-indicator {
+            font-size: 12px;
+            margin-left: 5px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-group {
+                flex-direction: column;
+            }
+
+            .time-filter-btn {
+                width: 100%;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="bi bi-graph-up"></i> Bot Trades Dashboard</h1>
+            <p class="header-subtitle">Real-time trading performance analytics</p>
+            
+            <!-- Metrics -->
+            <div class="metrics-row" id="metricsContainer">
+                <div class="metric-card neutral">
+                    <div class="metric-value" id="totalTrades">-</div>
+                    <div class="metric-label">Total Trades</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="winRate">-</div>
+                    <div class="metric-label">Win Rate %</div>
+                </div>
+                <div class="metric-card" id="pnlCard">
+                    <div class="metric-value" id="netPnL">-</div>
+                    <div class="metric-label">Net P&L</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-value" id="profitFactor">-</div>
+                    <div class="metric-label">Profit Factor</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-value" id="avgPnL">-</div>
+                    <div class="metric-label">Avg P&L per Trade</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="filter-group">
+                <span style="font-weight: bold; color: #2c3e50;">Filter by:</span>
+                <button class="time-filter-btn active" onclick="filterByPeriod('all')">All Time</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('24h')">Last 24 Hours</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('7d')">Last 7 Days</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('30d')">Last 30 Days</button>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorContainer"></div>
+
+        <!-- Cumulative P&L Chart -->
+        <div class="trades-table">
+            <div style="padding: 20px;">
+                <h5 style="color: var(--primary-color); margin-bottom: 20px;"><i class="bi bi-graph-up"></i> Cumulative P&L</h5>
+                <canvas id="pnlChart" height="80"></canvas>
+            </div>
+        </div>
+
+        <!-- Trades Table -->
+        <div class="trades-table">
+            <table class="table table-hover" id="tradesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;">#</th>
+                        <th style="width: 80px;">Time</th>
+                        <th style="width: 60px;">Type</th>
+                        <th style="width: 80px;">Price</th>
+                        <th style="width: 70px;">Volume</th>
+                        <th style="width: 80px;">P&L</th>
+                        <th style="width: 60px;">Bot</th>
+                        <th style="width: 200px;">Comment</th>
+                    </tr>
+                </thead>
+                <tbody id="tradesBody">
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <i class="bi bi-hourglass-split"></i> Loading trades...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-info" id="tableInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        let allTrades = [];
+        let filteredTrades = [];
+        let currentFilter = 'all';
+        let tradesData = null;
+        let chartInstance = null;
+
+        function isClosedTrade(trade) {
+            if (trade.is_closed === true) {
+                return true;
+            }
+            if (trade.entry === 1) {
+                return true;
+            }
+            if (trade.entry === 0) {
+                return false;
+            }
+            return trade.profit !== 0;
+        }
+
+        // Load JSON data
+        async function loadTradesData() {
+            try {
+                const response = await fetch('bot_trades.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                tradesData = await response.json();
+
+                const rawTrades = tradesData.trades || tradesData.orders || tradesData.deals || [];
+
+                // Keep only closed trades
+                const allClosedTrades = rawTrades.filter(isClosedTrade);
+                allTrades = allClosedTrades;
+                filteredTrades = [...allTrades];
+                
+                // Sort by time descending
+                filteredTrades.sort((a, b) => b.time - a.time);
+                
+                renderDashboard();
+                updateMetrics(filteredTrades);
+                updateChart(filteredTrades);
+            } catch (error) {
+                showError(`Failed to load trades data: ${error.message}`);
+                console.error('Error loading data:', error);
+            }
+        }
+
+        function filterByPeriod(period) {
+            currentFilter = period;
+            
+            // Update button states
+            document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const now = Date.now() / 1000; // Current time in seconds
+            let cutoffTime = 0;
+            
+            if (period === 'all') {
+                filteredTrades = [...allTrades];
+            } else if (period === '24h') {
+                cutoffTime = now - (24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '7d') {
+                cutoffTime = now - (7 * 24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '30d') {
+                cutoffTime = now - (30 * 24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            }
+            
+            // Sort by time descending
+            filteredTrades.sort((a, b) => b.time - a.time);
+            
+            renderDashboard();
+            updateMetrics(filteredTrades);
+            updateChart(filteredTrades);
+        }
+
+        function renderDashboard() {
+            const tbody = document.getElementById('tradesBody');
+            
+            if (filteredTrades.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="no-data">
+                            <i class="bi bi-inbox"></i><br>
+                            No closed trades found for this period
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('tableInfo').textContent = '';
+                return;
+            }
+            
+            let html = '';
+            filteredTrades.forEach((trade, index) => {
+                const date = new Date(trade.time * 1000);
+                const timeStr = date.toLocaleString();
+                const typeClass = trade.type === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
+                const profitClass = trade.profit > 0 ? 'trade-profit-positive' : (trade.profit < 0 ? 'trade-profit-negative' : 'trade-profit-zero');
+                const botBadgeClass = trade.magic === 777 ? 'badge-777' : 'badge-778';
+                
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${timeStr}</td>
+                        <td><span class="${typeClass}">${trade.type}</span></td>
+                        <td>${trade.price.toFixed(2)}</td>
+                        <td>${trade.volume.toFixed(2)}</td>
+                        <td><span class="${profitClass}">$${trade.profit.toFixed(2)}</span></td>
+                        <td><span class="badge badge-magic ${botBadgeClass}">${trade.magic}</span></td>
+                        <td style="max-width: 200px; word-wrap: break-word; font-size: 12px;">${trade.comment}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            
+            // Update table info
+            const startTime = new Date(filteredTrades[filteredTrades.length - 1].time * 1000).toLocaleString();
+            const endTime = new Date(filteredTrades[0].time * 1000).toLocaleString();
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${filteredTrades.length} closed trade(s) | From: ${startTime} to ${endTime}`;
+        }
+
+        function updateMetrics(trades) {
+            if (trades.length === 0) {
+                document.getElementById('totalTrades').textContent = '0';
+                document.getElementById('winRate').textContent = '0%';
+                document.getElementById('netPnL').textContent = '$0.00';
+                document.getElementById('profitFactor').textContent = '0.00';
+                document.getElementById('avgPnL').textContent = '$0.00';
+                return;
+            }
+            
+            if (trades.length === 0) {
+                document.getElementById('totalTrades').textContent = '0';
+                document.getElementById('winRate').textContent = '0%';
+                document.getElementById('netPnL').textContent = '$0.00';
+                document.getElementById('profitFactor').textContent = '0.00';
+                document.getElementById('avgPnL').textContent = '$0.00';
+                return;
+            }
+            
+            const totalTrades = trades.length;
+            const winningTrades = trades.filter(t => t.profit > 0).length;
+            const losingTrades = trades.filter(t => t.profit < 0).length;
+            const winRate = totalTrades > 0 ? ((winningTrades / totalTrades) * 100).toFixed(2) : 0;
+            
+            const totalProfit = trades.filter(t => t.profit > 0).reduce((sum, t) => sum + t.profit, 0);
+            const totalLoss = Math.abs(trades.filter(t => t.profit < 0).reduce((sum, t) => sum + t.profit, 0));
+            const netPnL = trades.reduce((sum, t) => sum + t.profit, 0);
+            const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss).toFixed(2) : 0;
+            const avgPnL = (netPnL / totalTrades).toFixed(2);
+            
+            // Update display
+            document.getElementById('totalTrades').textContent = totalTrades;
+            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('netPnL').textContent = '$' + netPnL.toFixed(2);
+            document.getElementById('profitFactor').textContent = profitFactor;
+            document.getElementById('avgPnL').textContent = '$' + avgPnL;
+            
+            // Update P&L card color
+            const pnlCard = document.getElementById('pnlCard');
+            pnlCard.className = 'metric-card';
+            if (netPnL > 0) {
+                pnlCard.classList.add('positive');
+            } else if (netPnL < 0) {
+                pnlCard.classList.add('negative');
+            } else {
+                pnlCard.classList.add('neutral');
+            }
+        }
+
+        function updateChart(trades) {
+            const orderedTrades = [...trades].sort((a, b) => a.time - b.time);
+
+            if (orderedTrades.length === 0) {
+                // Clear chart if no trades
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+                return;
+            }
+            
+            // Calculate cumulative P&L
+            let cumulativePnL = 0;
+            const labels = [];
+            const data = [];
+            
+            orderedTrades.forEach(trade => {
+                cumulativePnL += trade.profit;
+                const date = new Date(trade.time * 1000);
+                labels.push(date.toLocaleString());
+                data.push(parseFloat(cumulativePnL.toFixed(2)));
+            });
+            
+            const ctx = document.getElementById('pnlChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cumulative P&L ($)',
+                        data: data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: { size: 12, weight: 'bold' },
+                                color: '#2c3e50',
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 11 },
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                            },
+                            ticks: {
+                                color: '#7f8c8d',
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                            ticks: {
+                                color: '#7f8c8d',
+                                maxTicksLimit: 10,
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `<div class="error"><i class="bi bi-exclamation-circle"></i> ${message}</div>`;
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadTradesData);
+    </script>
+</body>
+</html>
