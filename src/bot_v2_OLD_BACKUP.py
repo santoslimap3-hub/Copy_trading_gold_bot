@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 """
-Gold Trading Bot - Set & Forget TP1 Strategy (Robust Edition)
+Gold Trading Bot - Clean Implementation (Robust Edition)
 Connects to Telegram channel for gold trading signals and executes trades automatically.
-
-STRATEGY:
-  1. Signal received → Enter immediately with failsafe SL ($8) and failsafe TP ($3)
-  2. Wait for message edit with real SL and TP1 values
-  3. Parse TP1 and SL from the edited message, update the trade
-  4. FORGET — let the broker handle exit via SL/TP. No further management.
-
-Priority: Never miss a trade. Designed to run unattended for weeks/months.
-
 Includes full health monitoring, connection recovery, message polling fallback,
-and MT5 thread pool executor for robustness.
+and MT5 thread pool executor — matching bot_zone.py robustness.
 """
 
 import asyncio
@@ -43,8 +34,7 @@ SESSION_FILE = "trading_bot_session"
 SYMBOL = "XAUUSD"
 MAGIC = 777
 RISK_PCT = 0.05  # 5% risk per trade
-FAILSAFE_SL_DISTANCE = 8.0  # failsafe SL: $8 away from entry
-FAILSAFE_TP_DISTANCE = 3.0  # failsafe TP: $3 away from entry (until real TP1 arrives)
+FAILSAFE_SL_DISTANCE = 8.0  # price units away from entry
 
 # Telegram filters
 ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
@@ -57,11 +47,17 @@ LOG_LEVEL = "INFO"  # Options: "DEBUG" (verbose), "INFO" (normal), "WARN" (quiet
 # Track open positions: message_id -> ticket
 position_map: Dict[int, int] = {}
 
+# Track TP levels per ticket: ticket -> {1: price, 2: price, 3: price, ...}
+tp_levels: Dict[int, Dict[int, float]] = {}
+
 # Track entry prices: ticket -> entry_price
 entry_prices: Dict[int, float] = {}
 
-# Track whether real SL/TP has been applied (from message edit): ticket -> bool
-tp_sl_updated: Dict[int, bool] = {}
+# Track failsafe TP3 (pattern-based): ticket -> tp3_price
+failsafe_tp3: Dict[int, float] = {}
+
+# Track if breakeven has been activated: ticket -> bool
+breakeven_activated: Dict[int, bool] = {}
 
 # Signal attempt log: list of (timestamp, signal, result, details)
 signal_log: list = []
@@ -89,6 +85,7 @@ last_telegram_activity: float = 0
 last_mt5_check: float = 0
 mt5_connected: bool = False
 telegram_connected: bool = False
+breakeven_monitor_alive: bool = False
 heartbeat_counter: int = 0
 
 # Track processed message IDs to avoid duplicate processing (push events + polling)
@@ -444,6 +441,53 @@ def open_position(side: str, lot: float) -> Optional[int]:
     return None
 
 
+def close_position(ticket: int, close_reason: str = "SAFETY_EXIT") -> bool:
+    """Close an open position immediately at market price (TP3 HIT safety exit)"""
+    log(f"Closing position {ticket} - {close_reason}", "INFO")
+
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        log(f"Position {ticket} not found (may already be closed)", "WARN")
+        return False
+
+    p = pos[0]
+    side = "BUY" if p.type == mt5.ORDER_TYPE_BUY else "SELL"
+    close_type = mt5.ORDER_TYPE_SELL if side == "BUY" else mt5.ORDER_TYPE_BUY
+
+    tick = mt5.symbol_info_tick(SYMBOL)
+    if tick is None:
+        log(f"No tick data for {SYMBOL}", "ERROR")
+        return False
+
+    close_price = float(tick.bid if side == "BUY" else tick.ask)
+
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": SYMBOL,
+        "volume": float(p.volume),
+        "type": close_type,
+        "position": ticket,
+        "price": close_price,
+        "magic": MAGIC,
+        "comment": f"TP3 HIT - {close_reason}",
+        "type_time": mt5.ORDER_TIME_GTC,
+        "type_filling": mt5.ORDER_FILLING_IOC,
+    }
+
+    log(f"   Closing {side} position: Ticket {ticket} | Volume {p.volume:.3f} | Price ${close_price:.5f}", "DEBUG")
+    result = mt5.order_send(request)
+
+    success = result.retcode == mt5.TRADE_RETCODE_DONE
+
+    if success:
+        log(f"Position {ticket} CLOSED successfully", "INFO")
+    else:
+        log(f"Failed to close position {ticket} - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
+        log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
+
+    return success
+
+
 def set_stop_loss(ticket: int, sl_price: float) -> bool:
     """Update position stop loss - preserves current TP"""
     log(f"Updating SL for ticket {ticket} to ${sl_price:.5f}...", "INFO")
@@ -475,32 +519,70 @@ def set_stop_loss(ticket: int, sl_price: float) -> bool:
     return success
 
 
-def set_sl_and_tp(ticket: int, sl_price: float, tp_price: float) -> bool:
-    """Update both SL and TP on a position in a single MT5 call."""
-    log(f"Updating SL+TP for ticket {ticket}: SL=${sl_price:.5f} | TP=${tp_price:.5f}", "INFO")
-
+def can_update_stop_loss(ticket: int, sl_price: float) -> Tuple[bool, str]:
+    """Validate SL update based on breakeven protection and trade side."""
     pos = mt5.positions_get(ticket=ticket)
     if not pos:
-        log(f"Position {ticket} not found", "ERROR")
+        return False, "position not found"
+
+    side = "BUY" if pos[0].type == mt5.ORDER_TYPE_BUY else "SELL"
+    current_sl = float(pos[0].sl) if pos[0].sl > 0 else 0.0
+    entry = entry_prices.get(ticket)
+
+    if current_sl > 0 and abs(current_sl - sl_price) < 1e-6:
+        return False, "no changes"
+
+    if breakeven_activated.get(ticket, False) and entry is not None:
+        if side == "BUY" and sl_price < entry:
+            return False, "breakeven protected (BUY)"
+        if side == "SELL" and sl_price > entry:
+            return False, "breakeven protected (SELL)"
+
+    return True, "ok"
+
+
+def calculate_failsafe_tp3(entry_price: float, side: str) -> float:
+    """Calculate failsafe TP3 based on the pattern: worst entry +/- 7 points."""
+    tp3 = entry_price + 7.0 if side == "BUY" else entry_price - 7.0
+    return tp3
+
+
+def is_valid_tp_price(ticket: int, tp_price: float) -> bool:
+    """Check if TP price is valid for the position."""
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
         return False
 
-    request = {
-        "action": mt5.TRADE_ACTION_SLTP,
-        "position": ticket,
-        "sl": sl_price,
-        "tp": tp_price,
-    }
+    entry = entry_prices.get(ticket, float(pos[0].price_open))
+    side = "BUY" if pos[0].type == mt5.ORDER_TYPE_BUY else "SELL"
 
-    result = mt5.order_send(request)
-    success = result.retcode == mt5.TRADE_RETCODE_DONE
-
-    if success:
-        log(f"SL+TP updated - Ticket {ticket}: SL=${sl_price:.5f} | TP=${tp_price:.5f}", "INFO")
+    if side == "BUY":
+        is_valid = tp_price > entry
     else:
-        log(f"SL+TP update FAILED - Retcode: {result.retcode} | Error: {result.comment}", "WARN")
-        log(f"   Last MT5 error: {mt5.last_error()}", "WARN")
+        is_valid = tp_price < entry
 
-    return success
+    if is_valid and abs(tp_price - entry) > 0.01:
+        if side == "BUY" and (tp_price - entry) < -1000:
+            is_valid = False
+        elif side == "SELL" and (entry - tp_price) < -1000:
+            is_valid = False
+
+    return is_valid
+
+
+def select_best_tp_with_fallback(ticket: int, tp_levels_dict: Dict[int, float]) -> Tuple[Optional[int], Optional[float]]:
+    """Select the best valid TP from available levels, with fallback logic.
+    Prefers TP3 > TP2 > TP1."""
+    for tp_num in [3, 2, 1]:
+        if tp_num in tp_levels_dict:
+            tp_price = tp_levels_dict[tp_num]
+            if is_valid_tp_price(ticket, tp_price):
+                log(f"   TP{tp_num} is valid: ${tp_price:.5f}", "DEBUG")
+                return tp_num, tp_price
+            else:
+                log(f"   TP{tp_num} is INVALID: ${tp_price:.5f} - trying lower level", "DEBUG")
+
+    return None, None
 
 
 def set_take_profit(ticket: int, tp_price: float) -> bool:
@@ -538,7 +620,59 @@ def set_take_profit(ticket: int, tp_price: float) -> bool:
     return success
 
 
+def get_position_side(ticket: int) -> Optional[str]:
+    """Get position direction (BUY or SELL)"""
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        log(f"Position {ticket} not found or already closed", "WARN")
+        return None
+
+    side = "BUY" if pos[0].type == mt5.ORDER_TYPE_BUY else "SELL"
+    log(f"   Position {ticket} side: {side}", "DEBUG")
+    return side
+
+
+def price_crossed_tp1(ticket: int, tp1: float, current_price: float) -> bool:
+    """Check if price has crossed TP1 level"""
+    side = get_position_side(ticket)
+    if side is None:
+        return False
+
+    if side == "BUY":
+        crossed = current_price >= tp1
+        log(
+            f"   [TP1 Check] Ticket {ticket}: Current=${current_price:.5f} vs TP1=${tp1:.5f} (BUY) -> {'CROSSED' if crossed else 'not crossed'}",
+            "DEBUG",
+        )
+    else:
+        crossed = current_price <= tp1
+        log(
+            f"   [TP1 Check] Ticket {ticket}: Current=${current_price:.5f} vs TP1=${tp1:.5f} (SELL) -> {'CROSSED' if crossed else 'not crossed'}",
+            "DEBUG",
+        )
+
+    return crossed
+
+
 # ===================== PARSING =====================
+
+def is_tp1_hit_message(text: str) -> bool:
+    """Check if message indicates TP1 / Target 1 has been hit (breakeven trigger)."""
+    t = (text or "").upper()
+    return bool(re.search(r"\bTP\s*1\s+HIT\b|\bTARGET\s*1\b", t))
+
+
+def is_tp2_hit_message(text: str) -> bool:
+    """Check if message indicates TP2 / Target 2 has been hit."""
+    t = (text or "").upper()
+    return bool(re.search(r"\bTP\s*2\s+HIT\b|\bTARGET\s*2\b", t))
+
+
+def is_tp3_hit_message(text: str) -> bool:
+    """Check if message is a TP3 HIT signal (safety exit trigger)"""
+    t = (text or "").upper()
+    return bool(re.search(r"\bTP\s*3\s+HIT\b|\bTARGET\s*3\b", t))
+
 
 def parse_signal(text: str) -> Optional[Tuple[str, str]]:
     """
@@ -670,8 +804,8 @@ def get_bot_metrics() -> Dict:
         "seconds_since_last_message": time_since_last_msg,
         "mt5_connected": mt5_connected,
         "telegram_connected": telegram_connected,
+        "breakeven_monitor_alive": breakeven_monitor_alive,
         "active_positions": len(position_map),
-        "positions_with_real_tp": sum(1 for v in tp_sl_updated.values() if v),
     }
 
 
@@ -687,8 +821,8 @@ def print_bot_status():
     log(f"  Trades: Executed={metrics['trades_executed']} | Failed={metrics['trades_failed']}", "INFO")
     log(f"  Connections: MT5={('OK' if metrics['mt5_connected'] else 'DOWN')} | Telegram={('OK' if metrics['telegram_connected'] else 'DOWN')}", "INFO")
     log(f"  Connection Losses: MT5={metrics['mt5_connection_losses']} | Telegram={metrics['telegram_connection_losses']}", "INFO")
-    log(f"  Strategy: SET & FORGET TP1", "INFO")
-    log(f"  Active Positions: {metrics['active_positions']} ({metrics['positions_with_real_tp']} with real SL/TP)", "INFO")
+    log(f"  Monitors: Breakeven={('OK' if metrics['breakeven_monitor_alive'] else 'DOWN')}", "INFO")
+    log(f"  Active Positions: {metrics['active_positions']}", "INFO")
 
     if last_message_time > 0:
         log(f"  Last Message: {metrics['seconds_since_last_message']:.0f}s ago", "INFO")
@@ -851,45 +985,16 @@ async def connection_health_monitor():
             await asyncio.sleep(10)
 
 
-async def monitor_stale_failsafe():
-    """
-    Robustness monitor: periodically check if any positions still have failsafe SL/TP.
-
-    This means the message edit with real SL/TP1 was never received.
-    Logs a warning so the operator is aware, but does NOT close the trade
-    (set-and-forget means the failsafe levels will handle the exit).
-    """
-    log("Stale failsafe monitor started (checks every 120s)", "INFO")
+async def monitor_closed_positions():
+    """Monitor for naturally closed positions (stub for forward compatibility)"""
+    log("Closed position monitor started", "INFO")
 
     while True:
         try:
-            await asyncio.sleep(120)
-
-            # Check for positions where tp_sl_updated is False
-            stale_tickets = [t for t, updated in tp_sl_updated.items() if not updated]
-
-            if not stale_tickets:
-                continue
-
-            # Verify they're still open
-            for ticket in stale_tickets:
-                pos = await run_mt5(lambda t=ticket: mt5.positions_get(ticket=t))
-                if not pos:
-                    # Position was closed by broker (SL or TP hit) - clean up
-                    log(f"Position {ticket} closed by broker (failsafe SL/TP hit). Cleaning up.", "INFO")
-                    tp_sl_updated.pop(ticket, None)
-                    entry_prices.pop(ticket, None)
-                    # Remove from position_map
-                    for mid, tid in list(position_map.items()):
-                        if tid == ticket:
-                            position_map.pop(mid, None)
-                            break
-                else:
-                    log(f"WARNING: Ticket {ticket} still has FAILSAFE SL/TP (no edit received yet)", "WARN")
-
-        except Exception as e:
-            log(f"Stale failsafe monitor error: {str(e)}", "ERROR")
             await asyncio.sleep(30)
+        except Exception as e:
+            log(f"Closed position monitor error: {str(e)}", "ERROR")
+            await asyncio.sleep(10)
 
 
 async def cleanup_and_report():
@@ -926,31 +1031,17 @@ async def cleanup_and_report():
 # ===================== PROCESS SIGNAL MESSAGE =====================
 
 def execute_signal_trade(side: str, entry_price: float, msg_id: int, msg_text: str):
-    """
-    Execute a trade from a parsed signal - Set & Forget TP1 Strategy.
-
-    1. Open position at market price
-    2. Set failsafe SL ($8 from entry) and failsafe TP ($3 from entry)
-    3. Wait for message edit to provide real SL and TP1 values
-
-    Runs inside the MT5 executor thread.
-    """
+    """Execute a trade from a parsed signal - runs inside the MT5 executor."""
     balance = get_account_balance()
     if balance <= 0:
         log(f"Invalid balance: ${balance:.2f} - aborting trade", "ERROR")
         log_signal_attempt(side, "FAILED", f"Invalid balance: ${balance:.2f}")
         return
 
-    # Calculate failsafe levels
-    if side == "BUY":
-        failsafe_sl = entry_price - FAILSAFE_SL_DISTANCE
-        failsafe_tp = entry_price + FAILSAFE_TP_DISTANCE
-    else:
-        failsafe_sl = entry_price + FAILSAFE_SL_DISTANCE
-        failsafe_tp = entry_price - FAILSAFE_TP_DISTANCE
+    failsafe_sl = entry_price - FAILSAFE_SL_DISTANCE if side == "BUY" else entry_price + FAILSAFE_SL_DISTANCE
 
-    log(f"Failsafe SL: ${failsafe_sl:.5f} (${FAILSAFE_SL_DISTANCE} from entry)", "INFO")
-    log(f"Failsafe TP: ${failsafe_tp:.5f} (${FAILSAFE_TP_DISTANCE} from entry)", "INFO")
+    log(f"Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.5f}", "DEBUG")
+    log(f"Failsafe SL price: ${failsafe_sl:.5f}", "DEBUG")
 
     lot = calculate_lot_size(entry_price, failsafe_sl, balance)
 
@@ -959,22 +1050,16 @@ def execute_signal_trade(side: str, entry_price: float, msg_id: int, msg_text: s
         log_signal_attempt(side, "FAILED", f"Invalid lot size: {lot}")
         return
 
-    log(f"Trade parameters: Entry=${entry_price:.5f} | SL=${failsafe_sl:.5f} | TP=${failsafe_tp:.5f} | Lot={lot:.4f}", "INFO")
+    log(f"Trade parameters: Entry=${entry_price:.5f} | SL=${failsafe_sl:.5f} | Lot={lot:.4f}", "INFO")
 
     ticket = open_position(side, lot)
 
     if ticket:
-        log("=" * 70, "INFO")
-        log(f"POSITION OPENED (SET & FORGET TP1)", "INFO")
-        log(f"   Ticket: {ticket} | Side: {side} | Entry: ${entry_price:.5f} | Lot: {lot:.4f}", "INFO")
-        log(f"   Failsafe SL: ${failsafe_sl:.5f} | Failsafe TP: ${failsafe_tp:.5f}", "INFO")
-        log(f"   Waiting for message edit with real SL/TP1...", "INFO")
-        log("=" * 70, "INFO")
-
+        log(f"POSITION OPENED: Ticket={ticket} | Side={side} | Entry=${entry_price:.5f} | Lot={lot:.4f}", "INFO")
         log_signal_attempt(side, "SUCCESS", f"Ticket={ticket} | Entry=${entry_price:.5f}")
         position_map[msg_id] = ticket
         entry_prices[ticket] = entry_price
-        tp_sl_updated[ticket] = False  # Will be set True when real SL/TP arrives
+        breakeven_activated[ticket] = False
         log(f"   Stored in position_map: msg_id={msg_id} -> ticket={ticket}", "DEBUG")
 
         signal_queue.add_signal(
@@ -989,10 +1074,15 @@ def execute_signal_trade(side: str, entry_price: float, msg_id: int, msg_text: s
         )
         signal_queue.mark_executed(msg_id)
 
-        # Apply failsafe SL and TP
         log("Waiting for MT5 to register position...", "DEBUG")
         time.sleep(0.5)
-        set_sl_and_tp(ticket, failsafe_sl, failsafe_tp)
+        set_stop_loss(ticket, failsafe_sl)
+
+        failsafe_tp3_price = calculate_failsafe_tp3(entry_price, side)
+        failsafe_tp3[ticket] = failsafe_tp3_price
+        log("Failsafe TP3 distance: 7 points", "INFO")
+        log(f"Failsafe TP3 price: ${failsafe_tp3_price:.5f}", "DEBUG")
+        set_take_profit(ticket, failsafe_tp3_price)
     else:
         log("POSITION OPEN FAILED - returning", "ERROR")
         log_signal_attempt(side, "FAILED", "Position open failed (see above for details)")
@@ -1027,71 +1117,76 @@ async def main():
     log(f"  Trading symbol: {SYMBOL}", "INFO")
     log(f"  Risk per trade: {RISK_PCT*100:.1f}%", "INFO")
     log(f"  Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.2f}", "INFO")
-    log(f"  Failsafe TP distance: ${FAILSAFE_TP_DISTANCE:.2f}", "INFO")
-    log(f"  Strategy: SET & FORGET TP1", "INFO")
     log(f"  Magic number: {MAGIC}", "INFO")
     log(f"  Log level: {LOG_LEVEL}", "INFO")
     log("=" * 70, "INFO")
 
-    # ── Helper: update SL and TP1 on a position from parsed values ──
-    async def update_position_sl_tp(ticket: int, sl: float = None, tp1: float = None, source: str = ""):
-        """Update SL and/or TP1 on a position. Set-and-forget: once updated, done."""
-        pos = await run_mt5(lambda: mt5.positions_get(ticket=ticket))
-        if not pos:
-            log(f"Position {ticket} not found - may have been closed already", "WARN")
-            return
+    # ── Helper: move SL to breakeven on all open bot positions ──
+    async def handle_tp1_breakeven(source_label: str = ""):
+        """Move SL to breakeven on all open bot positions."""
+        positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+        if positions:
+            moved_count = 0
+            for p in positions:
+                if p.magic == MAGIC:
+                    ticket = int(p.ticket)
+                    if breakeven_activated.get(ticket, False):
+                        log(f"   Ticket {ticket}: Breakeven already active - skipping", "INFO")
+                        continue
+                    entry = entry_prices.get(ticket, float(p.price_open))
+                    log(f"Moving SL to breakeven for ticket {ticket}: ${entry:.5f}", "INFO")
+                    await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
+                    breakeven_activated[ticket] = True
+                    moved_count += 1
+            if moved_count > 0:
+                log(f"BREAKEVEN SET on {moved_count} position(s) after TARGET 1 HIT{source_label}", "INFO")
+            else:
+                log("No positions needed breakeven update", "WARN")
+        else:
+            log("TARGET 1 HIT but no open positions found", "WARN")
 
-        current_sl = float(pos[0].sl) if pos[0].sl > 0 else 0.0
-        current_tp = float(pos[0].tp) if pos[0].tp > 0 else 0.0
-
-        new_sl = sl if sl else current_sl
-        new_tp = tp1 if tp1 else current_tp
-
-        # Validate: SL and TP must be on correct sides of entry
-        side = "BUY" if pos[0].type == 0 else "SELL"
-        entry = entry_prices.get(ticket, float(pos[0].price_open))
-
-        if sl:
-            if side == "BUY" and sl >= entry:
-                log(f"SL ${sl:.5f} is above entry ${entry:.5f} for BUY - ignoring SL update", "WARN")
-                new_sl = current_sl
-            elif side == "SELL" and sl <= entry:
-                log(f"SL ${sl:.5f} is below entry ${entry:.5f} for SELL - ignoring SL update", "WARN")
-                new_sl = current_sl
-
-        if tp1:
-            if side == "BUY" and tp1 <= entry:
-                log(f"TP1 ${tp1:.5f} is below entry ${entry:.5f} for BUY - ignoring TP update", "WARN")
-                new_tp = current_tp
-            elif side == "SELL" and tp1 >= entry:
-                log(f"TP1 ${tp1:.5f} is above entry ${entry:.5f} for SELL - ignoring TP update", "WARN")
-                new_tp = current_tp
-
-        # Only update if something actually changed
-        if abs(new_sl - current_sl) < 0.001 and abs(new_tp - current_tp) < 0.001:
-            log(f"No SL/TP changes needed for ticket {ticket}", "DEBUG")
-            return
-
-        log("=" * 70, "INFO")
-        log(f"UPDATING REAL SL/TP1 ON TICKET {ticket}{source}", "INFO")
-        log(f"   Old: SL=${current_sl:.5f} | TP=${current_tp:.5f}", "INFO")
-        log(f"   New: SL=${new_sl:.5f} | TP=${new_tp:.5f}", "INFO")
-        log("=" * 70, "INFO")
-
-        await run_mt5(lambda: set_sl_and_tp(ticket, new_sl, new_tp))
-        tp_sl_updated[ticket] = True
-        log(f"SET & FORGET: Ticket {ticket} now has real SL/TP1. Broker handles exit.", "INFO")
+    async def handle_tp3_close(source_label: str = ""):
+        """Close all open bot positions on TP3 hit."""
+        positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+        if positions:
+            closed_count = 0
+            for p in positions:
+                if p.magic == MAGIC:
+                    log(f"Closing position: Ticket {p.ticket} | Volume {p.volume:.3f}", "INFO")
+                    if await run_mt5(lambda t=int(p.ticket): close_position(t)):
+                        closed_count += 1
+            if closed_count > 0:
+                log(f"CLOSED {closed_count} POSITION(S) on TP3 HIT{source_label}", "INFO")
+            else:
+                log("Failed to close positions on TP3 HIT", "WARN")
+        else:
+            log("TP3 HIT detected but no open positions found", "WARN")
 
     # ── Process any message text through the signal pipeline ──
     async def process_message(text: str, msg_id: int, channel_name: str, source: str = ""):
-        """
-        Core message processing - Set & Forget TP1 Strategy.
-
-        Only handles:
-        1. BUY NOW / SELL NOW signals -> enter trade with failsafe SL/TP
-        2. SL / TP updates (new messages) -> update position with real values
-        """
+        """Core message processing shared by push handler and poller."""
         global messages_ignored
+
+        # ── TARGET 1 HIT -> Move SL to breakeven ──
+        if is_tp1_hit_message(text):
+            log("=" * 70, "INFO")
+            log(f"TARGET 1 HIT DETECTED{source} - MOVING SL TO BREAKEVEN!", "INFO")
+            log("=" * 70, "INFO")
+            await handle_tp1_breakeven(source)
+            return True
+
+        # ── TARGET 2 HIT -> Acknowledge ──
+        if is_tp2_hit_message(text):
+            log(f"TARGET 2 HIT acknowledged{source} - position remains open for TP3", "INFO")
+            return True
+
+        # ── TP3 HIT -> Safety close ──
+        if is_tp3_hit_message(text):
+            log("=" * 70, "INFO")
+            log(f"TP3 HIT DETECTED{source} - SAFETY EXIT!", "INFO")
+            log("=" * 70, "INFO")
+            await handle_tp3_close(source)
+            return True
 
         # ── Trade signal (BUY NOW / SELL NOW) ──
         signal = parse_signal(text)
@@ -1107,44 +1202,35 @@ async def main():
                 return True
 
             await run_mt5(lambda: execute_signal_trade(side, entry_price, msg_id, text))
-
-            # Also check if the initial message already contains SL/TP
-            sl = parse_stop_loss(text)
-            tp1 = parse_tp1(text)
-            if sl or tp1:
-                # Give 1 second for position to register
-                await asyncio.sleep(1)
-                if msg_id in position_map:
-                    ticket = position_map[msg_id]
-                    await update_position_sl_tp(ticket, sl, tp1, source)
-
             return True
 
-        # ── SL / TP update in a follow-up message (not an edit) ──
+        # ── SL / TP update messages ──
         sl = parse_stop_loss(text)
-        tp1 = parse_tp1(text)
         tp_levels_parsed = parse_tp_levels(text)
 
-        # If TP1 not found directly, try to get it from tp_levels
-        if not tp1 and tp_levels_parsed and 1 in tp_levels_parsed:
-            tp1 = tp_levels_parsed[1]
-
-        if sl or tp1:
-            # Find the most recent bot position to update
+        if sl or tp_levels_parsed:
             positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
             if not positions:
-                log(f"SL/TP update received but no open positions{source}", "WARN")
+                log("No open positions to update", "WARN")
                 return True
 
-            # Find the most recent bot position
-            bot_positions = [p for p in positions if p.magic == MAGIC]
-            if not bot_positions:
-                log(f"SL/TP update received but no bot positions found{source}", "WARN")
-                return True
+            ticket = int(positions[-1].ticket)
 
-            ticket = int(bot_positions[-1].ticket)
-            log(f"Applying SL/TP from new message to most recent bot position: ticket {ticket}{source}", "INFO")
-            await update_position_sl_tp(ticket, sl, tp1, source)
+            if sl:
+                can_update, reason = can_update_stop_loss(ticket, sl)
+                if can_update:
+                    await run_mt5(lambda: set_stop_loss(ticket, sl))
+                else:
+                    log(f"SL skipped: {reason}", "WARN")
+
+            if tp_levels_parsed:
+                tp_levels[ticket] = tp_levels_parsed
+                tp_num, tp_price = select_best_tp_with_fallback(ticket, tp_levels_parsed)
+                if tp_num and tp_price:
+                    log(f"TP{tp_num} set (${tp_price:.5f})", "INFO")
+                    await run_mt5(lambda: set_take_profit(ticket, tp_price))
+                else:
+                    log("TP levels invalid - waiting for valid values", "WARN")
             return True
 
         # Not recognized
@@ -1211,8 +1297,8 @@ async def main():
 
             handled = await process_message(text, msg_id, channel_name)
             if not handled:
-                log("Message not recognized as signal or SL/TP update - ignoring", "DEBUG")
-                log(f"   Checks: SIGNAL={parse_signal(text) is not None} | SL={parse_stop_loss(text) is not None} | TP1={parse_tp1(text) is not None}", "DEBUG")
+                log("Message not recognized as signal - ignoring", "DEBUG")
+                log(f"   Checks: TP1={is_tp1_hit_message(text)} | TP2={is_tp2_hit_message(text)} | TP3={is_tp3_hit_message(text)} | SIGNAL={parse_signal(text) is not None}", "DEBUG")
                 messages_ignored += 1
 
         except Exception as e:
@@ -1225,12 +1311,7 @@ async def main():
     # ══════════════════════════════════════════════════════════════════════
     @client.on(events.MessageEdited())
     async def on_edit(event):
-        """
-        Handle edited messages - THIS IS THE KEY HANDLER for Set & Forget.
-
-        When the signal provider edits the original message to add SL and TP1,
-        we parse those values and update the trade. Then forget.
-        """
+        """Handle edited messages from main or test channel"""
         global messages_received, messages_ignored, last_telegram_activity
 
         try:
@@ -1256,53 +1337,153 @@ async def main():
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
             log("=" * 70, "INFO")
-            log(f"{channel_name} MESSAGE EDITED (SET & FORGET TP1 UPDATE)", "INFO")
+            log(f"{channel_name} MESSAGE EDITED", "INFO")
             log(f"   Message ID: {msg_id}", "INFO")
-            log(f"   Preview: {text[:200]}", "INFO")
+            log(f"   Preview: {text[:150]}", "INFO")
             log("=" * 70, "INFO")
 
-            # Parse SL and TP1 from the edited message
-            sl = parse_stop_loss(text)
-            tp1 = parse_tp1(text)
-            tp_levels_parsed = parse_tp_levels(text)
-
-            # Fallback: get TP1 from tp_levels if parse_tp1 didn't find it
-            if not tp1 and tp_levels_parsed and 1 in tp_levels_parsed:
-                tp1 = tp_levels_parsed[1]
-
-            if not sl and not tp1:
-                log(f"Edit contains no SL/TP data - ignoring (msg_id={msg_id})", "DEBUG")
+            # ── TARGET 1 HIT (EDIT) -> Move SL to breakeven ──
+            if is_tp1_hit_message(text):
+                log("TARGET 1 HIT DETECTED (EDIT) - MOVING SL TO BREAKEVEN!", "INFO")
+                await handle_tp1_breakeven(" (EDIT)")
                 return
 
-            log(f"Parsed from edit: SL={f'${sl:.5f}' if sl else 'None'} | TP1={f'${tp1:.5f}' if tp1 else 'None'}", "INFO")
+            # ── TARGET 2 HIT (EDIT) -> Acknowledge ──
+            if is_tp2_hit_message(text):
+                log("TARGET 2 HIT acknowledged (EDIT) - position remains open for TP3", "INFO")
+                return
 
-            # Find the position for this message
-            if msg_id in position_map:
-                ticket = position_map[msg_id]
-                log(f"   Found mapped ticket: {ticket} for msg_id={msg_id}", "DEBUG")
-            else:
-                # Message ID not in map - find the most recent bot position
-                log(f"Message ID {msg_id} not in position_map - looking for recent bot positions", "WARN")
+            # ── TP3 HIT (EDIT) -> Safety close ──
+            if is_tp3_hit_message(text):
+                log("=" * 70, "INFO")
+                log("TP3 HIT DETECTED (EDIT) - SAFETY EXIT!", "INFO")
+                log("=" * 70, "INFO")
+                await handle_tp3_close(" (EDIT)")
+                return
+
+            # Find position for this message
+            if msg_id not in position_map:
+                log(f"Message ID {msg_id} not in position_map - checking for recent positions", "WARN")
                 positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
                 if not positions:
                     log("No open positions at all - ignoring edit", "WARN")
                     return
+                ticket = int(positions[-1].ticket)
+                log(f"   Using most recent position: ticket {ticket}", "DEBUG")
+            else:
+                ticket = position_map[msg_id]
+                log(f"   Found mapped ticket: {ticket}", "DEBUG")
 
-                bot_positions = [p for p in positions if p.magic == MAGIC]
-                if not bot_positions:
-                    log("No bot positions found - ignoring edit", "WARN")
-                    return
+            pos = await run_mt5(lambda: mt5.positions_get(ticket=ticket))
+            if not pos:
+                log(f"Position {ticket} not found - may have been closed", "WARN")
+                return
 
-                ticket = int(bot_positions[-1].ticket)
-                log(f"   Using most recent bot position: ticket {ticket}", "INFO")
+            # Update SL if present
+            sl = parse_stop_loss(text)
+            if sl:
+                log(f"Found SL in edit: ${sl:.5f}", "DEBUG")
+                can_update, reason = can_update_stop_loss(ticket, sl)
+                if can_update:
+                    await run_mt5(lambda: set_stop_loss(ticket, sl))
+                else:
+                    log(f"SL update skipped: {reason}", "WARN")
 
-            # Update the position with real SL/TP1 (set and forget)
-            await update_position_sl_tp(ticket, sl, tp1, " (EDIT)")
+            # Update TP levels if present
+            tp_levels_parsed = parse_tp_levels(text)
+            if tp_levels_parsed:
+                log(f"Found {len(tp_levels_parsed)} TP level(s) in edit: {tp_levels_parsed}", "DEBUG")
+                tp_levels[ticket] = tp_levels_parsed
+                tp_num, tp_price = select_best_tp_with_fallback(ticket, tp_levels_parsed)
+                if tp_num and tp_price:
+                    log(f"TP{tp_num} set (${tp_price:.5f})", "INFO")
+                    await run_mt5(lambda: set_take_profit(ticket, tp_price))
+                else:
+                    log("TP levels invalid - waiting for valid values", "WARN")
 
         except Exception as e:
             log(f"CRITICAL EXCEPTION in on_edit: {str(e)}", "ERROR")
             import traceback
             log(f"   {traceback.format_exc()}", "ERROR")
+
+    # ══════════════════════════════════════════════════════════════════════
+    # Breakeven monitor (price-based fallback)
+    # ══════════════════════════════════════════════════════════════════════
+    async def monitor_breakeven():
+        """Check if TP1 has been hit and move SL to breakeven"""
+        global breakeven_monitor_alive
+
+        log("Breakeven monitor started", "INFO")
+        breakeven_monitor_alive = True
+        check_count = 0
+
+        while True:
+            try:
+                breakeven_monitor_alive = True
+                check_count += 1
+
+                positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+
+                if not positions:
+                    if check_count % 30 == 0:
+                        log(f"Breakeven monitor check #{check_count}: No open positions", "DEBUG")
+                    await asyncio.sleep(2)
+                    continue
+
+                log(f"Breakeven monitor check #{check_count}: Checking {len(positions)} position(s)", "DEBUG")
+
+                for pos in positions:
+                    ticket = int(pos.ticket)
+
+                    if ticket not in entry_prices:
+                        log(f"   Ticket {ticket}: NOT in our tracking (entry_prices)", "DEBUG")
+                        continue
+
+                    if breakeven_activated.get(ticket, False):
+                        log(f"   Ticket {ticket}: Breakeven already activated", "DEBUG")
+                        continue
+
+                    if ticket not in tp_levels or 1 not in tp_levels[ticket]:
+                        log(f"   Ticket {ticket}: No TP1 stored yet", "DEBUG")
+                        continue
+
+                    tp1 = tp_levels[ticket][1]
+                    entry = entry_prices[ticket]
+                    side = await run_mt5(lambda t=ticket: get_position_side(t))
+
+                    if side is None:
+                        log(f"   Ticket {ticket}: Position side is None (closed?)", "WARN")
+                        continue
+
+                    tick = await run_mt5(lambda: mt5.symbol_info_tick(SYMBOL))
+                    if tick is None:
+                        log(f"   Ticket {ticket}: Cannot get tick data", "WARN")
+                        continue
+
+                    current = float(tick.bid if side == "SELL" else tick.ask)
+
+                    if price_crossed_tp1(ticket, tp1, current):
+                        log(
+                            f"TP1 HIT! Ticket {ticket} | Current=${current:.5f} vs TP1=${tp1:.5f} ({side})",
+                            "INFO",
+                        )
+                        log(f"   >>> MOVING SL TO BREAKEVEN: ${entry:.5f}", "INFO")
+                        await run_mt5(lambda t=ticket, e=entry: set_stop_loss(t, e))
+                        breakeven_activated[ticket] = True
+                    else:
+                        log(
+                            f"   Ticket {ticket}: TP1 not yet reached | Current=${current:.5f} | TP1=${tp1:.5f}",
+                            "DEBUG",
+                        )
+
+                await asyncio.sleep(2)
+
+            except Exception as e:
+                log(f"CRITICAL: Breakeven monitor exception: {str(e)}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+                breakeven_monitor_alive = False
+                await asyncio.sleep(10)
 
     # ── Signal log printer ──
     async def print_signal_log():
@@ -1339,8 +1520,11 @@ async def main():
     asyncio.create_task(connection_health_monitor())
     log("  Connection health monitor task created", "INFO")
 
-    asyncio.create_task(monitor_stale_failsafe())
-    log("  Stale failsafe monitor task created", "INFO")
+    asyncio.create_task(monitor_breakeven())
+    log("  Breakeven monitor task created", "INFO")
+
+    asyncio.create_task(monitor_closed_positions())
+    log("  Closed position monitor task created", "INFO")
 
     asyncio.create_task(print_signal_log())
     log("  Signal log printer task created", "INFO")
