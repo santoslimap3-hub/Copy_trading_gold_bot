@@ -491,6 +491,18 @@
       "msg_text": "Buy Zone Now\n\nLarger zone",
       "timestamp": "2026-02-13T23:55:46.180964",
       "executed": true
+    },
+    {
+      "id": 6190,
+      "signal_type": "ZONE",
+      "side": "SELL",
+      "entry_price": 5007.06,
+      "sl_price": 5012.06,
+      "lot_size": 0.02,
+      "tp_levels": {},
+      "msg_text": "Sell zone now",
+      "timestamp": "2026-02-14T00:19:42.316090",
+      "executed": true
     }
   ]
 }
