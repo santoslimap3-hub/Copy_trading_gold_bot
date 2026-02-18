@@ -13,7 +13,7 @@ from typing import List, Dict, Optional
 
 # ===================== CONFIGURATION =====================
 SYMBOL = "XAUUSD"
-BOT_MAGIC_NUMBERS = [777, 778]  # All bot magic numbers
+BOT_MAGIC_NUMBERS = [777]  # All bot magic numbers
 DAYS_BACK = 365  # How many days back to retrieve trades
 
 # Get the directory of the current script and go up to project root
@@ -303,35 +303,11 @@ class BotTradesExporter:
         return metrics
     
     def save_to_json(self, output_file: str = OUTPUT_FILE) -> bool:
-        """Save bot trades to JSON file, preserving any manually-added trades."""
+        """Save bot trades to JSON file."""
         print(f"\n💾 Saving bot trades to JSON...")
 
         trades_output = list(self.bot_closed_deals)  # copy so we don't mutate
         trade_source = 'deals_closed'
-
-        # ── Preserve manually-added trades from existing file ──
-        # Trades whose ticket is NOT in the MT5 export but already exist in the
-        # JSON (e.g. manually added with overridden magic) must be kept.
-        mt5_tickets = {t['ticket'] for t in trades_output}
-        manually_added = []
-        if os.path.exists(output_file):
-            try:
-                with open(output_file, 'r') as f:
-                    existing_data = json.load(f)
-                for t in existing_data.get('trades', []):
-                    if t['ticket'] not in mt5_tickets:
-                        manually_added.append(t)
-                        print(f"   📌 Preserving manually-added trade: ticket={t['ticket']} profit={t.get('profit')}")
-            except Exception as e:
-                print(f"   ⚠️ Could not read existing file for merge: {e}")
-
-        if manually_added:
-            trades_output.extend(manually_added)
-            trades_output.sort(key=lambda x: x['time'])
-            print(f"   ✅ Merged {len(manually_added)} manually-added trade(s)")
-
-        # Recalculate metrics on the merged list
-        self._merged_trades = trades_output
         
         # Prepare the output
         output_data = {
@@ -343,7 +319,6 @@ class BotTradesExporter:
                 'days_back': DAYS_BACK,
                 'trade_source': trade_source,
                 'closed_deals_match': 'magic_or_position_or_order',
-                'manually_added_count': len(manually_added),
             },
             'summary': self.calculate_metrics(trades_override=trades_output),
             'trades': trades_output,

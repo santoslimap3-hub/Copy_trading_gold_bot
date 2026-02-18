@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-02-13T23:52:30.917048",
+    "created_at": "2026-02-18T11:16:25.454818",
     "days_back": 365,
     "exporter": "account_trades_exporter"
   },
@@ -8,10 +8,10 @@
     "login": 22840119,
     "server": "VantageInternational-Live 14",
     "currency": "EUR",
-    "balance": 272.35,
-    "equity": 272.35,
+    "balance": 109.81,
+    "equity": 109.81,
     "margin": 0.0,
-    "free_margin": 272.35,
+    "free_margin": 109.81,
     "margin_level": 0,
     "floating_pnl": 0.0,
     "leverage": 500,
@@ -19,33 +19,33 @@
     "open_positions_count": 0
   },
   "summary": {
-    "total_trades": 259,
-    "buy_trades": 111,
-    "sell_trades": 148,
-    "winning_trades": 148,
-    "losing_trades": 106,
-    "breakeven_trades": 5,
-    "win_rate": 57.14,
-    "total_profit": 1087.7,
-    "total_loss": 965.29,
-    "net_pnl": 122.41,
+    "total_trades": 274,
+    "buy_trades": 122,
+    "sell_trades": 152,
+    "winning_trades": 156,
+    "losing_trades": 112,
+    "breakeven_trades": 6,
+    "win_rate": 56.93,
+    "total_profit": 1124.02,
+    "total_loss": 1014.15,
+    "net_pnl": 109.87,
     "total_commission": 0.0,
     "total_swap": -0.06,
     "total_fees": 0.0,
-    "net_after_costs": 122.35,
-    "profit_factor": 1.13,
-    "avg_pnl": 0.47,
-    "avg_win": 7.35,
-    "avg_loss": 9.11,
+    "net_after_costs": 109.81,
+    "profit_factor": 1.11,
+    "avg_pnl": 0.4,
+    "avg_win": 7.21,
+    "avg_loss": 9.05,
     "largest_win": 74.26,
     "largest_loss": -129.22,
     "max_consecutive_wins": 8,
     "max_consecutive_losses": 7,
     "max_drawdown": 170.31,
-    "max_drawdown_pct": 84.46,
-    "initial_balance": 150.0,
-    "final_balance": 272.35,
-    "profitable_days": 18,
+    "max_drawdown_pct": 329.8,
+    "initial_balance": -0.0,
+    "final_balance": 109.81,
+    "profitable_days": 21,
     "losing_days": 12,
     "best_day": {
       "date": "2026-01-31",
@@ -61,80 +61,80 @@
       "wins": 4,
       "losses": 7
     },
-    "trades_per_day": 7.05,
-    "avg_daily_pnl": 3.33,
-    "trading_days": 36,
+    "trades_per_day": 6.73,
+    "avg_daily_pnl": 2.7,
+    "trading_days": 40,
     "first_trade": "2026-01-08T08:33:53",
-    "last_trade": "2026-02-14T01:50:27",
+    "last_trade": "2026-02-18T02:03:31",
     "balance_curve": [
       {
         "time": 1767832433,
         "time_str": "2026-01-08T08:33:53",
-        "balance": 143.55,
+        "balance": -6.45,
         "pnl": -6.62,
         "drawdown": 6.45,
-        "drawdown_pct": 4.3
+        "drawdown_pct": 0
       },
       {
         "time": 1767885928,
         "time_str": "2026-01-08T23:25:28",
-        "balance": 135.64,
+        "balance": -14.36,
         "pnl": -7.91,
         "drawdown": 14.36,
-        "drawdown_pct": 9.57
+        "drawdown_pct": 0
       },
       {
         "time": 1767898946,
         "time_str": "2026-01-09T03:02:26",
-        "balance": 146.82,
+        "balance": -3.18,
         "pnl": 11.18,
         "drawdown": 3.18,
-        "drawdown_pct": 2.12
+        "drawdown_pct": 0
       },
       {
         "time": 1767943853,
         "time_str": "2026-01-09T15:30:53",
-        "balance": 142.35,
+        "balance": -7.65,
         "pnl": -4.29,
         "drawdown": 7.65,
-        "drawdown_pct": 5.1
+        "drawdown_pct": 0
       },
       {
         "time": 1767968163,
         "time_str": "2026-01-09T22:16:03",
-        "balance": 147.33,
+        "balance": -2.67,
         "pnl": 5.0,
         "drawdown": 2.67,
-        "drawdown_pct": 1.78
+        "drawdown_pct": 0
       },
       {
         "time": 1767976571,
         "time_str": "2026-01-10T00:36:11",
-        "balance": 147.12,
+        "balance": -2.88,
         "pnl": -0.21,
         "drawdown": 2.88,
-        "drawdown_pct": 1.92
+        "drawdown_pct": 0
       },
       {
         "time": 1767976628,
         "time_str": "2026-01-10T00:37:08",
-        "balance": 147.35,
+        "balance": -2.65,
         "pnl": 0.23,
         "drawdown": 2.65,
-        "drawdown_pct": 1.77
+        "drawdown_pct": 0
       },
       {
         "time": 1767976667,
         "time_str": "2026-01-10T00:37:47",
-        "balance": 148.74,
+        "balance": -1.26,
         "pnl": 1.39,
         "drawdown": 1.26,
-        "drawdown_pct": 0.84
+        "drawdown_pct": 0
       },
       {
         "time": 1767977701,
         "time_str": "2026-01-10T00:55:01",
-        "balance": 152.94,
+        "balance": 2.94,
         "pnl": 4.2,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -142,7 +142,7 @@
       {
         "time": 1767979699,
         "time_str": "2026-01-10T01:28:19",
-        "balance": 163.11,
+        "balance": 13.11,
         "pnl": 10.17,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -150,103 +150,103 @@
       {
         "time": 1768213026,
         "time_str": "2026-01-12T18:17:06",
-        "balance": 161.81,
+        "balance": 11.81,
         "pnl": -1.3,
         "drawdown": 1.3,
-        "drawdown_pct": 0.8
+        "drawdown_pct": 9.92
       },
       {
         "time": 1768213919,
         "time_str": "2026-01-12T18:31:59",
-        "balance": 157.25,
+        "balance": 7.25,
         "pnl": -4.56,
         "drawdown": 5.86,
-        "drawdown_pct": 3.59
+        "drawdown_pct": 44.7
       },
       {
         "time": 1768216999,
         "time_str": "2026-01-12T19:23:19",
-        "balance": 152.39,
+        "balance": 2.39,
         "pnl": -4.86,
         "drawdown": 10.72,
-        "drawdown_pct": 6.57
+        "drawdown_pct": 81.77
       },
       {
         "time": 1768217355,
         "time_str": "2026-01-12T19:29:15",
-        "balance": 153.36,
+        "balance": 3.36,
         "pnl": 0.97,
         "drawdown": 9.75,
-        "drawdown_pct": 5.98
+        "drawdown_pct": 74.37
       },
       {
         "time": 1768224919,
         "time_str": "2026-01-12T21:35:19",
-        "balance": 155.57,
+        "balance": 5.57,
         "pnl": 2.21,
         "drawdown": 7.54,
-        "drawdown_pct": 4.62
+        "drawdown_pct": 57.51
       },
       {
         "time": 1768226392,
         "time_str": "2026-01-12T21:59:52",
-        "balance": 157.22,
+        "balance": 7.22,
         "pnl": 1.65,
         "drawdown": 5.89,
-        "drawdown_pct": 3.61
+        "drawdown_pct": 44.93
       },
       {
         "time": 1768230758,
         "time_str": "2026-01-12T23:12:38",
-        "balance": 151.78,
+        "balance": 1.78,
         "pnl": -5.44,
         "drawdown": 11.33,
-        "drawdown_pct": 6.95
+        "drawdown_pct": 86.42
       },
       {
         "time": 1768233632,
         "time_str": "2026-01-13T00:00:32",
-        "balance": 154.54,
+        "balance": 4.54,
         "pnl": 2.76,
         "drawdown": 8.57,
-        "drawdown_pct": 5.25
+        "drawdown_pct": 65.37
       },
       {
         "time": 1768241290,
         "time_str": "2026-01-13T02:08:10",
-        "balance": 150.38,
+        "balance": 0.38,
         "pnl": -4.16,
         "drawdown": 12.73,
-        "drawdown_pct": 7.8
+        "drawdown_pct": 97.1
       },
       {
         "time": 1768243525,
         "time_str": "2026-01-13T02:45:25",
-        "balance": 152.4,
+        "balance": 2.4,
         "pnl": 2.02,
         "drawdown": 10.71,
-        "drawdown_pct": 6.57
+        "drawdown_pct": 81.69
       },
       {
         "time": 1768258447,
         "time_str": "2026-01-13T06:54:07",
-        "balance": 152.47,
+        "balance": 2.47,
         "pnl": 0.07,
         "drawdown": 10.64,
-        "drawdown_pct": 6.52
+        "drawdown_pct": 81.16
       },
       {
         "time": 1768258841,
         "time_str": "2026-01-13T07:00:41",
-        "balance": 152.45,
+        "balance": 2.45,
         "pnl": -0.02,
         "drawdown": 10.66,
-        "drawdown_pct": 6.54
+        "drawdown_pct": 81.31
       },
       {
         "time": 1768266060,
         "time_str": "2026-01-13T09:01:00",
-        "balance": 163.69,
+        "balance": 13.69,
         "pnl": 11.81,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -254,7 +254,7 @@
       {
         "time": 1768300584,
         "time_str": "2026-01-13T18:36:24",
-        "balance": 168.19,
+        "balance": 18.19,
         "pnl": 4.5,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -262,7 +262,7 @@
       {
         "time": 1768304664,
         "time_str": "2026-01-13T19:44:24",
-        "balance": 170.19,
+        "balance": 20.19,
         "pnl": 2.0,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -270,7 +270,7 @@
       {
         "time": 1768306921,
         "time_str": "2026-01-13T20:22:01",
-        "balance": 174.34,
+        "balance": 24.34,
         "pnl": 4.15,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -278,7 +278,7 @@
       {
         "time": 1768309242,
         "time_str": "2026-01-13T21:00:42",
-        "balance": 177.96,
+        "balance": 27.96,
         "pnl": 3.62,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -286,15 +286,15 @@
       {
         "time": 1768315049,
         "time_str": "2026-01-13T22:37:29",
-        "balance": 177.21,
+        "balance": 27.21,
         "pnl": -0.75,
         "drawdown": 0.75,
-        "drawdown_pct": 0.42
+        "drawdown_pct": 2.68
       },
       {
         "time": 1768319905,
         "time_str": "2026-01-13T23:58:25",
-        "balance": 180.02,
+        "balance": 30.02,
         "pnl": 2.81,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -302,23 +302,23 @@
       {
         "time": 1768324083,
         "time_str": "2026-01-14T01:08:03",
-        "balance": 176.14,
+        "balance": 26.14,
         "pnl": -3.88,
         "drawdown": 3.88,
-        "drawdown_pct": 2.16
+        "drawdown_pct": 12.92
       },
       {
         "time": 1768324888,
         "time_str": "2026-01-14T01:21:28",
-        "balance": 176.76,
+        "balance": 26.76,
         "pnl": 0.62,
         "drawdown": 3.26,
-        "drawdown_pct": 1.81
+        "drawdown_pct": 10.86
       },
       {
         "time": 1768360199,
         "time_str": "2026-01-14T11:09:59",
-        "balance": 194.1,
+        "balance": 44.1,
         "pnl": 16.99,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -326,7 +326,7 @@
       {
         "time": 1768384993,
         "time_str": "2026-01-14T18:03:13",
-        "balance": 196.68,
+        "balance": 46.68,
         "pnl": 2.58,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -334,7 +334,7 @@
       {
         "time": 1768385449,
         "time_str": "2026-01-14T18:10:49",
-        "balance": 197.31,
+        "balance": 47.31,
         "pnl": 0.63,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -342,7 +342,7 @@
       {
         "time": 1768386640,
         "time_str": "2026-01-14T18:30:40",
-        "balance": 201.64,
+        "balance": 51.64,
         "pnl": 4.33,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -350,839 +350,839 @@
       {
         "time": 1768387879,
         "time_str": "2026-01-14T18:51:19",
-        "balance": 194.5,
+        "balance": 44.5,
         "pnl": -7.14,
         "drawdown": 7.14,
-        "drawdown_pct": 3.54
+        "drawdown_pct": 13.83
       },
       {
         "time": 1768395877,
         "time_str": "2026-01-14T21:04:37",
-        "balance": 197.21,
+        "balance": 47.21,
         "pnl": 2.71,
         "drawdown": 4.43,
-        "drawdown_pct": 2.2
+        "drawdown_pct": 8.58
       },
       {
         "time": 1768399476,
         "time_str": "2026-01-14T22:04:36",
-        "balance": 162.5,
+        "balance": 12.5,
         "pnl": -34.71,
         "drawdown": 39.14,
-        "drawdown_pct": 19.41
+        "drawdown_pct": 75.79
       },
       {
         "time": 1768400700,
         "time_str": "2026-01-14T22:25:00",
-        "balance": 155.51,
+        "balance": 5.51,
         "pnl": -6.99,
         "drawdown": 46.13,
-        "drawdown_pct": 22.88
+        "drawdown_pct": 89.33
       },
       {
         "time": 1768404946,
         "time_str": "2026-01-14T23:35:46",
-        "balance": 163.49,
+        "balance": 13.49,
         "pnl": 7.98,
         "drawdown": 38.15,
-        "drawdown_pct": 18.92
+        "drawdown_pct": 73.88
       },
       {
         "time": 1768405503,
         "time_str": "2026-01-14T23:45:03",
-        "balance": 160.73,
+        "balance": 10.73,
         "pnl": -2.76,
         "drawdown": 40.91,
-        "drawdown_pct": 20.29
+        "drawdown_pct": 79.22
       },
       {
         "time": 1768405503,
         "time_str": "2026-01-14T23:45:03",
-        "balance": 156.3,
+        "balance": 6.3,
         "pnl": -4.43,
         "drawdown": 45.34,
-        "drawdown_pct": 22.49
+        "drawdown_pct": 87.8
       },
       {
         "time": 1768408608,
         "time_str": "2026-01-15T00:36:48",
-        "balance": 158.67,
+        "balance": 8.67,
         "pnl": 2.37,
         "drawdown": 42.97,
-        "drawdown_pct": 21.31
+        "drawdown_pct": 83.21
       },
       {
         "time": 1768409195,
         "time_str": "2026-01-15T00:46:35",
-        "balance": 157.23,
+        "balance": 7.23,
         "pnl": -1.44,
         "drawdown": 44.41,
-        "drawdown_pct": 22.02
+        "drawdown_pct": 86.0
       },
       {
         "time": 1768409385,
         "time_str": "2026-01-15T00:49:45",
-        "balance": 162.89,
+        "balance": 12.89,
         "pnl": 5.66,
         "drawdown": 38.75,
-        "drawdown_pct": 19.22
+        "drawdown_pct": 75.04
       },
       {
         "time": 1768416117,
         "time_str": "2026-01-15T02:41:57",
-        "balance": 163.85,
+        "balance": 13.85,
         "pnl": 0.96,
         "drawdown": 37.79,
-        "drawdown_pct": 18.74
+        "drawdown_pct": 73.18
       },
       {
         "time": 1768428987,
         "time_str": "2026-01-15T06:16:27",
-        "balance": 163.85,
+        "balance": 13.85,
         "pnl": 0.0,
         "drawdown": 37.79,
-        "drawdown_pct": 18.74
+        "drawdown_pct": 73.18
       },
       {
         "time": 1768432499,
         "time_str": "2026-01-15T07:14:59",
-        "balance": 181.02,
+        "balance": 31.02,
         "pnl": 17.17,
         "drawdown": 20.62,
-        "drawdown_pct": 10.23
+        "drawdown_pct": 39.93
       },
       {
         "time": 1768465996,
         "time_str": "2026-01-15T16:33:16",
-        "balance": 180.78,
+        "balance": 30.78,
         "pnl": -0.24,
         "drawdown": 20.86,
-        "drawdown_pct": 10.35
+        "drawdown_pct": 40.4
       },
       {
         "time": 1768471427,
         "time_str": "2026-01-15T18:03:47",
-        "balance": 166.33,
+        "balance": 16.33,
         "pnl": -14.45,
         "drawdown": 35.31,
-        "drawdown_pct": 17.51
+        "drawdown_pct": 68.38
       },
       {
         "time": 1768473039,
         "time_str": "2026-01-15T18:30:39",
-        "balance": 173.73,
+        "balance": 23.73,
         "pnl": 7.4,
         "drawdown": 27.91,
-        "drawdown_pct": 13.84
+        "drawdown_pct": 54.05
       },
       {
         "time": 1768487134,
         "time_str": "2026-01-15T22:25:34",
-        "balance": 177.77,
+        "balance": 27.77,
         "pnl": 4.04,
         "drawdown": 23.87,
-        "drawdown_pct": 11.84
+        "drawdown_pct": 46.22
       },
       {
         "time": 1768488925,
         "time_str": "2026-01-15T22:55:25",
-        "balance": 160.91,
+        "balance": 10.91,
         "pnl": -16.86,
         "drawdown": 40.73,
-        "drawdown_pct": 20.2
+        "drawdown_pct": 78.87
       },
       {
         "time": 1768489661,
         "time_str": "2026-01-15T23:07:41",
-        "balance": 161.1,
+        "balance": 11.1,
         "pnl": 0.19,
         "drawdown": 40.54,
-        "drawdown_pct": 20.11
+        "drawdown_pct": 78.51
       },
       {
         "time": 1768490432,
         "time_str": "2026-01-15T23:20:32",
-        "balance": 161.1,
+        "balance": 11.1,
         "pnl": 0.0,
         "drawdown": 40.54,
-        "drawdown_pct": 20.11
+        "drawdown_pct": 78.51
       },
       {
         "time": 1768490494,
         "time_str": "2026-01-15T23:21:34",
-        "balance": 164.39,
+        "balance": 14.39,
         "pnl": 3.29,
         "drawdown": 37.25,
-        "drawdown_pct": 18.47
+        "drawdown_pct": 72.13
       },
       {
         "time": 1768491931,
         "time_str": "2026-01-15T23:45:31",
-        "balance": 153.65,
+        "balance": 3.65,
         "pnl": -10.74,
         "drawdown": 47.99,
-        "drawdown_pct": 23.8
+        "drawdown_pct": 92.93
       },
       {
         "time": 1768491931,
         "time_str": "2026-01-15T23:45:31",
-        "balance": 135.26,
+        "balance": -14.74,
         "pnl": -18.39,
         "drawdown": 66.38,
-        "drawdown_pct": 32.92
+        "drawdown_pct": 128.54
       },
       {
         "time": 1768492118,
         "time_str": "2026-01-15T23:48:38",
-        "balance": 137.52,
+        "balance": -12.48,
         "pnl": 2.26,
         "drawdown": 64.12,
-        "drawdown_pct": 31.8
+        "drawdown_pct": 124.17
       },
       {
         "time": 1768492639,
         "time_str": "2026-01-15T23:57:19",
-        "balance": 139.85,
+        "balance": -10.15,
         "pnl": 2.33,
         "drawdown": 61.79,
-        "drawdown_pct": 30.64
+        "drawdown_pct": 119.66
       },
       {
         "time": 1768553815,
         "time_str": "2026-01-16T16:56:55",
-        "balance": 141.55,
+        "balance": -8.45,
         "pnl": 1.7,
         "drawdown": 60.09,
-        "drawdown_pct": 29.8
+        "drawdown_pct": 116.36
       },
       {
         "time": 1768556732,
         "time_str": "2026-01-16T17:45:32",
-        "balance": 142.91,
+        "balance": -7.09,
         "pnl": 1.36,
         "drawdown": 58.73,
-        "drawdown_pct": 29.13
+        "drawdown_pct": 113.73
       },
       {
         "time": 1768559346,
         "time_str": "2026-01-16T18:29:06",
-        "balance": 146.34,
+        "balance": -3.66,
         "pnl": 3.43,
         "drawdown": 55.3,
-        "drawdown_pct": 27.43
+        "drawdown_pct": 107.09
       },
       {
         "time": 1768563582,
         "time_str": "2026-01-16T19:39:42",
-        "balance": 146.49,
+        "balance": -3.51,
         "pnl": 0.15,
         "drawdown": 55.15,
-        "drawdown_pct": 27.35
+        "drawdown_pct": 106.8
       },
       {
         "time": 1768576738,
         "time_str": "2026-01-16T23:18:58",
-        "balance": 149.09,
+        "balance": -0.91,
         "pnl": 2.6,
         "drawdown": 52.55,
-        "drawdown_pct": 26.06
+        "drawdown_pct": 101.76
       },
       {
         "time": 1768584367,
         "time_str": "2026-01-17T01:26:07",
-        "balance": 141.89,
+        "balance": -8.11,
         "pnl": -7.2,
         "drawdown": 59.75,
-        "drawdown_pct": 29.63
+        "drawdown_pct": 115.7
       },
       {
         "time": 1768585330,
         "time_str": "2026-01-17T01:42:10",
-        "balance": 158.04,
+        "balance": 8.04,
         "pnl": 16.15,
         "drawdown": 43.6,
-        "drawdown_pct": 21.62
+        "drawdown_pct": 84.43
       },
       {
         "time": 1768817221,
         "time_str": "2026-01-19T18:07:01",
-        "balance": 142.45,
+        "balance": -7.55,
         "pnl": -15.59,
         "drawdown": 59.19,
-        "drawdown_pct": 29.35
+        "drawdown_pct": 114.62
       },
       {
         "time": 1768830989,
         "time_str": "2026-01-19T21:56:29",
-        "balance": 129.55,
+        "balance": -20.45,
         "pnl": -12.9,
         "drawdown": 72.09,
-        "drawdown_pct": 35.75
+        "drawdown_pct": 139.6
       },
       {
         "time": 1768840010,
         "time_str": "2026-01-20T00:26:50",
-        "balance": 119.34,
+        "balance": -30.66,
         "pnl": -10.21,
         "drawdown": 82.3,
-        "drawdown_pct": 40.82
+        "drawdown_pct": 159.37
       },
       {
         "time": 1768840234,
         "time_str": "2026-01-20T00:30:34",
-        "balance": 123.91,
+        "balance": -26.09,
         "pnl": 4.57,
         "drawdown": 77.73,
-        "drawdown_pct": 38.55
+        "drawdown_pct": 150.52
       },
       {
         "time": 1768841345,
         "time_str": "2026-01-20T00:49:05",
-        "balance": 109.31,
+        "balance": -40.69,
         "pnl": -14.6,
         "drawdown": 92.33,
-        "drawdown_pct": 45.79
+        "drawdown_pct": 178.8
       },
       {
         "time": 1768852267,
         "time_str": "2026-01-20T03:51:07",
-        "balance": 117.9,
+        "balance": -32.1,
         "pnl": 8.59,
         "drawdown": 83.74,
-        "drawdown_pct": 41.53
+        "drawdown_pct": 162.16
       },
       {
         "time": 1768900151,
         "time_str": "2026-01-20T17:09:11",
-        "balance": 135.74,
+        "balance": -14.26,
         "pnl": 17.84,
         "drawdown": 65.9,
-        "drawdown_pct": 32.68
+        "drawdown_pct": 127.61
       },
       {
         "time": 1768901031,
         "time_str": "2026-01-20T17:23:51",
-        "balance": 124.37,
+        "balance": -25.63,
         "pnl": -11.37,
         "drawdown": 77.27,
-        "drawdown_pct": 38.32
+        "drawdown_pct": 149.63
       },
       {
         "time": 1768901750,
         "time_str": "2026-01-20T17:35:50",
-        "balance": 113.92,
+        "balance": -36.08,
         "pnl": -10.45,
         "drawdown": 87.72,
-        "drawdown_pct": 43.5
+        "drawdown_pct": 169.87
       },
       {
         "time": 1768905411,
         "time_str": "2026-01-20T18:36:51",
-        "balance": 119.42,
+        "balance": -30.58,
         "pnl": 5.5,
         "drawdown": 82.22,
-        "drawdown_pct": 40.78
+        "drawdown_pct": 159.22
       },
       {
         "time": 1768907629,
         "time_str": "2026-01-20T19:13:49",
-        "balance": 121.67,
+        "balance": -28.33,
         "pnl": 2.25,
         "drawdown": 79.97,
-        "drawdown_pct": 39.66
+        "drawdown_pct": 154.86
       },
       {
         "time": 1768922530,
         "time_str": "2026-01-20T23:22:10",
-        "balance": 128.45,
+        "balance": -21.55,
         "pnl": 6.78,
         "drawdown": 73.19,
-        "drawdown_pct": 36.3
+        "drawdown_pct": 141.73
       },
       {
         "time": 1768984999,
         "time_str": "2026-01-21T16:43:19",
-        "balance": 123.66,
+        "balance": -26.34,
         "pnl": -4.79,
         "drawdown": 77.98,
-        "drawdown_pct": 38.67
+        "drawdown_pct": 151.01
       },
       {
         "time": 1768986204,
         "time_str": "2026-01-21T17:03:24",
-        "balance": 116.89,
+        "balance": -33.11,
         "pnl": -6.77,
         "drawdown": 84.75,
-        "drawdown_pct": 42.03
+        "drawdown_pct": 164.12
       },
       {
         "time": 1768990807,
         "time_str": "2026-01-21T18:20:07",
-        "balance": 120.48,
+        "balance": -29.52,
         "pnl": 3.59,
         "drawdown": 81.16,
-        "drawdown_pct": 40.25
+        "drawdown_pct": 157.16
       },
       {
         "time": 1768993219,
         "time_str": "2026-01-21T19:00:19",
-        "balance": 118.87,
+        "balance": -31.13,
         "pnl": -1.61,
         "drawdown": 82.77,
-        "drawdown_pct": 41.05
+        "drawdown_pct": 160.28
       },
       {
         "time": 1769007119,
         "time_str": "2026-01-21T22:51:59",
-        "balance": 110.35,
+        "balance": -39.65,
         "pnl": -8.52,
         "drawdown": 91.29,
-        "drawdown_pct": 45.27
+        "drawdown_pct": 176.78
       },
       {
         "time": 1769011805,
         "time_str": "2026-01-22T00:10:05",
-        "balance": 100.8,
+        "balance": -49.2,
         "pnl": -9.55,
         "drawdown": 100.84,
-        "drawdown_pct": 50.01
+        "drawdown_pct": 195.27
       },
       {
         "time": 1769080443,
         "time_str": "2026-01-22T19:14:03",
-        "balance": 101.72,
+        "balance": -48.28,
         "pnl": 0.92,
         "drawdown": 99.92,
-        "drawdown_pct": 49.55
+        "drawdown_pct": 193.49
       },
       {
         "time": 1769088948,
         "time_str": "2026-01-22T21:35:48",
-        "balance": 103.39,
+        "balance": -46.61,
         "pnl": 1.67,
         "drawdown": 98.25,
-        "drawdown_pct": 48.73
+        "drawdown_pct": 190.26
       },
       {
         "time": 1769090304,
         "time_str": "2026-01-22T21:58:24",
-        "balance": 104.64,
+        "balance": -45.36,
         "pnl": 1.25,
         "drawdown": 97.0,
-        "drawdown_pct": 48.11
+        "drawdown_pct": 187.84
       },
       {
         "time": 1769094008,
         "time_str": "2026-01-22T23:00:08",
-        "balance": 113.07,
+        "balance": -36.93,
         "pnl": 8.43,
         "drawdown": 88.57,
-        "drawdown_pct": 43.92
+        "drawdown_pct": 171.51
       },
       {
         "time": 1769094274,
         "time_str": "2026-01-22T23:04:34",
-        "balance": 113.93,
+        "balance": -36.07,
         "pnl": 0.86,
         "drawdown": 87.71,
-        "drawdown_pct": 43.5
+        "drawdown_pct": 169.85
       },
       {
         "time": 1769096614,
         "time_str": "2026-01-22T23:43:34",
-        "balance": 113.93,
+        "balance": -36.07,
         "pnl": 0.0,
         "drawdown": 87.71,
-        "drawdown_pct": 43.5
+        "drawdown_pct": 169.85
       },
       {
         "time": 1769434578,
         "time_str": "2026-01-26T21:36:18",
-        "balance": 115.32,
+        "balance": -34.68,
         "pnl": 1.39,
         "drawdown": 86.32,
-        "drawdown_pct": 42.81
+        "drawdown_pct": 167.16
       },
       {
         "time": 1769441531,
         "time_str": "2026-01-26T23:32:11",
-        "balance": 106.87,
+        "balance": -43.13,
         "pnl": -8.45,
         "drawdown": 94.77,
-        "drawdown_pct": 47.0
+        "drawdown_pct": 183.52
       },
       {
         "time": 1769441600,
         "time_str": "2026-01-26T23:33:20",
-        "balance": 108.87,
+        "balance": -41.13,
         "pnl": 2.0,
         "drawdown": 92.77,
-        "drawdown_pct": 46.01
+        "drawdown_pct": 179.65
       },
       {
         "time": 1769445705,
         "time_str": "2026-01-27T00:41:45",
-        "balance": 114.99,
+        "balance": -35.01,
         "pnl": 6.12,
         "drawdown": 86.65,
-        "drawdown_pct": 42.97
+        "drawdown_pct": 167.8
       },
       {
         "time": 1769446374,
         "time_str": "2026-01-27T00:52:54",
-        "balance": 140.17,
+        "balance": -9.83,
         "pnl": 25.18,
         "drawdown": 61.47,
-        "drawdown_pct": 30.49
+        "drawdown_pct": 119.04
       },
       {
         "time": 1769506456,
         "time_str": "2026-01-27T17:34:16",
-        "balance": 138.72,
+        "balance": -11.28,
         "pnl": -1.45,
         "drawdown": 62.92,
-        "drawdown_pct": 31.2
+        "drawdown_pct": 121.84
       },
       {
         "time": 1769517782,
         "time_str": "2026-01-27T20:43:02",
-        "balance": 155.68,
+        "balance": 5.68,
         "pnl": 16.96,
         "drawdown": 45.96,
-        "drawdown_pct": 22.79
+        "drawdown_pct": 89.0
       },
       {
         "time": 1769521996,
         "time_str": "2026-01-27T21:53:16",
-        "balance": 157.23,
+        "balance": 7.23,
         "pnl": 1.55,
         "drawdown": 44.41,
-        "drawdown_pct": 22.02
+        "drawdown_pct": 86.0
       },
       {
         "time": 1769525214,
         "time_str": "2026-01-27T22:46:54",
-        "balance": 149.6,
+        "balance": -0.4,
         "pnl": -7.63,
         "drawdown": 52.04,
-        "drawdown_pct": 25.81
+        "drawdown_pct": 100.77
       },
       {
         "time": 1769526581,
         "time_str": "2026-01-27T23:09:41",
-        "balance": 150.67,
+        "balance": 0.67,
         "pnl": 1.07,
         "drawdown": 50.97,
-        "drawdown_pct": 25.28
+        "drawdown_pct": 98.7
       },
       {
         "time": 1769528307,
         "time_str": "2026-01-27T23:38:27",
-        "balance": 151.94,
+        "balance": 1.94,
         "pnl": 1.27,
         "drawdown": 49.7,
-        "drawdown_pct": 24.65
+        "drawdown_pct": 96.24
       },
       {
         "time": 1769530020,
         "time_str": "2026-01-28T00:07:00",
-        "balance": 154.76,
+        "balance": 4.76,
         "pnl": 2.82,
         "drawdown": 46.88,
-        "drawdown_pct": 23.25
+        "drawdown_pct": 90.78
       },
       {
         "time": 1769538112,
         "time_str": "2026-01-28T02:21:52",
-        "balance": 181.68,
+        "balance": 31.68,
         "pnl": 26.92,
         "drawdown": 19.96,
-        "drawdown_pct": 9.9
+        "drawdown_pct": 38.65
       },
       {
         "time": 1769542678,
         "time_str": "2026-01-28T03:37:58",
-        "balance": 188.16,
+        "balance": 38.16,
         "pnl": 6.48,
         "drawdown": 13.48,
-        "drawdown_pct": 6.69
+        "drawdown_pct": 26.1
       },
       {
         "time": 1769554035,
         "time_str": "2026-01-28T06:47:15",
-        "balance": 182.34,
+        "balance": 32.34,
         "pnl": -5.82,
         "drawdown": 19.3,
-        "drawdown_pct": 9.57
+        "drawdown_pct": 37.37
       },
       {
         "time": 1769592360,
         "time_str": "2026-01-28T17:26:00",
-        "balance": 53.12,
+        "balance": -96.88,
         "pnl": -129.22,
         "drawdown": 148.52,
-        "drawdown_pct": 73.66
+        "drawdown_pct": 287.61
       },
       {
         "time": 1769597249,
         "time_str": "2026-01-28T18:47:29",
-        "balance": 48.08,
+        "balance": -101.92,
         "pnl": -5.04,
         "drawdown": 153.56,
-        "drawdown_pct": 76.16
+        "drawdown_pct": 297.37
       },
       {
         "time": 1769604310,
         "time_str": "2026-01-28T20:45:10",
-        "balance": 47.92,
+        "balance": -102.08,
         "pnl": -0.16,
         "drawdown": 153.72,
-        "drawdown_pct": 76.23
+        "drawdown_pct": 297.68
       },
       {
         "time": 1769604991,
         "time_str": "2026-01-28T20:56:31",
-        "balance": 47.87,
+        "balance": -102.13,
         "pnl": -0.05,
         "drawdown": 153.77,
-        "drawdown_pct": 76.26
+        "drawdown_pct": 297.77
       },
       {
         "time": 1769605479,
         "time_str": "2026-01-28T21:04:39",
-        "balance": 40.06,
+        "balance": -109.94,
         "pnl": -7.81,
         "drawdown": 161.58,
-        "drawdown_pct": 80.13
+        "drawdown_pct": 312.9
       },
       {
         "time": 1769612486,
         "time_str": "2026-01-28T23:01:26",
-        "balance": 33.12,
+        "balance": -116.88,
         "pnl": -6.94,
         "drawdown": 168.52,
-        "drawdown_pct": 83.57
+        "drawdown_pct": 326.34
       },
       {
         "time": 1769612731,
         "time_str": "2026-01-28T23:05:31",
-        "balance": 34.32,
+        "balance": -115.68,
         "pnl": 1.2,
         "drawdown": 167.32,
-        "drawdown_pct": 82.98
+        "drawdown_pct": 324.01
       },
       {
         "time": 1769619909,
         "time_str": "2026-01-29T01:05:09",
-        "balance": 37.19,
+        "balance": -112.81,
         "pnl": 2.87,
         "drawdown": 164.45,
-        "drawdown_pct": 81.56
+        "drawdown_pct": 318.45
       },
       {
         "time": 1769620471,
         "time_str": "2026-01-29T01:14:31",
-        "balance": 40.36,
+        "balance": -109.64,
         "pnl": 3.17,
         "drawdown": 161.28,
-        "drawdown_pct": 79.98
+        "drawdown_pct": 312.32
       },
       {
         "time": 1769639425,
         "time_str": "2026-01-29T06:30:25",
-        "balance": 31.33,
+        "balance": -118.67,
         "pnl": -9.03,
         "drawdown": 170.31,
-        "drawdown_pct": 84.46
+        "drawdown_pct": 329.8
       },
       {
         "time": 1769641365,
         "time_str": "2026-01-29T07:02:45",
-        "balance": 35.14,
+        "balance": -114.86,
         "pnl": 3.81,
         "drawdown": 166.5,
-        "drawdown_pct": 82.57
+        "drawdown_pct": 322.42
       },
       {
         "time": 1769641365,
         "time_str": "2026-01-29T07:02:45",
-        "balance": 45.63,
+        "balance": -104.37,
         "pnl": 10.49,
         "drawdown": 156.01,
-        "drawdown_pct": 77.37
+        "drawdown_pct": 302.11
       },
       {
         "time": 1769681167,
         "time_str": "2026-01-29T18:06:07",
-        "balance": 44.09,
+        "balance": -105.91,
         "pnl": -1.54,
         "drawdown": 157.55,
-        "drawdown_pct": 78.13
+        "drawdown_pct": 305.09
       },
       {
         "time": 1769689982,
         "time_str": "2026-01-29T20:33:02",
-        "balance": 45.82,
+        "balance": -104.18,
         "pnl": 1.73,
         "drawdown": 155.82,
-        "drawdown_pct": 77.28
+        "drawdown_pct": 301.74
       },
       {
         "time": 1769693528,
         "time_str": "2026-01-29T21:32:08",
-        "balance": 83.81,
+        "balance": -66.19,
         "pnl": 37.99,
         "drawdown": 117.83,
-        "drawdown_pct": 58.44
+        "drawdown_pct": 228.18
       },
       {
         "time": 1769695029,
         "time_str": "2026-01-29T21:57:09",
-        "balance": 85.89,
+        "balance": -64.11,
         "pnl": 2.08,
         "drawdown": 115.75,
-        "drawdown_pct": 57.4
+        "drawdown_pct": 224.15
       },
       {
         "time": 1769699599,
         "time_str": "2026-01-29T23:13:19",
-        "balance": 87.2,
+        "balance": -62.8,
         "pnl": 1.31,
         "drawdown": 114.44,
-        "drawdown_pct": 56.75
+        "drawdown_pct": 221.61
       },
       {
         "time": 1769704551,
         "time_str": "2026-01-30T00:35:51",
-        "balance": 79.68,
+        "balance": -70.32,
         "pnl": -7.52,
         "drawdown": 121.96,
-        "drawdown_pct": 60.48
+        "drawdown_pct": 236.17
       },
       {
         "time": 1769704641,
         "time_str": "2026-01-30T00:37:21",
-        "balance": 86.81,
+        "balance": -63.19,
         "pnl": 7.13,
         "drawdown": 114.83,
-        "drawdown_pct": 56.95
+        "drawdown_pct": 222.37
       },
       {
         "time": 1769706279,
         "time_str": "2026-01-30T01:04:39",
-        "balance": 82.79,
+        "balance": -67.21,
         "pnl": -4.02,
         "drawdown": 118.85,
-        "drawdown_pct": 58.94
+        "drawdown_pct": 230.15
       },
       {
         "time": 1769751552,
         "time_str": "2026-01-30T13:39:12",
-        "balance": 85.24,
+        "balance": -64.76,
         "pnl": 2.45,
         "drawdown": 116.4,
-        "drawdown_pct": 57.73
+        "drawdown_pct": 225.41
       },
       {
         "time": 1769751735,
         "time_str": "2026-01-30T13:42:15",
-        "balance": 84.77,
+        "balance": -65.23,
         "pnl": -0.47,
         "drawdown": 116.87,
-        "drawdown_pct": 57.96
+        "drawdown_pct": 226.32
       },
       {
         "time": 1769771253,
         "time_str": "2026-01-30T19:07:33",
-        "balance": 79.05,
+        "balance": -70.95,
         "pnl": -5.72,
         "drawdown": 122.59,
-        "drawdown_pct": 60.8
+        "drawdown_pct": 237.39
       },
       {
         "time": 1769771856,
         "time_str": "2026-01-30T19:17:36",
-        "balance": 83.27,
+        "balance": -66.73,
         "pnl": 4.22,
         "drawdown": 118.37,
-        "drawdown_pct": 58.7
+        "drawdown_pct": 229.22
       },
       {
         "time": 1769772357,
         "time_str": "2026-01-30T19:25:57",
-        "balance": 89.88,
+        "balance": -60.12,
         "pnl": 6.61,
         "drawdown": 111.76,
-        "drawdown_pct": 55.43
+        "drawdown_pct": 216.42
       },
       {
         "time": 1769773913,
         "time_str": "2026-01-30T19:51:53",
-        "balance": 96.91,
+        "balance": -53.09,
         "pnl": 7.03,
         "drawdown": 104.73,
-        "drawdown_pct": 51.94
+        "drawdown_pct": 202.81
       },
       {
         "time": 1769778096,
         "time_str": "2026-01-30T21:01:36",
-        "balance": 100.94,
+        "balance": -49.06,
         "pnl": 4.03,
         "drawdown": 100.7,
-        "drawdown_pct": 49.94
+        "drawdown_pct": 195.0
       },
       {
         "time": 1769791748,
         "time_str": "2026-01-31T00:49:08",
-        "balance": 175.2,
+        "balance": 25.2,
         "pnl": 74.26,
         "drawdown": 26.44,
-        "drawdown_pct": 13.11
+        "drawdown_pct": 51.2
       },
       {
         "time": 1770027599,
         "time_str": "2026-02-02T18:19:59",
-        "balance": 182.06,
+        "balance": 32.06,
         "pnl": 6.86,
         "drawdown": 19.58,
-        "drawdown_pct": 9.71
+        "drawdown_pct": 37.92
       },
       {
         "time": 1770031706,
         "time_str": "2026-02-02T19:28:26",
-        "balance": 165.6,
+        "balance": 15.6,
         "pnl": -16.46,
         "drawdown": 36.04,
-        "drawdown_pct": 17.87
+        "drawdown_pct": 69.79
       },
       {
         "time": 1770031761,
         "time_str": "2026-02-02T19:29:21",
-        "balance": 172.99,
+        "balance": 22.99,
         "pnl": 7.39,
         "drawdown": 28.65,
-        "drawdown_pct": 14.21
+        "drawdown_pct": 55.48
       },
       {
         "time": 1770042363,
         "time_str": "2026-02-02T22:26:03",
-        "balance": 178.08,
+        "balance": 28.08,
         "pnl": 5.09,
         "drawdown": 23.56,
-        "drawdown_pct": 11.68
+        "drawdown_pct": 45.62
       },
       {
         "time": 1770046457,
         "time_str": "2026-02-02T23:34:17",
-        "balance": 181.06,
+        "balance": 31.06,
         "pnl": 2.98,
         "drawdown": 20.58,
-        "drawdown_pct": 10.21
+        "drawdown_pct": 39.85
       },
       {
         "time": 1770087682,
         "time_str": "2026-02-03T11:01:22",
-        "balance": 223.37,
+        "balance": 73.37,
         "pnl": 42.31,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1190,63 +1190,63 @@
       {
         "time": 1770091482,
         "time_str": "2026-02-03T12:04:42",
-        "balance": 207.04,
+        "balance": 57.04,
         "pnl": -16.33,
         "drawdown": 16.33,
-        "drawdown_pct": 7.31
+        "drawdown_pct": 22.26
       },
       {
         "time": 1770093016,
         "time_str": "2026-02-03T12:30:16",
-        "balance": 194.18,
+        "balance": 44.18,
         "pnl": -12.86,
         "drawdown": 29.19,
-        "drawdown_pct": 13.07
+        "drawdown_pct": 39.78
       },
       {
         "time": 1770104266,
         "time_str": "2026-02-03T15:37:46",
-        "balance": 183.21,
+        "balance": 33.21,
         "pnl": -10.97,
         "drawdown": 40.16,
-        "drawdown_pct": 17.98
+        "drawdown_pct": 54.74
       },
       {
         "time": 1770111284,
         "time_str": "2026-02-03T17:34:44",
-        "balance": 188.38,
+        "balance": 38.38,
         "pnl": 5.17,
         "drawdown": 34.99,
-        "drawdown_pct": 15.66
+        "drawdown_pct": 47.69
       },
       {
         "time": 1770113222,
         "time_str": "2026-02-03T18:07:02",
-        "balance": 196.02,
+        "balance": 46.02,
         "pnl": 7.64,
         "drawdown": 27.35,
-        "drawdown_pct": 12.24
+        "drawdown_pct": 37.28
       },
       {
         "time": 1770116408,
         "time_str": "2026-02-03T19:00:08",
-        "balance": 198.85,
+        "balance": 48.85,
         "pnl": 2.83,
         "drawdown": 24.52,
-        "drawdown_pct": 10.98
+        "drawdown_pct": 33.42
       },
       {
         "time": 1770116423,
         "time_str": "2026-02-03T19:00:23",
-        "balance": 199.66,
+        "balance": 49.66,
         "pnl": 0.81,
         "drawdown": 23.71,
-        "drawdown_pct": 10.61
+        "drawdown_pct": 32.32
       },
       {
         "time": 1770117391,
         "time_str": "2026-02-03T19:16:31",
-        "balance": 232.62,
+        "balance": 82.62,
         "pnl": 32.77,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1254,7 +1254,7 @@
       {
         "time": 1770118261,
         "time_str": "2026-02-03T19:31:01",
-        "balance": 236.66,
+        "balance": 86.66,
         "pnl": 4.04,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1262,55 +1262,55 @@
       {
         "time": 1770119933,
         "time_str": "2026-02-03T19:58:53",
-        "balance": 226.27,
+        "balance": 76.27,
         "pnl": -10.39,
         "drawdown": 10.39,
-        "drawdown_pct": 4.39
+        "drawdown_pct": 11.99
       },
       {
         "time": 1770123779,
         "time_str": "2026-02-03T21:02:59",
-        "balance": 211.06,
+        "balance": 61.06,
         "pnl": -15.21,
         "drawdown": 25.6,
-        "drawdown_pct": 10.82
+        "drawdown_pct": 29.54
       },
       {
         "time": 1770132666,
         "time_str": "2026-02-03T23:31:06",
-        "balance": 199.87,
+        "balance": 49.87,
         "pnl": -11.19,
         "drawdown": 36.79,
-        "drawdown_pct": 15.55
+        "drawdown_pct": 42.45
       },
       {
         "time": 1770133627,
         "time_str": "2026-02-03T23:47:07",
-        "balance": 208.26,
+        "balance": 58.26,
         "pnl": 8.39,
         "drawdown": 28.4,
-        "drawdown_pct": 12.0
+        "drawdown_pct": 32.77
       },
       {
         "time": 1770134902,
         "time_str": "2026-02-04T00:08:22",
-        "balance": 211.58,
+        "balance": 61.58,
         "pnl": 3.32,
         "drawdown": 25.08,
-        "drawdown_pct": 10.6
+        "drawdown_pct": 28.94
       },
       {
         "time": 1770135428,
         "time_str": "2026-02-04T00:17:08",
-        "balance": 236.44,
+        "balance": 86.44,
         "pnl": 24.86,
         "drawdown": 0.22,
-        "drawdown_pct": 0.09
+        "drawdown_pct": 0.25
       },
       {
         "time": 1770142661,
         "time_str": "2026-02-04T02:17:41",
-        "balance": 241.55,
+        "balance": 91.55,
         "pnl": 5.11,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1318,127 +1318,127 @@
       {
         "time": 1770150754,
         "time_str": "2026-02-04T04:32:34",
-        "balance": 224.18,
+        "balance": 74.18,
         "pnl": -17.37,
         "drawdown": 17.37,
-        "drawdown_pct": 7.19
+        "drawdown_pct": 18.97
       },
       {
         "time": 1770187622,
         "time_str": "2026-02-04T14:47:02",
-        "balance": 210.28,
+        "balance": 60.28,
         "pnl": -13.9,
         "drawdown": 31.27,
-        "drawdown_pct": 12.95
+        "drawdown_pct": 34.16
       },
       {
         "time": 1770198633,
         "time_str": "2026-02-04T17:50:33",
-        "balance": 209.94,
+        "balance": 59.94,
         "pnl": -0.34,
         "drawdown": 31.61,
-        "drawdown_pct": 13.09
+        "drawdown_pct": 34.53
       },
       {
         "time": 1770202930,
         "time_str": "2026-02-04T19:02:10",
-        "balance": 210.02,
+        "balance": 60.02,
         "pnl": 0.08,
         "drawdown": 31.53,
-        "drawdown_pct": 13.05
+        "drawdown_pct": 34.44
       },
       {
         "time": 1770203827,
         "time_str": "2026-02-04T19:17:07",
-        "balance": 215.83,
+        "balance": 65.83,
         "pnl": 5.81,
         "drawdown": 25.72,
-        "drawdown_pct": 10.65
+        "drawdown_pct": 28.09
       },
       {
         "time": 1770204759,
         "time_str": "2026-02-04T19:32:39",
-        "balance": 194.89,
+        "balance": 44.89,
         "pnl": -20.94,
         "drawdown": 46.66,
-        "drawdown_pct": 19.32
+        "drawdown_pct": 50.97
       },
       {
         "time": 1770210414,
         "time_str": "2026-02-04T21:06:54",
-        "balance": 206.92,
+        "balance": 56.92,
         "pnl": 12.03,
         "drawdown": 34.63,
-        "drawdown_pct": 14.34
+        "drawdown_pct": 37.83
       },
       {
         "time": 1770210961,
         "time_str": "2026-02-04T21:16:01",
-        "balance": 185.43,
+        "balance": 35.43,
         "pnl": -21.49,
         "drawdown": 56.12,
-        "drawdown_pct": 23.23
+        "drawdown_pct": 61.3
       },
       {
         "time": 1770213496,
         "time_str": "2026-02-04T21:58:16",
-        "balance": 187.66,
+        "balance": 37.66,
         "pnl": 2.23,
         "drawdown": 53.89,
-        "drawdown_pct": 22.31
+        "drawdown_pct": 58.86
       },
       {
         "time": 1770221510,
         "time_str": "2026-02-05T00:11:50",
-        "balance": 203.24,
+        "balance": 53.24,
         "pnl": 15.58,
         "drawdown": 38.31,
-        "drawdown_pct": 15.86
+        "drawdown_pct": 41.85
       },
       {
         "time": 1770227018,
         "time_str": "2026-02-05T01:43:38",
-        "balance": 202.11,
+        "balance": 52.11,
         "pnl": -1.13,
         "drawdown": 39.44,
-        "drawdown_pct": 16.33
+        "drawdown_pct": 43.08
       },
       {
         "time": 1770227524,
         "time_str": "2026-02-05T01:52:04",
-        "balance": 219.65,
+        "balance": 69.65,
         "pnl": 17.54,
         "drawdown": 21.9,
-        "drawdown_pct": 9.07
+        "drawdown_pct": 23.92
       },
       {
         "time": 1770230911,
         "time_str": "2026-02-05T02:48:31",
-        "balance": 210.71,
+        "balance": 60.71,
         "pnl": -8.94,
         "drawdown": 30.84,
-        "drawdown_pct": 12.77
+        "drawdown_pct": 33.69
       },
       {
         "time": 1770232223,
         "time_str": "2026-02-05T03:10:23",
-        "balance": 236.54,
+        "balance": 86.54,
         "pnl": 25.83,
         "drawdown": 5.01,
-        "drawdown_pct": 2.07
+        "drawdown_pct": 5.47
       },
       {
         "time": 1770270646,
         "time_str": "2026-02-05T13:50:46",
-        "balance": 219.13,
+        "balance": 69.13,
         "pnl": -17.41,
         "drawdown": 22.42,
-        "drawdown_pct": 9.28
+        "drawdown_pct": 24.49
       },
       {
         "time": 1770292698,
         "time_str": "2026-02-05T19:58:18",
-        "balance": 242.43,
+        "balance": 92.43,
         "pnl": 23.3,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1446,7 +1446,7 @@
       {
         "time": 1770297857,
         "time_str": "2026-02-05T21:24:17",
-        "balance": 242.43,
+        "balance": 92.43,
         "pnl": 0.0,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1454,7 +1454,7 @@
       {
         "time": 1770306409,
         "time_str": "2026-02-05T23:46:49",
-        "balance": 247.33,
+        "balance": 97.33,
         "pnl": 4.9,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1462,7 +1462,7 @@
       {
         "time": 1770313720,
         "time_str": "2026-02-06T01:48:40",
-        "balance": 248.15,
+        "balance": 98.15,
         "pnl": 0.82,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1470,7 +1470,7 @@
       {
         "time": 1770374206,
         "time_str": "2026-02-06T18:36:46",
-        "balance": 254.41,
+        "balance": 104.41,
         "pnl": 6.26,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1478,15 +1478,15 @@
       {
         "time": 1770376264,
         "time_str": "2026-02-06T19:11:04",
-        "balance": 253.73,
+        "balance": 103.73,
         "pnl": -0.68,
         "drawdown": 0.68,
-        "drawdown_pct": 0.27
+        "drawdown_pct": 0.65
       },
       {
         "time": 1770383086,
         "time_str": "2026-02-06T21:04:46",
-        "balance": 264.79,
+        "balance": 114.79,
         "pnl": 11.06,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1494,23 +1494,23 @@
       {
         "time": 1770385854,
         "time_str": "2026-02-06T21:50:54",
-        "balance": 264.28,
+        "balance": 114.28,
         "pnl": -0.51,
         "drawdown": 0.51,
-        "drawdown_pct": 0.19
+        "drawdown_pct": 0.44
       },
       {
         "time": 1770633570,
         "time_str": "2026-02-09T18:39:30",
-        "balance": 263.66,
+        "balance": 113.66,
         "pnl": -0.62,
         "drawdown": 1.13,
-        "drawdown_pct": 0.43
+        "drawdown_pct": 0.98
       },
       {
         "time": 1770638771,
         "time_str": "2026-02-09T20:06:11",
-        "balance": 280.25,
+        "balance": 130.25,
         "pnl": 16.59,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1518,71 +1518,71 @@
       {
         "time": 1770662401,
         "time_str": "2026-02-10T02:40:01",
-        "balance": 278.79,
+        "balance": 128.79,
         "pnl": -1.46,
         "drawdown": 1.46,
-        "drawdown_pct": 0.52
+        "drawdown_pct": 1.12
       },
       {
         "time": 1770720369,
         "time_str": "2026-02-10T18:46:09",
-        "balance": 271.97,
+        "balance": 121.97,
         "pnl": -6.82,
         "drawdown": 8.28,
-        "drawdown_pct": 2.95
+        "drawdown_pct": 6.36
       },
       {
         "time": 1770726166,
         "time_str": "2026-02-10T20:22:46",
-        "balance": 277.28,
+        "balance": 127.28,
         "pnl": 5.31,
         "drawdown": 2.97,
-        "drawdown_pct": 1.06
+        "drawdown_pct": 2.28
       },
       {
         "time": 1770734688,
         "time_str": "2026-02-10T22:44:48",
-        "balance": 261.58,
+        "balance": 111.58,
         "pnl": -15.7,
         "drawdown": 18.67,
-        "drawdown_pct": 6.66
+        "drawdown_pct": 14.33
       },
       {
         "time": 1770801222,
         "time_str": "2026-02-11T17:13:42",
-        "balance": 269.63,
+        "balance": 119.63,
         "pnl": 8.05,
         "drawdown": 10.62,
-        "drawdown_pct": 3.79
+        "drawdown_pct": 8.15
       },
       {
         "time": 1770802085,
         "time_str": "2026-02-11T17:28:05",
-        "balance": 270.22,
+        "balance": 120.22,
         "pnl": 0.59,
         "drawdown": 10.03,
-        "drawdown_pct": 3.58
+        "drawdown_pct": 7.7
       },
       {
         "time": 1770805093,
         "time_str": "2026-02-11T18:18:13",
-        "balance": 270.01,
+        "balance": 120.01,
         "pnl": -0.21,
         "drawdown": 10.24,
-        "drawdown_pct": 3.65
+        "drawdown_pct": 7.86
       },
       {
         "time": 1770806026,
         "time_str": "2026-02-11T18:33:46",
-        "balance": 270.54,
+        "balance": 120.54,
         "pnl": 0.53,
         "drawdown": 9.71,
-        "drawdown_pct": 3.46
+        "drawdown_pct": 7.45
       },
       {
         "time": 1770807609,
         "time_str": "2026-02-11T19:00:09",
-        "balance": 282.22,
+        "balance": 132.22,
         "pnl": 11.68,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1590,7 +1590,7 @@
       {
         "time": 1770807627,
         "time_str": "2026-02-11T19:00:27",
-        "balance": 293.34,
+        "balance": 143.34,
         "pnl": 11.12,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1598,7 +1598,7 @@
       {
         "time": 1770808236,
         "time_str": "2026-02-11T19:10:36",
-        "balance": 304.1,
+        "balance": 154.1,
         "pnl": 10.76,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1606,538 +1606,658 @@
       {
         "time": 1770810255,
         "time_str": "2026-02-11T19:44:15",
-        "balance": 303.4,
+        "balance": 153.4,
         "pnl": -0.7,
         "drawdown": 0.7,
-        "drawdown_pct": 0.23
+        "drawdown_pct": 0.45
       },
       {
         "time": 1770810267,
         "time_str": "2026-02-11T19:44:27",
-        "balance": 292.22,
+        "balance": 142.22,
         "pnl": -11.18,
         "drawdown": 11.88,
-        "drawdown_pct": 3.91
+        "drawdown_pct": 7.71
       },
       {
         "time": 1770810614,
         "time_str": "2026-02-11T19:50:14",
-        "balance": 303.88,
+        "balance": 153.88,
         "pnl": 11.66,
         "drawdown": 0.22,
-        "drawdown_pct": 0.07
+        "drawdown_pct": 0.14
       },
       {
         "time": 1770811994,
         "time_str": "2026-02-11T20:13:14",
-        "balance": 291.11,
+        "balance": 141.11,
         "pnl": -12.77,
         "drawdown": 12.99,
-        "drawdown_pct": 4.27
+        "drawdown_pct": 8.43
       },
       {
         "time": 1770812115,
         "time_str": "2026-02-11T20:15:15",
-        "balance": 290.04,
+        "balance": 140.04,
         "pnl": -1.07,
         "drawdown": 14.06,
-        "drawdown_pct": 4.62
+        "drawdown_pct": 9.12
       },
       {
         "time": 1770812678,
         "time_str": "2026-02-11T20:24:38",
-        "balance": 279.63,
+        "balance": 129.63,
         "pnl": -10.41,
         "drawdown": 24.47,
-        "drawdown_pct": 8.05
+        "drawdown_pct": 15.88
       },
       {
         "time": 1770812840,
         "time_str": "2026-02-11T20:27:20",
-        "balance": 289.21,
+        "balance": 139.21,
         "pnl": 9.58,
         "drawdown": 14.89,
-        "drawdown_pct": 4.9
+        "drawdown_pct": 9.66
       },
       {
         "time": 1770813858,
         "time_str": "2026-02-11T20:44:18",
-        "balance": 272.37,
+        "balance": 122.37,
         "pnl": -16.84,
         "drawdown": 31.73,
-        "drawdown_pct": 10.43
+        "drawdown_pct": 20.59
       },
       {
         "time": 1770816890,
         "time_str": "2026-02-11T21:34:50",
-        "balance": 272.4,
+        "balance": 122.4,
         "pnl": 0.03,
         "drawdown": 31.7,
-        "drawdown_pct": 10.42
+        "drawdown_pct": 20.57
       },
       {
         "time": 1770818401,
         "time_str": "2026-02-11T22:00:01",
-        "balance": 272.35,
+        "balance": 122.35,
         "pnl": -0.05,
         "drawdown": 31.75,
-        "drawdown_pct": 10.44
+        "drawdown_pct": 20.6
       },
       {
         "time": 1770819651,
         "time_str": "2026-02-11T22:20:51",
-        "balance": 258.62,
+        "balance": 108.62,
         "pnl": -13.73,
         "drawdown": 45.48,
-        "drawdown_pct": 14.96
+        "drawdown_pct": 29.51
       },
       {
         "time": 1770820681,
         "time_str": "2026-02-11T22:38:01",
-        "balance": 263.76,
+        "balance": 113.76,
         "pnl": 5.14,
         "drawdown": 40.34,
-        "drawdown_pct": 13.27
+        "drawdown_pct": 26.18
       },
       {
         "time": 1770826715,
         "time_str": "2026-02-12T00:18:35",
-        "balance": 263.59,
+        "balance": 113.59,
         "pnl": -0.17,
         "drawdown": 40.51,
-        "drawdown_pct": 13.32
+        "drawdown_pct": 26.29
       },
       {
         "time": 1770828048,
         "time_str": "2026-02-12T00:40:48",
-        "balance": 257.87,
+        "balance": 107.87,
         "pnl": -5.72,
         "drawdown": 46.23,
-        "drawdown_pct": 15.2
+        "drawdown_pct": 30.0
       },
       {
         "time": 1770828228,
         "time_str": "2026-02-12T00:43:48",
-        "balance": 255.98,
+        "balance": 105.98,
         "pnl": -1.89,
         "drawdown": 48.12,
-        "drawdown_pct": 15.82
+        "drawdown_pct": 31.23
       },
       {
         "time": 1770829859,
         "time_str": "2026-02-12T01:10:59",
-        "balance": 255.69,
+        "balance": 105.69,
         "pnl": -0.29,
         "drawdown": 48.41,
-        "drawdown_pct": 15.92
+        "drawdown_pct": 31.41
       },
       {
         "time": 1770831350,
         "time_str": "2026-02-12T01:35:50",
-        "balance": 267.97,
+        "balance": 117.97,
         "pnl": 12.28,
         "drawdown": 36.13,
-        "drawdown_pct": 11.88
+        "drawdown_pct": 23.45
       },
       {
         "time": 1770885303,
         "time_str": "2026-02-12T16:35:03",
-        "balance": 262.43,
+        "balance": 112.43,
         "pnl": -5.54,
         "drawdown": 41.67,
-        "drawdown_pct": 13.7
+        "drawdown_pct": 27.04
       },
       {
         "time": 1770885819,
         "time_str": "2026-02-12T16:43:39",
-        "balance": 268.26,
+        "balance": 118.26,
         "pnl": 5.83,
         "drawdown": 35.84,
-        "drawdown_pct": 11.79
+        "drawdown_pct": 23.26
       },
       {
         "time": 1770890820,
         "time_str": "2026-02-12T18:07:00",
-        "balance": 256.61,
+        "balance": 106.61,
         "pnl": -11.65,
         "drawdown": 47.49,
-        "drawdown_pct": 15.62
+        "drawdown_pct": 30.82
       },
       {
         "time": 1770891921,
         "time_str": "2026-02-12T18:25:21",
-        "balance": 261.17,
+        "balance": 111.17,
         "pnl": 4.56,
         "drawdown": 42.93,
-        "drawdown_pct": 14.12
+        "drawdown_pct": 27.86
       },
       {
         "time": 1770895887,
         "time_str": "2026-02-12T19:31:27",
-        "balance": 260.9,
+        "balance": 110.9,
         "pnl": -0.27,
         "drawdown": 43.2,
-        "drawdown_pct": 14.21
+        "drawdown_pct": 28.03
       },
       {
         "time": 1770896254,
         "time_str": "2026-02-12T19:37:34",
-        "balance": 261.37,
+        "balance": 111.37,
         "pnl": 0.47,
         "drawdown": 42.73,
-        "drawdown_pct": 14.05
+        "drawdown_pct": 27.73
       },
       {
         "time": 1770897983,
         "time_str": "2026-02-12T20:06:23",
-        "balance": 261.62,
+        "balance": 111.62,
         "pnl": 0.25,
         "drawdown": 42.48,
-        "drawdown_pct": 13.97
+        "drawdown_pct": 27.57
       },
       {
         "time": 1770898289,
         "time_str": "2026-02-12T20:11:29",
-        "balance": 253.3,
+        "balance": 103.3,
         "pnl": -8.32,
         "drawdown": 50.8,
-        "drawdown_pct": 16.71
+        "drawdown_pct": 32.97
       },
       {
         "time": 1770899243,
         "time_str": "2026-02-12T20:27:23",
-        "balance": 242.66,
+        "balance": 92.66,
         "pnl": -10.64,
         "drawdown": 61.44,
-        "drawdown_pct": 20.2
+        "drawdown_pct": 39.87
       },
       {
         "time": 1770899749,
         "time_str": "2026-02-12T20:35:49",
-        "balance": 248.92,
+        "balance": 98.92,
         "pnl": 6.26,
         "drawdown": 55.18,
-        "drawdown_pct": 18.15
+        "drawdown_pct": 35.81
       },
       {
         "time": 1770905142,
         "time_str": "2026-02-12T22:05:42",
-        "balance": 253.89,
+        "balance": 103.89,
         "pnl": 4.97,
         "drawdown": 50.21,
-        "drawdown_pct": 16.51
+        "drawdown_pct": 32.58
       },
       {
         "time": 1770905290,
         "time_str": "2026-02-12T22:08:10",
-        "balance": 259.78,
+        "balance": 109.78,
         "pnl": 5.89,
         "drawdown": 44.32,
-        "drawdown_pct": 14.57
+        "drawdown_pct": 28.76
       },
       {
         "time": 1770908576,
         "time_str": "2026-02-12T23:02:56",
-        "balance": 267.27,
+        "balance": 117.27,
         "pnl": 7.49,
         "drawdown": 36.83,
-        "drawdown_pct": 12.11
+        "drawdown_pct": 23.9
       },
       {
         "time": 1770910139,
         "time_str": "2026-02-12T23:28:59",
-        "balance": 274.8,
+        "balance": 124.8,
         "pnl": 7.53,
         "drawdown": 29.3,
-        "drawdown_pct": 9.63
+        "drawdown_pct": 19.01
       },
       {
         "time": 1770912233,
         "time_str": "2026-02-13T00:03:53",
-        "balance": 286.92,
+        "balance": 136.92,
         "pnl": 12.12,
         "drawdown": 17.18,
-        "drawdown_pct": 5.65
+        "drawdown_pct": 11.15
       },
       {
         "time": 1770913606,
         "time_str": "2026-02-13T00:26:46",
-        "balance": 288.47,
+        "balance": 138.47,
         "pnl": 1.55,
         "drawdown": 15.63,
-        "drawdown_pct": 5.14
+        "drawdown_pct": 10.14
       },
       {
         "time": 1770914500,
         "time_str": "2026-02-13T00:41:40",
-        "balance": 288.49,
+        "balance": 138.49,
         "pnl": 0.02,
         "drawdown": 15.61,
-        "drawdown_pct": 5.13
+        "drawdown_pct": 10.13
       },
       {
         "time": 1770916677,
         "time_str": "2026-02-13T01:17:57",
-        "balance": 280.48,
+        "balance": 130.48,
         "pnl": -8.01,
         "drawdown": 23.62,
-        "drawdown_pct": 7.77
+        "drawdown_pct": 15.33
       },
       {
         "time": 1770917582,
         "time_str": "2026-02-13T01:33:02",
-        "balance": 280.48,
+        "balance": 130.48,
         "pnl": 0.0,
         "drawdown": 23.62,
-        "drawdown_pct": 7.77
+        "drawdown_pct": 15.33
       },
       {
         "time": 1770919151,
         "time_str": "2026-02-13T01:59:11",
-        "balance": 292.27,
+        "balance": 142.27,
         "pnl": 11.79,
         "drawdown": 11.83,
-        "drawdown_pct": 3.89
+        "drawdown_pct": 7.68
       },
       {
         "time": 1770919995,
         "time_str": "2026-02-13T02:13:15",
-        "balance": 278.02,
+        "balance": 128.02,
         "pnl": -14.25,
         "drawdown": 26.08,
-        "drawdown_pct": 8.58
+        "drawdown_pct": 16.92
       },
       {
         "time": 1770920066,
         "time_str": "2026-02-13T02:14:26",
-        "balance": 264.57,
+        "balance": 114.57,
         "pnl": -13.45,
         "drawdown": 39.53,
-        "drawdown_pct": 13.0
+        "drawdown_pct": 25.65
       },
       {
         "time": 1770920364,
         "time_str": "2026-02-13T02:19:24",
-        "balance": 275.03,
+        "balance": 125.03,
         "pnl": 10.46,
         "drawdown": 29.07,
-        "drawdown_pct": 9.56
+        "drawdown_pct": 18.86
       },
       {
         "time": 1770926288,
         "time_str": "2026-02-13T03:58:08",
-        "balance": 253.4,
+        "balance": 103.4,
         "pnl": -21.63,
         "drawdown": 50.7,
-        "drawdown_pct": 16.67
+        "drawdown_pct": 32.9
       },
       {
         "time": 1770926502,
         "time_str": "2026-02-13T04:01:42",
-        "balance": 255.41,
+        "balance": 105.41,
         "pnl": 2.01,
         "drawdown": 48.69,
-        "drawdown_pct": 16.01
+        "drawdown_pct": 31.6
       },
       {
         "time": 1770934843,
         "time_str": "2026-02-13T06:20:43",
-        "balance": 242.04,
+        "balance": 92.04,
         "pnl": -13.37,
         "drawdown": 62.06,
-        "drawdown_pct": 20.41
+        "drawdown_pct": 40.27
       },
       {
         "time": 1770973280,
         "time_str": "2026-02-13T17:01:20",
-        "balance": 254.12,
+        "balance": 104.12,
         "pnl": 12.08,
         "drawdown": 49.98,
-        "drawdown_pct": 16.44
+        "drawdown_pct": 32.43
       },
       {
         "time": 1770974696,
         "time_str": "2026-02-13T17:24:56",
-        "balance": 269.93,
+        "balance": 119.93,
         "pnl": 15.81,
         "drawdown": 34.17,
-        "drawdown_pct": 11.24
+        "drawdown_pct": 22.17
       },
       {
         "time": 1770975763,
         "time_str": "2026-02-13T17:42:43",
-        "balance": 282.87,
+        "balance": 132.87,
         "pnl": 12.94,
         "drawdown": 21.23,
-        "drawdown_pct": 6.98
+        "drawdown_pct": 13.78
       },
       {
         "time": 1770977439,
         "time_str": "2026-02-13T18:10:39",
-        "balance": 276.52,
+        "balance": 126.52,
         "pnl": -6.35,
         "drawdown": 27.58,
-        "drawdown_pct": 9.07
+        "drawdown_pct": 17.9
       },
       {
         "time": 1770977528,
         "time_str": "2026-02-13T18:12:08",
-        "balance": 286.98,
+        "balance": 136.98,
         "pnl": 10.46,
         "drawdown": 17.12,
-        "drawdown_pct": 5.63
+        "drawdown_pct": 11.11
       },
       {
         "time": 1770980068,
         "time_str": "2026-02-13T18:54:28",
-        "balance": 293.86,
+        "balance": 143.86,
         "pnl": 6.88,
         "drawdown": 10.24,
-        "drawdown_pct": 3.37
+        "drawdown_pct": 6.65
       },
       {
         "time": 1770982181,
         "time_str": "2026-02-13T19:29:41",
-        "balance": 280.46,
+        "balance": 130.46,
         "pnl": -13.4,
         "drawdown": 23.64,
-        "drawdown_pct": 7.77
+        "drawdown_pct": 15.34
       },
       {
         "time": 1770982423,
         "time_str": "2026-02-13T19:33:43",
-        "balance": 290.57,
+        "balance": 140.57,
         "pnl": 10.11,
         "drawdown": 13.53,
-        "drawdown_pct": 4.45
+        "drawdown_pct": 8.78
       },
       {
         "time": 1770982423,
         "time_str": "2026-02-13T19:33:43",
-        "balance": 297.0,
+        "balance": 147.0,
         "pnl": 6.43,
         "drawdown": 7.1,
-        "drawdown_pct": 2.33
+        "drawdown_pct": 4.61
       },
       {
         "time": 1770986982,
         "time_str": "2026-02-13T20:49:42",
-        "balance": 299.73,
+        "balance": 149.73,
         "pnl": 2.73,
         "drawdown": 4.37,
-        "drawdown_pct": 1.44
+        "drawdown_pct": 2.84
       },
       {
         "time": 1770987631,
         "time_str": "2026-02-13T21:00:31",
-        "balance": 297.81,
+        "balance": 147.81,
         "pnl": -1.92,
         "drawdown": 6.29,
-        "drawdown_pct": 2.07
+        "drawdown_pct": 4.08
       },
       {
         "time": 1770991301,
         "time_str": "2026-02-13T22:01:41",
-        "balance": 295.03,
+        "balance": 145.03,
         "pnl": -2.78,
         "drawdown": 9.07,
-        "drawdown_pct": 2.98
+        "drawdown_pct": 5.89
       },
       {
         "time": 1770991436,
         "time_str": "2026-02-13T22:03:56",
-        "balance": 282.46,
+        "balance": 132.46,
         "pnl": -12.57,
         "drawdown": 21.64,
-        "drawdown_pct": 7.12
+        "drawdown_pct": 14.04
       },
       {
         "time": 1770991808,
         "time_str": "2026-02-13T22:10:08",
-        "balance": 288.01,
+        "balance": 138.01,
         "pnl": 5.55,
         "drawdown": 16.09,
-        "drawdown_pct": 5.29
+        "drawdown_pct": 10.44
       },
       {
         "time": 1770991866,
         "time_str": "2026-02-13T22:11:06",
-        "balance": 287.17,
+        "balance": 137.17,
         "pnl": -0.84,
         "drawdown": 16.93,
-        "drawdown_pct": 5.57
+        "drawdown_pct": 10.99
       },
       {
         "time": 1770993259,
         "time_str": "2026-02-13T22:34:19",
-        "balance": 287.63,
+        "balance": 137.63,
         "pnl": 0.46,
         "drawdown": 16.47,
-        "drawdown_pct": 5.42
+        "drawdown_pct": 10.69
       },
       {
         "time": 1770996970,
         "time_str": "2026-02-13T23:36:10",
-        "balance": 302.31,
+        "balance": 152.31,
         "pnl": 14.68,
         "drawdown": 1.79,
-        "drawdown_pct": 0.59
+        "drawdown_pct": 1.16
       },
       {
         "time": 1770999301,
         "time_str": "2026-02-14T00:15:01",
-        "balance": 287.62,
+        "balance": 137.62,
         "pnl": -14.69,
         "drawdown": 16.48,
-        "drawdown_pct": 5.42
+        "drawdown_pct": 10.69
       },
       {
         "time": 1770999691,
         "time_str": "2026-02-14T00:21:31",
-        "balance": 286.76,
+        "balance": 136.76,
         "pnl": -0.86,
         "drawdown": 17.34,
-        "drawdown_pct": 5.7
+        "drawdown_pct": 11.25
       },
       {
         "time": 1771003060,
         "time_str": "2026-02-14T01:17:40",
-        "balance": 274.22,
+        "balance": 124.22,
         "pnl": -12.54,
         "drawdown": 29.88,
-        "drawdown_pct": 9.83
+        "drawdown_pct": 19.39
       },
       {
         "time": 1771004208,
         "time_str": "2026-02-14T01:36:48",
-        "balance": 255.38,
+        "balance": 105.38,
         "pnl": -18.84,
         "drawdown": 48.72,
-        "drawdown_pct": 16.02
+        "drawdown_pct": 31.62
       },
       {
         "time": 1771004244,
         "time_str": "2026-02-14T01:37:24",
-        "balance": 260.39,
+        "balance": 110.39,
         "pnl": 5.01,
         "drawdown": 43.71,
-        "drawdown_pct": 14.37
+        "drawdown_pct": 28.36
       },
       {
         "time": 1771004858,
         "time_str": "2026-02-14T01:47:38",
-        "balance": 259.35,
+        "balance": 109.35,
         "pnl": -1.04,
         "drawdown": 44.75,
-        "drawdown_pct": 14.72
+        "drawdown_pct": 29.04
       },
       {
         "time": 1771005027,
         "time_str": "2026-02-14T01:50:27",
-        "balance": 272.35,
+        "balance": 122.35,
         "pnl": 13.0,
         "drawdown": 31.75,
-        "drawdown_pct": 10.44
+        "drawdown_pct": 20.6
+      },
+      {
+        "time": 1771005534,
+        "time_str": "2026-02-14T01:58:54",
+        "balance": 95.97,
+        "pnl": -26.38,
+        "drawdown": 58.13,
+        "drawdown_pct": 37.72
+      },
+      {
+        "time": 1771006986,
+        "time_str": "2026-02-14T02:23:06",
+        "balance": 93.86,
+        "pnl": -2.11,
+        "drawdown": 60.24,
+        "drawdown_pct": 39.09
+      },
+      {
+        "time": 1771230675,
+        "time_str": "2026-02-16T16:31:15",
+        "balance": 93.86,
+        "pnl": 0.0,
+        "drawdown": 60.24,
+        "drawdown_pct": 39.09
+      },
+      {
+        "time": 1771231483,
+        "time_str": "2026-02-16T16:44:43",
+        "balance": 89.65,
+        "pnl": -4.21,
+        "drawdown": 64.45,
+        "drawdown_pct": 41.82
+      },
+      {
+        "time": 1771235245,
+        "time_str": "2026-02-16T17:47:25",
+        "balance": 85.44,
+        "pnl": -4.21,
+        "drawdown": 68.66,
+        "drawdown_pct": 44.56
+      },
+      {
+        "time": 1771236837,
+        "time_str": "2026-02-16T18:13:57",
+        "balance": 81.06,
+        "pnl": -4.38,
+        "drawdown": 73.04,
+        "drawdown_pct": 47.4
+      },
+      {
+        "time": 1771239757,
+        "time_str": "2026-02-16T19:02:37",
+        "balance": 89.79,
+        "pnl": 8.73,
+        "drawdown": 64.31,
+        "drawdown_pct": 41.73
+      },
+      {
+        "time": 1771254882,
+        "time_str": "2026-02-16T23:14:42",
+        "balance": 101.63,
+        "pnl": 11.84,
+        "drawdown": 52.47,
+        "drawdown_pct": 34.05
+      },
+      {
+        "time": 1771260487,
+        "time_str": "2026-02-17T00:48:07",
+        "balance": 103.48,
+        "pnl": 1.85,
+        "drawdown": 50.62,
+        "drawdown_pct": 32.85
+      },
+      {
+        "time": 1771326717,
+        "time_str": "2026-02-17T19:11:57",
+        "balance": 110.53,
+        "pnl": 7.05,
+        "drawdown": 43.57,
+        "drawdown_pct": 28.27
+      },
+      {
+        "time": 1771326717,
+        "time_str": "2026-02-17T19:11:57",
+        "balance": 112.26,
+        "pnl": 1.73,
+        "drawdown": 41.84,
+        "drawdown_pct": 27.15
+      },
+      {
+        "time": 1771329303,
+        "time_str": "2026-02-17T19:55:03",
+        "balance": 114.86,
+        "pnl": 2.6,
+        "drawdown": 39.24,
+        "drawdown_pct": 25.46
+      },
+      {
+        "time": 1771330790,
+        "time_str": "2026-02-17T20:19:50",
+        "balance": 116.37,
+        "pnl": 1.51,
+        "drawdown": 37.73,
+        "drawdown_pct": 24.48
+      },
+      {
+        "time": 1771337727,
+        "time_str": "2026-02-17T22:15:27",
+        "balance": 108.8,
+        "pnl": -7.57,
+        "drawdown": 45.3,
+        "drawdown_pct": 29.4
+      },
+      {
+        "time": 1771351411,
+        "time_str": "2026-02-18T02:03:31",
+        "balance": 109.81,
+        "pnl": 1.01,
+        "drawdown": 44.29,
+        "drawdown_pct": 28.74
       }
     ],
     "daily_pnl": [
@@ -2346,21 +2466,42 @@
       },
       {
         "date": "2026-02-14",
-        "pnl": -29.96,
-        "trades": 7,
+        "pnl": -58.45,
+        "trades": 9,
         "wins": 2,
-        "losses": 5
+        "losses": 7
+      },
+      {
+        "date": "2026-02-16",
+        "pnl": 7.77,
+        "trades": 6,
+        "wins": 2,
+        "losses": 3
+      },
+      {
+        "date": "2026-02-17",
+        "pnl": 7.17,
+        "trades": 6,
+        "wins": 5,
+        "losses": 1
+      },
+      {
+        "date": "2026-02-18",
+        "pnl": 1.01,
+        "trades": 1,
+        "wins": 1,
+        "losses": 0
       }
     ],
     "symbol_breakdown": [
       {
         "symbol": "BTCUSD",
-        "trades": 25,
-        "pnl": 76.23,
-        "volume": 1.05,
-        "wins": 18,
+        "trades": 28,
+        "pnl": 93.74,
+        "volume": 1.15,
+        "wins": 21,
         "losses": 7,
-        "win_rate": 72.0
+        "win_rate": 75.0
       },
       {
         "symbol": "GBPJPY",
@@ -2381,6 +2522,15 @@
         "win_rate": 50.0
       },
       {
+        "symbol": "GBPUSD",
+        "trades": 8,
+        "pnl": 10.84,
+        "volume": 0.75,
+        "wins": 4,
+        "losses": 4,
+        "win_rate": 50.0
+      },
+      {
         "symbol": "SP500.r",
         "trades": 4,
         "pnl": 7.11,
@@ -2388,15 +2538,6 @@
         "wins": 2,
         "losses": 2,
         "win_rate": 50.0
-      },
-      {
-        "symbol": "XAUUSD",
-        "trades": 204,
-        "pnl": 3.32,
-        "volume": 3.71,
-        "wins": 117,
-        "losses": 82,
-        "win_rate": 57.4
       },
       {
         "symbol": "USDCHF",
@@ -2417,15 +2558,6 @@
         "win_rate": 100.0
       },
       {
-        "symbol": "GBPUSD",
-        "trades": 7,
-        "pnl": -1.0,
-        "volume": 0.66,
-        "wins": 3,
-        "losses": 4,
-        "win_rate": 42.9
-      },
-      {
         "symbol": "GBPAUD",
         "trades": 1,
         "pnl": -10.45,
@@ -2442,6 +2574,15 @@
         "wins": 3,
         "losses": 8,
         "win_rate": 27.3
+      },
+      {
+        "symbol": "XAUUSD",
+        "trades": 215,
+        "pnl": -38.57,
+        "volume": 3.85,
+        "wins": 121,
+        "losses": 88,
+        "win_rate": 56.3
       }
     ],
     "monthly_breakdown": [
@@ -2454,10 +2595,10 @@
       },
       {
         "month": "2026-02",
-        "pnl": 96.96,
-        "trades": 125,
-        "wins": 68,
-        "losses": 55
+        "pnl": 84.42,
+        "trades": 140,
+        "wins": 76,
+        "losses": 61
       }
     ]
   },
@@ -7641,6 +7782,306 @@
       "fee": 0.0,
       "symbol": "XAUUSD",
       "comment": "TP3 HIT - SAFETY"
+    },
+    {
+      "ticket": 24745396,
+      "order": 26264178,
+      "position_id": 26255584,
+      "time": 1771005534,
+      "time_str": "2026-02-14T01:58:54",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 4976.97,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -26.38,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 4977.00]"
+    },
+    {
+      "ticket": 24782213,
+      "order": 26301019,
+      "position_id": 26293357,
+      "time": 1771006986,
+      "time_str": "2026-02-14T02:23:06",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5008.28,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -2.11,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5007.06]"
+    },
+    {
+      "ticket": 25492867,
+      "order": 27032349,
+      "position_id": 27028574,
+      "time": 1771230675,
+      "time_str": "2026-02-16T16:31:15",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 4993.62,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.0,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 4993.62]"
+    },
+    {
+      "ticket": 25502397,
+      "order": 27042194,
+      "position_id": 27037038,
+      "time": 1771231483,
+      "time_str": "2026-02-16T16:44:43",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5001.8,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.21,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5001.80]"
+    },
+    {
+      "ticket": 25540597,
+      "order": 27082251,
+      "position_id": 27069499,
+      "time": 1771235245,
+      "time_str": "2026-02-16T17:47:25",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5007.1,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.21,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5007.10]"
+    },
+    {
+      "ticket": 25568308,
+      "order": 27110387,
+      "position_id": 27099551,
+      "time": 1771236837,
+      "time_str": "2026-02-16T18:13:57",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 778,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 4998.92,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.38,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 4999.17]"
+    },
+    {
+      "ticket": 25607718,
+      "order": 27151199,
+      "position_id": 27096538,
+      "time": 1771239757,
+      "time_str": "2026-02-16T19:02:37",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.05,
+      "price": 68852.48,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 8.73,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[tp 68851.00]"
+    },
+    {
+      "ticket": 25867164,
+      "order": 27415179,
+      "position_id": 27215478,
+      "time": 1771254882,
+      "time_str": "2026-02-16T23:14:42",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.09,
+      "price": 1.36346,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 11.84,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": "[tp 1.36350]"
+    },
+    {
+      "ticket": 25997786,
+      "order": 27547209,
+      "position_id": 27536156,
+      "time": 1771260487,
+      "time_str": "2026-02-17T00:48:07",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 4985.98,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.85,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 4986.00]"
+    },
+    {
+      "ticket": 26579915,
+      "order": 28145846,
+      "position_id": 28114259,
+      "time": 1771326717,
+      "time_str": "2026-02-17T19:11:57",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.04,
+      "price": 68064.74,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 7.05,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[tp 68068.00]"
+    },
+    {
+      "ticket": 26579926,
+      "order": 28145842,
+      "position_id": 28109114,
+      "time": 1771326717,
+      "time_str": "2026-02-17T19:11:57",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 68065.87,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.73,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[tp 68068.00]"
+    },
+    {
+      "ticket": 26650806,
+      "order": 28217596,
+      "position_id": 28211763,
+      "time": 1771329303,
+      "time_str": "2026-02-17T19:55:03",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 4927.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.6,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 4927.00]"
+    },
+    {
+      "ticket": 26691086,
+      "order": 28258389,
+      "position_id": 28234105,
+      "time": 1771330790,
+      "time_str": "2026-02-17T20:19:50",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 4932.02,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.51,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 4932.00]"
+    },
+    {
+      "ticket": 26858967,
+      "order": 28427963,
+      "position_id": 28400368,
+      "time": 1771337727,
+      "time_str": "2026-02-17T22:15:27",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 4943.93,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -7.57,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 4943.00]"
+    },
+    {
+      "ticket": 27249541,
+      "order": 28844583,
+      "position_id": 28836251,
+      "time": 1771351411,
+      "time_str": "2026-02-18T02:03:31",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 4883.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.01,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 4883.00]"
     }
   ]
 }
