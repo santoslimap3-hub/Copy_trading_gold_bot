@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-02-18T11:00:29.537089",
+    "created_at": "2026-02-18T11:01:44.066478",
     "bot_version": "zone",
     "symbol": "XAUUSD",
     "magic_numbers": [
@@ -10,25 +10,25 @@
     "days_back": 365,
     "trade_source": "deals_closed",
     "closed_deals_match": "magic_or_position_or_order",
-    "manually_added_count": 1
+    "manually_added_count": 0
   },
   "summary": {
-    "total_trades": 107,
-    "buy_trades": 54,
+    "total_trades": 106,
+    "buy_trades": 53,
     "sell_trades": 53,
-    "winning_trades": 51,
+    "winning_trades": 50,
     "losing_trades": 53,
     "breakeven_trades": 3,
-    "win_rate_percent": 47.66,
-    "total_profit": 386.83,
+    "win_rate_percent": 47.17,
+    "total_profit": 376.37,
     "total_loss": 550.43,
-    "net_pnl": -163.6,
+    "net_pnl": -174.06,
     "total_commission": 0.0,
     "total_swap": 0.0,
-    "avg_pnl_per_trade": -1.53,
-    "avg_profit_per_win": 7.58,
+    "avg_pnl_per_trade": -1.64,
+    "avg_profit_per_win": 7.53,
     "avg_loss_per_loss": 10.39,
-    "profit_factor": 0.7
+    "profit_factor": 0.68
   },
   "trades": [
     {
@@ -1834,26 +1834,6 @@
       "comment": "",
       "external_id": "DVacATdau3uy-AieCpDYeg",
       "source": "deal"
-    },
-    {
-      "ticket": 24130432,
-      "order": 25646933,
-      "position_id": 25643205,
-      "time": 1770977528,
-      "time_str": "2026-02-13T18:12:08",
-      "type": "BUY",
-      "entry": 1,
-      "is_closed": true,
-      "magic": 778,
-      "reason": 5,
-      "volume": 0.02,
-      "price": 4981.0,
-      "commission": 0.0,
-      "swap": 0.0,
-      "profit": 10.46,
-      "fee": 0.0,
-      "symbol": "XAUUSD",
-      "comment": "[tp 4981.00]"
     },
     {
       "ticket": 24165777,
