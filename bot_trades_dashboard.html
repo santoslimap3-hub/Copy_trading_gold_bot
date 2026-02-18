@@ -348,7 +348,7 @@
         // Load JSON data
         async function loadTradesData() {
             try {
-                const response = await fetch('bot_trades.json');
+                const response = await fetch('bot_trades.json?t=' + Date.now(), { cache: 'no-store' });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -426,7 +426,12 @@
             filteredTrades.forEach((trade, index) => {
                 const date = new Date(trade.time * 1000);
                 const timeStr = date.toLocaleString();
-                const typeClass = trade.type === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
+                // For closing deals (entry=1), reverse type to show position direction
+                // A closing BUY deal means the position was SELL, and vice versa
+                const displayType = (trade.entry === 1)
+                    ? (trade.type === 'BUY' ? 'SELL' : 'BUY')
+                    : trade.type;
+                const typeClass = displayType === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
                 const profitClass = trade.profit > 0 ? 'trade-profit-positive' : (trade.profit < 0 ? 'trade-profit-negative' : 'trade-profit-zero');
                 const botBadgeClass = trade.magic === 777 ? 'badge-777' : 'badge-778';
                 
@@ -434,7 +439,7 @@
                     <tr>
                         <td>${index + 1}</td>
                         <td>${timeStr}</td>
-                        <td><span class="${typeClass}">${trade.type}</span></td>
+                        <td><span class="${typeClass}">${displayType}</span></td>
                         <td>${trade.price.toFixed(2)}</td>
                         <td>${trade.volume.toFixed(2)}</td>
                         <td><span class="${profitClass}">$${trade.profit.toFixed(2)}</span></td>
