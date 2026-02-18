@@ -228,12 +228,25 @@ def check_autotrading_status():
 
 
 def ensure_mt5_connection():
-    """Initialize MT5 if not connected"""
+    """Initialize MT5 if not connected.
+    
+    Supports multi-account setups via the MT5_PATH environment variable.
+    Set MT5_PATH to the full path of terminal64.exe for the desired account.
+    Example: set MT5_PATH=C:\\MT5_Account2\\terminal64.exe
+    If not set, uses the default MT5 installation.
+    """
     global mt5_connected, mt5_connection_losses
 
     log("Attempting MT5 initialization...", "DEBUG")
 
-    if not mt5.initialize():
+    mt5_path = os.environ.get("MT5_PATH")
+    if mt5_path:
+        log(f"   Using custom MT5 path: {mt5_path}", "INFO")
+        init_ok = mt5.initialize(path=mt5_path)
+    else:
+        init_ok = mt5.initialize()
+
+    if not init_ok:
         log("MT5 initialization FAILED", "ERROR")
         log(f"   Last error: {mt5.last_error()}", "ERROR")
         mt5_connected = False
@@ -288,7 +301,9 @@ def recover_mt5_connection() -> bool:
         mt5.shutdown()
         time.sleep(2)
 
-        if mt5.initialize():
+        mt5_path = os.environ.get("MT5_PATH")
+        init_ok = mt5.initialize(path=mt5_path) if mt5_path else mt5.initialize()
+        if init_ok:
             log("MT5 reconnection successful", "INFO")
             return True
         else:
