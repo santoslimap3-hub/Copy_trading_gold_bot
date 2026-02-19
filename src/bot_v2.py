@@ -94,7 +94,7 @@ heartbeat_counter: int = 0
 # Track processed message IDs to avoid duplicate processing (push events + polling)
 _processed_msg_ids: set = set()
 _MAX_PROCESSED_IDS = 500  # Cap the set size to prevent memory leak
-POLLING_INTERVAL = 15  # seconds between polling checks
+POLLING_INTERVAL = 0.5  # seconds between polling checks
 
 # Thread pool for running blocking MT5 calls without freezing the async event loop
 _mt5_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="mt5")
