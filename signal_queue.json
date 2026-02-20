@@ -63,6 +63,42 @@
       "msg_text": "High Risk Buy Zone now",
       "timestamp": "2026-02-12T20:54:13.143829",
       "executed": true
+    },
+    {
+      "id": 3339,
+      "signal_type": "TRADE",
+      "side": "SELL",
+      "entry_price": 4966.43,
+      "sl_price": 4974.43,
+      "lot_size": 0.01,
+      "tp_levels": {},
+      "msg_text": "XAU USD SELL NOW",
+      "timestamp": "2026-02-18T21:37:12.768887",
+      "executed": true
+    },
+    {
+      "id": 46,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 4954.16,
+      "sl_price": 4946.16,
+      "lot_size": 0.2,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW",
+      "timestamp": "2026-02-18T21:42:28.307506",
+      "executed": true
+    },
+    {
+      "id": 47,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 4953.91,
+      "sl_price": 4945.91,
+      "lot_size": 0.2,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW",
+      "timestamp": "2026-02-18T21:45:35.762159",
+      "executed": true
     }
   ]
 }
