@@ -283,6 +283,7 @@
                 <button class="time-filter-btn active" onclick="filterByPeriod('all')">All Time</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('24h')">Last 24 Hours</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('7d')">Last 7 Days</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('14d')">Last 2 Weeks</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('30d')">Last 30 Days</button>
             </div>
         </div>
@@ -392,6 +393,9 @@
                 filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
             } else if (period === '7d') {
                 cutoffTime = now - (7 * 24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '14d') {
+                cutoffTime = now - (14 * 24 * 60 * 60);
                 filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
             } else if (period === '30d') {
                 cutoffTime = now - (30 * 24 * 60 * 60);
