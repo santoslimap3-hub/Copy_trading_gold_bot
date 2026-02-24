@@ -19,6 +19,7 @@ import asyncio
 import concurrent.futures
 import os
 import re
+import subprocess
 import sys
 import time
 import MetaTrader5 as mt5
@@ -98,6 +99,11 @@ POLLING_INTERVAL = 0.5  # seconds between polling checks
 
 # Thread pool for running blocking MT5 calls without freezing the async event loop
 _mt5_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="mt5")
+
+# Maximum consecutive reconnection failures before self-restart
+MAX_CONSECUTIVE_FAILURES = 10
+# Flag to signal the bot should do a full self-restart
+_restart_requested = False
 
 
 async def run_mt5(func, *args):
@@ -239,12 +245,9 @@ def ensure_mt5_connection():
 
     log("Attempting MT5 initialization...", "DEBUG")
 
-    mt5_path = os.environ.get("MT5_PATH")
-    if mt5_path:
-        log(f"   Using custom MT5 path: {mt5_path}", "INFO")
-        init_ok = mt5.initialize(path=mt5_path)
-    else:
-        init_ok = mt5.initialize()
+    mt5_path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
+    log(f"Initializing MT5 at: {mt5_path}", "INFO")
+    init_ok = mt5.initialize(path=mt5_path)
 
     if not init_ok:
         log("MT5 initialization FAILED", "ERROR")
@@ -301,8 +304,8 @@ def recover_mt5_connection() -> bool:
         mt5.shutdown()
         time.sleep(2)
 
-        mt5_path = os.environ.get("MT5_PATH")
-        init_ok = mt5.initialize(path=mt5_path) if mt5_path else mt5.initialize()
+        mt5_path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
+        init_ok = mt5.initialize(path=mt5_path)
         if init_ok:
             log("MT5 reconnection successful", "INFO")
             return True
@@ -720,6 +723,90 @@ def init_telegram():
     return TelegramClient(SESSION_FILE, API_ID, API_HASH)
 
 
+async def reconnect_telegram(client, reason: str = "unknown") -> bool:
+    """
+    Robust Telegram reconnection with multiple retries and exponential backoff.
+    Returns True if reconnection succeeded, False if all attempts exhausted.
+    """
+    global telegram_connected, last_telegram_activity, telegram_connection_losses
+
+    max_attempts = 5
+    base_delay = 5
+    max_delay = 120
+
+    log(f"Starting Telegram reconnection sequence (reason: {reason})...", "WARN")
+
+    for attempt in range(1, max_attempts + 1):
+        delay = min(base_delay * (2 ** (attempt - 1)), max_delay)
+        log(f"  Reconnection attempt {attempt}/{max_attempts} (delay: {delay}s)...", "INFO")
+
+        # Ensure we're fully disconnected first
+        try:
+            if client.is_connected():
+                await client.disconnect()
+        except Exception:
+            pass
+
+        await asyncio.sleep(delay)
+
+        try:
+            await client.connect()
+            if not await client.is_user_authorized():
+                log("  Connected but not authorized - calling client.start()...", "WARN")
+                await client.start()
+
+            # Verify the connection actually works
+            me = await asyncio.wait_for(client.get_me(), timeout=15)
+            if me:
+                telegram_connected = True
+                last_telegram_activity = time.time()
+                log(f"  Telegram reconnected successfully on attempt {attempt}", "INFO")
+
+                # Refresh dialogs to re-initialize update state
+                try:
+                    await client.get_dialogs()
+                    log("  Dialogs refreshed after reconnect", "DEBUG")
+                except Exception:
+                    pass
+
+                # Catch up on any missed messages
+                await catch_up_messages(client, lookback_minutes=5)
+                return True
+            else:
+                log(f"  get_me() returned None on attempt {attempt}", "WARN")
+
+        except Exception as e:
+            log(f"  Reconnection attempt {attempt} failed: {e}", "ERROR")
+            telegram_connected = False
+
+    log(f"ALL {max_attempts} reconnection attempts failed", "ERROR")
+    return False
+
+
+def restart_bot():
+    """
+    Self-restart the bot process. Equivalent to Ctrl+C → re-run.
+    This replaces the current process entirely.
+    """
+    log("=" * 70, "WARN")
+    log("SELF-RESTART: Bot is restarting itself...", "WARN")
+    log("=" * 70, "WARN")
+
+    # Shutdown MT5 cleanly before restart
+    try:
+        mt5.shutdown()
+    except Exception:
+        pass
+
+    # Small delay to let logs flush
+    time.sleep(2)
+
+    # Re-execute the same script with the same Python interpreter
+    python = sys.executable
+    script = os.path.abspath(__file__)
+    os.execv(python, [python, script])
+
+
 async def catch_up_messages(client, lookback_minutes: int = 5):
     """Manually fetch recent messages from allowed channels to catch up on missed messages."""
     try:
@@ -833,24 +920,22 @@ async def connection_health_monitor():
                     if _telegram_client is not None:
                         try:
                             if not _telegram_client.is_connected():
-                                log("Telegram client.is_connected() = False - forcing disconnect to trigger reconnection", "WARN")
+                                log("Telegram client.is_connected() = False - attempting reconnection from health monitor", "WARN")
                                 telegram_connected = False
-                                try:
-                                    await _telegram_client.disconnect()
-                                except Exception:
-                                    pass
+                                reconnected = await reconnect_telegram(_telegram_client, reason="health_monitor_not_connected")
+                                if not reconnected:
+                                    log("Health monitor reconnection failed - main loop will handle restart", "ERROR")
                             else:
                                 try:
                                     await asyncio.wait_for(_telegram_client.get_me(), timeout=10)
                                     log("Telegram ping successful - connection alive, channel is just quiet", "DEBUG")
                                     telegram_connected = True
                                 except (asyncio.TimeoutError, Exception) as ping_err:
-                                    log(f"Telegram ping FAILED ({ping_err}) - connection is dead, forcing disconnect", "WARN")
+                                    log(f"Telegram ping FAILED ({ping_err}) - attempting reconnection", "WARN")
                                     telegram_connected = False
-                                    try:
-                                        await _telegram_client.disconnect()
-                                    except Exception:
-                                        pass
+                                    reconnected = await reconnect_telegram(_telegram_client, reason="health_monitor_ping_failed")
+                                    if not reconnected:
+                                        log("Health monitor reconnection failed - main loop will handle restart", "ERROR")
                         except Exception as check_err:
                             log(f"Error during active Telegram check: {check_err}", "WARN")
                             telegram_connected = False
@@ -1508,12 +1593,28 @@ async def main():
     # ══════════════════════════════════════════════════════════════════════
     # Main loop with robust reconnection
     # ══════════════════════════════════════════════════════════════════════
-    max_reconnect_delay = 60
-    reconnect_delay = 5
     consecutive_failures = 0
 
     try:
         while True:
+            # ── Pre-flight: make sure we're connected before entering run_until_disconnected ──
+            if not client.is_connected():
+                log("Client not connected before run_until_disconnected - reconnecting first...", "WARN")
+                reconnected = await reconnect_telegram(client, reason="pre_flight_check")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
+                    consecutive_failures += 1
+                    log(f"Pre-flight reconnection failed (consecutive failures: {consecutive_failures})", "ERROR")
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
+                    # Wait before retrying the whole loop
+                    backoff = min(30 * (2 ** min(consecutive_failures - 1, 4)), 300)
+                    log(f"Waiting {backoff}s before next reconnection attempt...", "WARN")
+                    await asyncio.sleep(backoff)
+                    continue
+
             try:
                 await client.run_until_disconnected()
                 # run_until_disconnected() returned normally - connection was lost
@@ -1523,43 +1624,15 @@ async def main():
 
                 reconnect_monitor.record_reconnect("Disconnected", "run_until_disconnected returned")
 
-                await asyncio.sleep(reconnect_delay)
-
-                try:
-                    await client.connect()
-                    if await client.is_user_authorized():
-                        telegram_connected = True
-                        last_telegram_activity = time.time()
-                        consecutive_failures = 0
-                        reconnect_delay = 5
-                        log("Telegram reconnected successfully after disconnect", "INFO")
-                        try:
-                            await client.get_dialogs()
-                            log("Dialogs refreshed after reconnect", "DEBUG")
-                        except Exception:
-                            pass
-                        await catch_up_messages(client, lookback_minutes=5)
-                    else:
-                        log("Telegram connected but not authorized - restarting client...", "WARN")
-                        await client.start()
-                        telegram_connected = True
-                        last_telegram_activity = time.time()
-                        consecutive_failures = 0
-                        reconnect_delay = 5
-                        log("Telegram client restarted and authorized", "INFO")
-                        try:
-                            await client.get_dialogs()
-                            log("Dialogs refreshed after restart", "DEBUG")
-                        except Exception:
-                            pass
-                        await catch_up_messages(client, lookback_minutes=5)
-                except Exception as reconn_err:
+                reconnected = await reconnect_telegram(client, reason="run_until_disconnected_returned")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
                     consecutive_failures += 1
-                    reconnect_delay = min(reconnect_delay * 2, max_reconnect_delay)
-                    telegram_connected = False
-                    log(f"Telegram reconnection failed (attempt {consecutive_failures}): {reconn_err}", "ERROR")
-                    log(f"   Next retry in {reconnect_delay}s", "WARN")
-                    await asyncio.sleep(reconnect_delay)
+                    log(f"Reconnection failed after disconnect (consecutive failures: {consecutive_failures})", "ERROR")
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
 
                 continue
 
@@ -1587,35 +1660,57 @@ async def main():
                     client.on(events.NewMessage())(on_new_message)
                     client.on(events.MessageEdited())(on_edit)
 
-                try:
-                    await client.disconnect()
-                except Exception as ex:
-                    log(f"Error while disconnecting client: {ex}", "WARN")
-
-                await asyncio.sleep(5)
-
-                try:
-                    await client.start()
-                    telegram_connected = True
-                    last_telegram_activity = time.time()
-                    log("Telegram client restarted after TypeNotFoundError", "INFO")
-                    try:
-                        await client.get_dialogs()
-                        log("Dialogs refreshed after TypeNotFoundError restart", "DEBUG")
-                    except Exception:
-                        pass
-                    await catch_up_messages(client, lookback_minutes=3)
-                except Exception as ex2:
-                    telegram_connected = False
-                    log(f"Failed to restart Telegram client: {ex2}", "ERROR")
-                    await asyncio.sleep(5)
+                reconnected = await reconnect_telegram(client, reason="TypeNotFoundError")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
+                    consecutive_failures += 1
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
                 continue
+
+            except ConnectionError as e:
+                # This catches "Cannot send requests while disconnected" and similar
+                telegram_connected = False
+                telegram_connection_losses += 1
+                log(f"ConnectionError in main loop: {e} - attempting reconnection...", "ERROR")
+
+                reconnect_monitor.record_reconnect("ConnectionError", str(e)[:50])
+
+                reconnected = await reconnect_telegram(client, reason=f"ConnectionError: {e}")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
+                    consecutive_failures += 1
+                    log(f"Reconnection after ConnectionError failed (consecutive failures: {consecutive_failures})", "ERROR")
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
+                continue
+
             except Exception as e:
                 log(f"CRITICAL: Unexpected error in main loop: {str(e)}", "ERROR")
                 import traceback
                 log(f"   {traceback.format_exc()}", "ERROR")
-                log("Bot will attempt to continue...", "WARN")
-                await asyncio.sleep(10)
+
+                # Check if we're actually disconnected (common root cause)
+                if not client.is_connected():
+                    log("Client is disconnected - this error is likely due to lost connection. Reconnecting...", "WARN")
+                    telegram_connected = False
+                    reconnected = await reconnect_telegram(client, reason=f"exception_while_disconnected: {e}")
+                    if reconnected:
+                        consecutive_failures = 0
+                    else:
+                        consecutive_failures += 1
+                        if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                            log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                            restart_bot()
+                else:
+                    # Truly unexpected error, but connection is fine
+                    log("Bot will attempt to continue (connection still active)...", "WARN")
+                    consecutive_failures = 0
+                    await asyncio.sleep(10)
                 continue
     finally:
         log("Bot shutting down...", "INFO")

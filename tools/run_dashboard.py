@@ -12,6 +12,8 @@ from pathlib import Path
 
 PORT = 8000
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 
 class DashboardHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -29,7 +31,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
 def main():
-    os.chdir(SCRIPT_DIR)
+    os.chdir(DATA_DIR)
     
     handler = DashboardHandler
     
@@ -37,8 +39,8 @@ def main():
         url = f"http://localhost:{PORT}"
         print(f"🚀 Bot Trades Dashboard Server Started")
         print(f"📊 Open your browser: {url}")
-        print(f"💾 Serving from: {SCRIPT_DIR}")
-        print(f"📁 Make sure 'bot_trades.json' is in the same directory")
+        print(f"💾 Serving from: {DATA_DIR}")
+        print(f"📁 Make sure 'bot_trades.json' is in the data/ directory")
         print(f"\n⚠️  Press Ctrl+C to stop the server\n")
         
         # Try to open browser automatically

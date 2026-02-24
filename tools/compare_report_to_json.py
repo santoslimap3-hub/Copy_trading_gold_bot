@@ -5,6 +5,7 @@ Verifies that all trades with magic 777/778 from the report are in the JSON
 """
 
 import json
+import os
 import re
 from pathlib import Path
 from html.parser import HTMLParser
@@ -148,8 +149,11 @@ def compare_trades(report_trades, json_trades):
     return len(missing_in_json) == 0
 
 def main():
-    report_file = "ReportHistory-22840119.html"
-    json_file = "bot_trades.json"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    data_dir = os.path.join(project_root, "data")
+    report_file = os.path.join(data_dir, "ReportHistory-22840119.html")
+    json_file = os.path.join(data_dir, "bot_trades.json")
     
     if not Path(report_file).exists():
         print(f"❌ Report file not found: {report_file}")

@@ -25,7 +25,9 @@ from typing import Optional, List, Tuple, Dict
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
 CHANNEL_ID = -1003142865169  # Main channel (Gold Scalping - Analysis & Zones)
-SESSION_FILE = os.path.join("src", "trading_bot_session_zone")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+SESSION_FILE = os.path.join(PROJECT_ROOT, "src", "trading_bot_session_zone")
 
 # ── Date range: last full trading week (Monday → Friday) ──
 # Today is Saturday Feb 14 2026, so last week is Feb 9 – Feb 13

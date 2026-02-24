@@ -1,1 +1,18 @@
-src/trading_bot_session.session
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Telegram session files (contain auth tokens - never commit)
+*.session
+*.session-journal
+
+# Runtime data
+src/signal_queue.json
+src/sessions/
+
+# Logs
+*.log
+
+# Downloads
+tools/downloads/

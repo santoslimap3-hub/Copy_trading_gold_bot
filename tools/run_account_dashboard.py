@@ -18,6 +18,8 @@ sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 PORT = 8001  # Different port from bot dashboard (8000)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 
 
 class DashboardHandler(http.server.SimpleHTTPRequestHandler):
@@ -33,7 +35,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
 def export_trades():
     """Run the account trades exporter to refresh data."""
-    exporter_path = os.path.join(SCRIPT_DIR, "src", "account_trades_exporter.py")
+    exporter_path = os.path.join(SCRIPT_DIR, "account_trades_exporter.py")
     if not os.path.exists(exporter_path):
         print(f"❌ Exporter not found: {exporter_path}")
         return False
@@ -54,12 +56,12 @@ def export_trades():
 
 
 def main():
-    os.chdir(SCRIPT_DIR)
+    os.chdir(DATA_DIR)
 
     # Step 1: refresh the JSON data
     export_trades()
 
-    json_path = os.path.join(SCRIPT_DIR, "account_trades.json")
+    json_path = os.path.join(DATA_DIR, "account_trades.json")
     if not os.path.exists(json_path):
         print("❌ account_trades.json not found. Make sure MT5 is running and try again.")
         return 1

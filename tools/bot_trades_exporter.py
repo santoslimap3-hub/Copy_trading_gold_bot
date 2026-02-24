@@ -19,7 +19,7 @@ DAYS_BACK = 365  # How many days back to retrieve trades
 # Get the directory of the current script and go up to project root
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-OUTPUT_FILE = os.path.join(PROJECT_ROOT, "bot_trades.json")
+OUTPUT_FILE = os.path.join(PROJECT_ROOT, "data", "bot_trades.json")
 
 # ===================== MAIN CLASS =====================
 
