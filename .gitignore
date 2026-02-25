@@ -16,3 +16,5 @@ src/sessions/
 
 # Downloads
 tools/downloads/
+signal_queue.json
+trading_bot_session.session
