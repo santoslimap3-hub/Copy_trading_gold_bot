@@ -105,6 +105,35 @@ MAX_CONSECUTIVE_FAILURES = 10
 # Flag to signal the bot should do a full self-restart
 _restart_requested = False
 
+# ===================== MT5 CACHE (refreshed every 5s in background) =====================
+# Caches symbol_info and account_info to avoid redundant MT5 calls in the hot trade path
+_cached_symbol_info = None
+_cached_account_info = None
+_cache_last_refresh: float = 0
+_CACHE_REFRESH_INTERVAL = 5.0  # seconds
+
+
+def refresh_mt5_cache():
+    """Refresh cached MT5 data. Called from background task and at startup."""
+    global _cached_symbol_info, _cached_account_info, _cache_last_refresh
+    _cached_symbol_info = mt5.symbol_info(SYMBOL)
+    _cached_account_info = mt5.account_info()
+    _cache_last_refresh = time.time()
+
+
+def get_cached_symbol_info():
+    """Get symbol info from cache, refreshing if stale."""
+    if _cached_symbol_info is None or (time.time() - _cache_last_refresh) > _CACHE_REFRESH_INTERVAL:
+        refresh_mt5_cache()
+    return _cached_symbol_info
+
+
+def get_cached_account_info():
+    """Get account info from cache, refreshing if stale."""
+    if _cached_account_info is None or (time.time() - _cache_last_refresh) > _CACHE_REFRESH_INTERVAL:
+        refresh_mt5_cache()
+    return _cached_account_info
+
 
 async def run_mt5(func, *args):
     """Run a blocking MT5 function in a thread so the event loop stays responsive."""
@@ -271,6 +300,10 @@ def ensure_mt5_connection():
 
     check_autotrading_status()
 
+    # Warm up the MT5 cache at startup
+    refresh_mt5_cache()
+    log("MT5 cache initialized", "DEBUG")
+
 
 def check_mt5_health() -> bool:
     """Check if MT5 connection is still alive"""
@@ -318,8 +351,8 @@ def recover_mt5_connection() -> bool:
 
 
 def get_account_balance() -> float:
-    """Get current account balance"""
-    acc = mt5.account_info()
+    """Get current account balance (uses cache for speed)"""
+    acc = get_cached_account_info()
     if acc is None:
         log("account_info() returned None - account not logged in?", "ERROR")
         return 0.0
@@ -363,7 +396,7 @@ def calculate_lot_size(entry_price: float, sl_price: float, balance: float) -> f
         log(f"Invalid price distance: {price_distance}", "ERROR")
         return 0.01
 
-    symbol_info = mt5.symbol_info(SYMBOL)
+    symbol_info = get_cached_symbol_info()
     if symbol_info is None:
         log(f"symbol_info({SYMBOL}) returned None", "ERROR")
         log(f"   Last error: {mt5.last_error()}", "ERROR")
@@ -390,8 +423,8 @@ def calculate_lot_size(entry_price: float, sl_price: float, balance: float) -> f
 
 
 def get_filling_mode() -> int:
-    """Get the appropriate filling mode for the symbol"""
-    symbol_info = mt5.symbol_info(SYMBOL)
+    """Get the appropriate filling mode for the symbol (uses cache for speed)"""
+    symbol_info = get_cached_symbol_info()
     if symbol_info is None:
         log("Could not get symbol info, defaulting to IOC", "WARN")
         return mt5.ORDER_FILLING_IOC
@@ -409,9 +442,11 @@ def get_filling_mode() -> int:
         return mt5.ORDER_FILLING_RETURN
 
 
-def open_position(side: str, lot: float) -> Optional[int]:
+def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Optional[int]:
     """
-    Open market position. Returns ticket number or None.
+    Open market position with optional SL/TP in a single order.
+    Including SL/TP in the initial order avoids a second round-trip.
+    Returns ticket number or None.
     """
     log(f"Opening {side} position with lot size {lot:.4f}...", "INFO")
 
@@ -428,6 +463,12 @@ def open_position(side: str, lot: float) -> Optional[int]:
         "comment": f"Signal {side}",
     }
 
+    # Include SL/TP in initial order to avoid a second round-trip
+    if sl > 0:
+        request["sl"] = sl
+    if tp > 0:
+        request["tp"] = tp
+
     log(f"   Request: {request}", "DEBUG")
 
     result = mt5.order_send(request)
@@ -437,6 +478,19 @@ def open_position(side: str, lot: float) -> Optional[int]:
         log(f"Position opened successfully - Ticket: {ticket}", "INFO")
         return ticket
 
+    # If SL/TP caused the rejection, retry without them and set separately
+    if result.retcode in {5, 10040, 10041} and (sl > 0 or tp > 0):
+        log(f"Order with SL/TP rejected (retcode {result.retcode}) - retrying without SL/TP...", "WARN")
+        request.pop("sl", None)
+        request.pop("tp", None)
+        result = mt5.order_send(request)
+        if result.retcode == mt5.TRADE_RETCODE_DONE:
+            ticket = result.order
+            log(f"Position opened without SL/TP - Ticket: {ticket}. Setting SL/TP separately...", "INFO")
+            time.sleep(0.05)
+            set_sl_and_tp(ticket, sl, tp)
+            return ticket
+
     if result.retcode == 10027:
         log("AutoTrading DISABLED - cannot trade!", "ERROR")
         return None
@@ -445,13 +499,13 @@ def open_position(side: str, lot: float) -> Optional[int]:
     log(f"   Human-readable: {get_error_message(result.retcode)}", "ERROR")
     log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
 
-    # Retry for certain errors
+    # Retry for certain errors (reduced delay from 2s to 0.5s)
     retryable_codes = {10009, 10028, 10044, 9}
 
     if result.retcode in retryable_codes:
         for attempt in range(1, 3):
             log(f"   Retry attempt {attempt}/2 (retcode was {result.retcode})...", "INFO")
-            time.sleep(2)
+            time.sleep(0.5)
             result = mt5.order_send(request)
             if result.retcode == mt5.TRADE_RETCODE_DONE:
                 ticket = result.order
@@ -992,6 +1046,16 @@ async def monitor_stale_failsafe():
             await asyncio.sleep(30)
 
 
+async def mt5_cache_refresher():
+    """Background task to keep MT5 cache warm for fast trade execution."""
+    while True:
+        try:
+            await asyncio.sleep(5)
+            await run_mt5(refresh_mt5_cache)
+        except Exception:
+            await asyncio.sleep(5)
+
+
 async def cleanup_and_report():
     """Periodic cleanup and reporting of system health."""
     while True:
@@ -1025,21 +1089,29 @@ async def cleanup_and_report():
 
 # ===================== PROCESS SIGNAL MESSAGE =====================
 
-def execute_signal_trade(side: str, entry_price: float, msg_id: int, msg_text: str):
+def execute_signal_trade(side: str, msg_id: int, msg_text: str):
     """
     Execute a trade from a parsed signal - Set & Forget TP1 Strategy.
 
-    1. Open position at market price
-    2. Set failsafe SL ($8 from entry) and failsafe TP ($3 from entry)
-    3. Wait for message edit to provide real SL and TP1 values
+    1. Get market price + open position with failsafe SL/TP in a single order
+    2. Wait for message edit to provide real SL and TP1 values
 
-    Runs inside the MT5 executor thread.
+    Runs inside the MT5 executor thread. All MT5 calls happen here to minimize
+    async executor round-trips (previously get_market_price was a separate call).
+    Returns the ticket number or None.
     """
+    # Get market price (previously a separate executor round-trip)
+    entry_price = get_market_price(side)
+    if entry_price is None:
+        log("Cannot get market price - aborting trade", "ERROR")
+        log_signal_attempt(side, "FAILED", "Cannot get market price")
+        return None
+
     balance = get_account_balance()
     if balance <= 0:
         log(f"Invalid balance: ${balance:.2f} - aborting trade", "ERROR")
         log_signal_attempt(side, "FAILED", f"Invalid balance: ${balance:.2f}")
-        return
+        return None
 
     # Calculate failsafe levels
     if side == "BUY":
@@ -1057,11 +1129,12 @@ def execute_signal_trade(side: str, entry_price: float, msg_id: int, msg_text: s
     if lot <= 0:
         log(f"Invalid lot size: {lot} - aborting trade", "ERROR")
         log_signal_attempt(side, "FAILED", f"Invalid lot size: {lot}")
-        return
+        return None
 
     log(f"Trade parameters: Entry=${entry_price:.5f} | SL=${failsafe_sl:.5f} | TP=${failsafe_tp:.5f} | Lot={lot:.4f}", "INFO")
 
-    ticket = open_position(side, lot)
+    # Open position with SL/TP included — single order_send, no second round-trip
+    ticket = open_position(side, lot, sl=failsafe_sl, tp=failsafe_tp)
 
     if ticket:
         log("=" * 70, "INFO")
@@ -1088,14 +1161,11 @@ def execute_signal_trade(side: str, entry_price: float, msg_id: int, msg_text: s
             msg_text=msg_text[:100],
         )
         signal_queue.mark_executed(msg_id)
-
-        # Apply failsafe SL and TP
-        log("Waiting for MT5 to register position...", "DEBUG")
-        time.sleep(0.5)
-        set_sl_and_tp(ticket, failsafe_sl, failsafe_tp)
+        return ticket
     else:
         log("POSITION OPEN FAILED - returning", "ERROR")
         log_signal_attempt(side, "FAILED", "Position open failed (see above for details)")
+        return None
 
 
 # ===================== MAIN =====================
@@ -1200,22 +1270,14 @@ async def main():
             log(f"SIGNAL DETECTED{source}: {side} {symbol}", "INFO")
             log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id}{source}")
 
-            entry_price = await run_mt5(lambda: get_market_price(side))
-            if entry_price is None:
-                log("Cannot get market price - aborting trade", "ERROR")
-                log_signal_attempt(side, "FAILED", "Cannot get market price")
-                return True
+            # Single executor call: gets price + opens position with failsafe SL/TP
+            ticket = await run_mt5(lambda: execute_signal_trade(side, msg_id, text))
 
-            await run_mt5(lambda: execute_signal_trade(side, entry_price, msg_id, text))
-
-            # Also check if the initial message already contains SL/TP
-            sl = parse_stop_loss(text)
-            tp1 = parse_tp1(text)
-            if sl or tp1:
-                # Give 1 second for position to register
-                await asyncio.sleep(1)
-                if msg_id in position_map:
-                    ticket = position_map[msg_id]
+            # If initial message already contains real SL/TP, apply immediately
+            if ticket and msg_id in position_map:
+                sl = parse_stop_loss(text)
+                tp1 = parse_tp1(text)
+                if sl or tp1:
                     await update_position_sl_tp(ticket, sl, tp1, source)
 
             return True
@@ -1274,10 +1336,7 @@ async def main():
             # Filter by allowed chat IDs
             if event.chat_id not in ALLOWED_CHAT_IDS:
                 messages_ignored += 1
-                if DEBUG_LOG_ALL_MESSAGES:
-                    chat = await event.get_chat()
-                    chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
-                    log(f"Ignored: chat_id={event.chat_id} | {chat_title}", "DEBUG")
+                log(f"Ignored: chat_id={event.chat_id}", "DEBUG")
                 return
 
             last_telegram_activity = time.time()
@@ -1288,9 +1347,7 @@ async def main():
             channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
             if DEBUG_LOG_ALL_MESSAGES:
-                chat = await event.get_chat()
-                chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
-                log(f"[RAW] chat_id={event.chat_id} | {chat_title} | {text[:80]}", "DEBUG")
+                log(f"[RAW] chat_id={event.chat_id} | {channel_name} | {text[:80]}", "DEBUG")
 
             # Calculate delivery delay
             msg_timestamp = event.message.date.timestamp()
@@ -1312,7 +1369,6 @@ async def main():
             handled = await process_message(text, msg_id, channel_name)
             if not handled:
                 log("Message not recognized as signal or SL/TP update - ignoring", "DEBUG")
-                log(f"   Checks: SIGNAL={parse_signal(text) is not None} | SL={parse_stop_loss(text) is not None} | TP1={parse_tp1(text) is not None}", "DEBUG")
                 messages_ignored += 1
 
         except Exception as e:
@@ -1338,18 +1394,16 @@ async def main():
 
             last_telegram_activity = time.time()
 
-            if DEBUG_LOG_ALL_MESSAGES:
-                chat = await event.get_chat()
-                chat_title = getattr(chat, "title", None) or getattr(chat, "username", None) or "(no title)"
-                preview = extract_message_text(event.message).strip()[:80]
-                log(f"[RAW EDIT] chat_id={event.chat_id} | {chat_title} | {preview}", "DEBUG")
-
             messages_received += 1
 
             if event.chat_id not in ALLOWED_CHAT_IDS:
                 messages_ignored += 1
                 log(f"Edit ignored - chat_id {event.chat_id} not in allowed list", "DEBUG")
                 return
+
+            if DEBUG_LOG_ALL_MESSAGES:
+                preview = extract_message_text(event.message).strip()[:80]
+                log(f"[RAW EDIT] chat_id={event.chat_id} | {preview}", "DEBUG")
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
@@ -1447,6 +1501,9 @@ async def main():
 
     asyncio.create_task(cleanup_and_report())
     log("  Cleanup and reporting task created", "INFO")
+
+    asyncio.create_task(mt5_cache_refresher())
+    log("  MT5 cache refresher task created", "INFO")
 
     # ══════════════════════════════════════════════════════════════════════
     # Connect to Telegram
