@@ -95,10 +95,21 @@ heartbeat_counter: int = 0
 # Track processed message IDs to avoid duplicate processing (push events + polling)
 _processed_msg_ids: set = set()
 _MAX_PROCESSED_IDS = 500  # Cap the set size to prevent memory leak
-POLLING_INTERVAL = 0.5  # seconds between polling checks
+POLLING_INTERVAL = 0.2  # seconds between polling checks (was 0.5 — reduced for faster fallback)
 
 # Thread pool for running blocking MT5 calls without freezing the async event loop
 _mt5_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix="mt5")
+
+# Pre-compiled regex patterns for signal parsing (avoids re-compilation on every call)
+_RE_TP_LEVELS = re.compile(r"TP\s*(\d+)\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
+_RE_STOP_LOSS = re.compile(r"SL\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
+_RE_TP1 = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
+
+# Pre-built separator string (avoid "=" * 70 allocation on every log call)
+_LOG_SEP = "=" * 70
+
+# Cached filling mode (symbol filling mode never changes during a session)
+_cached_filling_mode: Optional[int] = None
 
 # ===================== MT5 CACHE (refreshed every 5s in background) =====================
 # Caches symbol_info and account_info to avoid redundant MT5 calls in the hot trade path
@@ -418,7 +429,11 @@ def calculate_lot_size(entry_price: float, sl_price: float, balance: float) -> f
 
 
 def get_filling_mode() -> int:
-    """Get the appropriate filling mode for the symbol (uses cache for speed)"""
+    """Get the appropriate filling mode for the symbol (cached per session for speed)"""
+    global _cached_filling_mode
+    if _cached_filling_mode is not None:
+        return _cached_filling_mode
+
     symbol_info = get_cached_symbol_info()
     if symbol_info is None:
         log("Could not get symbol info, defaulting to IOC", "WARN")
@@ -427,14 +442,16 @@ def get_filling_mode() -> int:
     filling = symbol_info.filling_mode
 
     if filling & 2 == 2:
-        log("   Using ORDER_FILLING_IOC", "DEBUG")
-        return mt5.ORDER_FILLING_IOC
+        log("   Using ORDER_FILLING_IOC (cached)", "DEBUG")
+        _cached_filling_mode = mt5.ORDER_FILLING_IOC
     elif filling & 1 == 1:
-        log("   Using ORDER_FILLING_FOK", "DEBUG")
-        return mt5.ORDER_FILLING_FOK
+        log("   Using ORDER_FILLING_FOK (cached)", "DEBUG")
+        _cached_filling_mode = mt5.ORDER_FILLING_FOK
     else:
-        log("   Using ORDER_FILLING_RETURN", "DEBUG")
-        return mt5.ORDER_FILLING_RETURN
+        log("   Using ORDER_FILLING_RETURN (cached)", "DEBUG")
+        _cached_filling_mode = mt5.ORDER_FILLING_RETURN
+
+    return _cached_filling_mode
 
 
 def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Optional[int]:
@@ -482,7 +499,6 @@ def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Op
         if result.retcode == mt5.TRADE_RETCODE_DONE:
             ticket = result.order
             log(f"Position opened without SL/TP - Ticket: {ticket}. Setting SL/TP separately...", "INFO")
-            time.sleep(0.05)
             set_sl_and_tp(ticket, sl, tp)
             return ticket
 
@@ -500,7 +516,7 @@ def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Op
     if result.retcode in retryable_codes:
         for attempt in range(1, 3):
             log(f"   Retry attempt {attempt}/2 (retcode was {result.retcode})...", "INFO")
-            time.sleep(0.5)
+            time.sleep(0.15)
             result = mt5.order_send(request)
             if result.retcode == mt5.TRADE_RETCODE_DONE:
                 ticket = result.order
@@ -635,7 +651,7 @@ def parse_tp_levels(text: str) -> Dict[int, float]:
     log("Parsing TP levels...", "DEBUG")
     levels = {}
 
-    matches = re.finditer(r"TP\s*(\d+)\s+([0-9]+(?:\.[0-9]+)?)", text, re.IGNORECASE)
+    matches = _RE_TP_LEVELS.finditer(text)
 
     for match in matches:
         tp_num = int(match.group(1))
@@ -658,7 +674,7 @@ def parse_stop_loss(text: str) -> Optional[float]:
     """
     log("Parsing stop loss...", "DEBUG")
 
-    match = re.search(r"SL\s+([0-9]+(?:\.[0-9]+)?)", text, re.IGNORECASE)
+    match = _RE_STOP_LOSS.search(text)
 
     if match:
         sl_price = float(match.group(1))
@@ -672,7 +688,7 @@ def parse_stop_loss(text: str) -> Optional[float]:
 
 def parse_tp1(text: str) -> Optional[float]:
     """Parse TP1 value from text"""
-    match = re.search(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", text, re.IGNORECASE)
+    match = _RE_TP1.search(text)
 
     if match:
         tp1_price = float(match.group(1))
@@ -1011,7 +1027,8 @@ def execute_signal_trade(side: str, msg_id: int, msg_text: str):
 
     Runs inside the MT5 executor thread. All MT5 calls happen here to minimize
     async executor round-trips (previously get_market_price was a separate call).
-    Returns the ticket number or None.
+    Returns (ticket, entry_price, failsafe_sl, lot) on success, or None on failure.
+    Signal queue persistence is handled by the caller to keep file I/O off this thread.
     """
     # Get market price (previously a separate executor round-trip)
     entry_price = get_market_price(side)
@@ -1050,12 +1067,12 @@ def execute_signal_trade(side: str, msg_id: int, msg_text: str):
     ticket = open_position(side, lot, sl=failsafe_sl, tp=failsafe_tp)
 
     if ticket:
-        log("=" * 70, "INFO")
+        log(_LOG_SEP, "INFO")
         log(f"POSITION OPENED (SET & FORGET TP1)", "INFO")
         log(f"   Ticket: {ticket} | Side: {side} | Entry: ${entry_price:.5f} | Lot: {lot:.4f}", "INFO")
         log(f"   Failsafe SL: ${failsafe_sl:.5f} | Failsafe TP: ${failsafe_tp:.5f}", "INFO")
         log(f"   Waiting for message edit with real SL/TP1...", "INFO")
-        log("=" * 70, "INFO")
+        log(_LOG_SEP, "INFO")
 
         log_signal_attempt(side, "SUCCESS", f"Ticket={ticket} | Entry=${entry_price:.5f}")
         position_map[msg_id] = ticket
@@ -1063,18 +1080,8 @@ def execute_signal_trade(side: str, msg_id: int, msg_text: str):
         tp_sl_updated[ticket] = False  # Will be set True when real SL/TP arrives
         log(f"   Stored in position_map: msg_id={msg_id} -> ticket={ticket}", "DEBUG")
 
-        signal_queue.add_signal(
-            signal_type="TRADE",
-            side=side,
-            entry_price=entry_price,
-            sl_price=failsafe_sl,
-            lot_size=lot,
-            tp_levels={},
-            msg_id=msg_id,
-            msg_text=msg_text[:100],
-        )
-        signal_queue.mark_executed(msg_id)
-        return ticket
+        # Return trade details — signal_queue persistence handled by caller (off MT5 thread)
+        return (ticket, entry_price, failsafe_sl, lot)
     else:
         log("POSITION OPEN FAILED - returning", "ERROR")
         log_signal_attempt(side, "FAILED", "Position open failed (see above for details)")
@@ -1184,14 +1191,30 @@ async def main():
             log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id}{source}")
 
             # Single executor call: gets price + opens position with failsafe SL/TP
-            ticket = await run_mt5(lambda: execute_signal_trade(side, msg_id, text))
+            result = await run_mt5(lambda: execute_signal_trade(side, msg_id, text))
 
-            # If initial message already contains real SL/TP, apply immediately
-            if ticket and msg_id in position_map:
-                sl = parse_stop_loss(text)
-                tp1 = parse_tp1(text)
-                if sl or tp1:
-                    await update_position_sl_tp(ticket, sl, tp1, source)
+            if result:
+                ticket, entry_price, failsafe_sl, lot = result
+
+                # Persist to signal queue AFTER MT5 thread is free (file I/O off executor)
+                signal_queue.add_signal(
+                    signal_type="TRADE",
+                    side=side,
+                    entry_price=entry_price,
+                    sl_price=failsafe_sl,
+                    lot_size=lot,
+                    tp_levels={},
+                    msg_id=msg_id,
+                    msg_text=text[:100],
+                )
+                signal_queue.mark_executed(msg_id)
+
+                # If initial message already contains real SL/TP, apply immediately
+                if msg_id in position_map:
+                    sl = parse_stop_loss(text)
+                    tp1 = parse_tp1(text)
+                    if sl or tp1:
+                        await update_position_sl_tp(ticket, sl, tp1, source)
 
             return True
 

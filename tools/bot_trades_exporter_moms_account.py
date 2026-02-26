@@ -13,7 +13,7 @@ from typing import List, Dict, Optional
 
 # ===================== CONFIGURATION =====================
 SYMBOL = "XAUUSD"
-BOT_MAGIC_NUMBERS = [779, 777, None]  # All bot magic numbers
+BOT_MAGIC_NUMBERS = [779, 777, 0]  # All bot magic numbers
 DAYS_BACK = 365  # How many days back to retrieve trades
 
 # Get the directory of the current script and go up to project root
