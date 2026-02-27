@@ -64,6 +64,11 @@ entry_prices: Dict[int, float] = {}
 # Track whether real SL/TP has been applied (from message edit): ticket -> bool
 tp_sl_updated: Dict[int, bool] = {}
 
+# Pending entry range: when channel sends just "5175 - 5170" without BUY/SELL keyword
+# We store the range and wait for the follow-up TP/SL message to infer direction
+_pending_entry: Optional[Dict] = None
+_PENDING_ENTRY_TIMEOUT = 120  # seconds before pending entry expires
+
 # Signal attempt log: list of (timestamp, signal, result, details)
 signal_log: list = []
 
@@ -104,6 +109,7 @@ _mt5_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name
 _RE_TP_LEVELS = re.compile(r"TP\s*(\d+)\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_STOP_LOSS = re.compile(r"SL\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_TP1 = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
+_RE_ENTRY_RANGE = re.compile(r"^(\d{4,5}(?:\.\d{1,2})?)\s*[-\u2013\u2014]\s*(\d{4,5}(?:\.\d{1,2})?)$")
 
 # Pre-built separator string (avoid "=" * 70 allocation on every log call)
 _LOG_SEP = "=" * 70
@@ -642,6 +648,44 @@ def parse_signal(text: str) -> Optional[Tuple[str, str]]:
     return None
 
 
+def parse_entry_range(text: str) -> Optional[Tuple[float, float]]:
+    """
+    Parse a bare entry range like '5175 - 5170' from the first line of text.
+    This handles signals where the channel sends just a price range without BUY/SELL keywords.
+    Returns (price1, price2) or None.
+    """
+    first_line = text.strip().split('\n')[0].strip()
+    match = _RE_ENTRY_RANGE.match(first_line)
+    if match:
+        p1 = float(match.group(1))
+        p2 = float(match.group(2))
+        if 1000 <= p1 <= 9999 and 1000 <= p2 <= 9999:
+            log(f"   Found entry range: {p1} - {p2}", "DEBUG")
+            return (p1, p2)
+    return None
+
+
+def infer_direction(entry_high: float, entry_low: float, tp1: float = None, sl: float = None) -> Optional[str]:
+    """
+    Infer BUY/SELL direction from entry range and TP1/SL values.
+    - If TP1 is above the entry range midpoint -> BUY
+    - If TP1 is below the entry range midpoint -> SELL
+    - Falls back to SL-based inference if TP1 is not available
+    """
+    midpoint = (entry_high + entry_low) / 2
+    if tp1:
+        if tp1 > midpoint:
+            return "BUY"
+        elif tp1 < midpoint:
+            return "SELL"
+    if sl:
+        if sl < midpoint:
+            return "BUY"
+        elif sl > midpoint:
+            return "SELL"
+    return None
+
+
 def parse_tp_levels(text: str) -> Dict[int, float]:
     """
     Parse all TP levels from text.
@@ -1177,16 +1221,19 @@ async def main():
         """
         Core message processing - Set & Forget TP1 Strategy.
 
-        Only handles:
+        Handles:
         1. BUY NOW / SELL NOW signals -> enter trade with failsafe SL/TP
-        2. SL / TP updates (new messages) -> update position with real values
+        2. Bare entry ranges (e.g. '5175 - 5170') -> store as pending, wait for TP/SL
+        3. SL / TP updates -> if pending entry exists, infer direction & open trade;
+           otherwise update existing position with real values
         """
-        global messages_ignored
+        global messages_ignored, _pending_entry
 
         # ── Trade signal (BUY NOW / SELL NOW) ──
         signal = parse_signal(text)
         if signal:
             symbol, side = signal
+            _pending_entry = None  # Clear any pending entry
             log(f"SIGNAL DETECTED{source}: {side} {symbol}", "INFO")
             log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id}{source}")
 
@@ -1218,6 +1265,65 @@ async def main():
 
             return True
 
+        # ── Check for bare entry range (e.g. "5175 - 5170" without BUY/SELL) ──
+        entry_range = parse_entry_range(text)
+        if entry_range:
+            p1, p2 = entry_range
+            entry_high = max(p1, p2)
+            entry_low = min(p1, p2)
+
+            # Check if this message ALSO contains TP/SL (e.g. after edit with full details)
+            sl = parse_stop_loss(text)
+            tp1 = parse_tp1(text)
+            tp_levels_parsed = parse_tp_levels(text)
+            if not tp1 and tp_levels_parsed and 1 in tp_levels_parsed:
+                tp1 = tp_levels_parsed[1]
+
+            if tp1 or sl:
+                # Entry range + TP/SL in same message → infer direction and execute immediately
+                direction = infer_direction(entry_high, entry_low, tp1, sl)
+                if direction:
+                    _pending_entry = None
+                    log(_LOG_SEP, "INFO")
+                    log(f"SIGNAL DETECTED (ENTRY RANGE + TP/SL){source}: {direction} {SYMBOL}", "INFO")
+                    log(f"   Entry range: {entry_high} - {entry_low} | TP1: {tp1} | SL: {sl}", "INFO")
+                    log(_LOG_SEP, "INFO")
+                    log_signal_attempt(direction, "RECEIVED", f"msg_id={msg_id}{source} (inferred from range)")
+
+                    result = await run_mt5(lambda: execute_signal_trade(direction, msg_id, text))
+                    if result:
+                        ticket, entry_price, failsafe_sl, lot = result
+                        signal_queue.add_signal(
+                            signal_type="TRADE",
+                            side=direction,
+                            entry_price=entry_price,
+                            sl_price=failsafe_sl,
+                            lot_size=lot,
+                            tp_levels={},
+                            msg_id=msg_id,
+                            msg_text=text[:100],
+                        )
+                        signal_queue.mark_executed(msg_id)
+                        # Apply real SL/TP immediately since we already have them
+                        if msg_id in position_map:
+                            await update_position_sl_tp(ticket, sl, tp1, source)
+                    return True
+                else:
+                    log(f"Entry range found but cannot infer direction from TP/SL - ignoring{source}", "WARN")
+            else:
+                # Entry range only — store as pending, wait for follow-up TP/SL
+                _pending_entry = {
+                    "msg_id": msg_id,
+                    "high": entry_high,
+                    "low": entry_low,
+                    "timestamp": time.time(),
+                }
+                log(_LOG_SEP, "INFO")
+                log(f"PENDING ENTRY RANGE stored: {entry_high} - {entry_low} (msg_id={msg_id}){source}", "INFO")
+                log(f"   Waiting for follow-up TP/SL message to determine direction...", "INFO")
+                log(_LOG_SEP, "INFO")
+            return True
+
         # ── SL / TP update in a follow-up message (not an edit) ──
         sl = parse_stop_loss(text)
         tp1 = parse_tp1(text)
@@ -1228,7 +1334,41 @@ async def main():
             tp1 = tp_levels_parsed[1]
 
         if sl or tp1:
-            # Find the most recent bot position to update
+            # ── Check for pending entry first: TP/SL follow-up completes the signal ──
+            if _pending_entry and (time.time() - _pending_entry["timestamp"]) < _PENDING_ENTRY_TIMEOUT:
+                direction = infer_direction(_pending_entry["high"], _pending_entry["low"], tp1, sl)
+                if direction:
+                    pending_msg_id = _pending_entry["msg_id"]
+                    entry_high = _pending_entry["high"]
+                    entry_low = _pending_entry["low"]
+                    _pending_entry = None  # Clear pending
+
+                    log(_LOG_SEP, "INFO")
+                    log(f"SIGNAL DETECTED (PENDING RANGE + FOLLOW-UP TP/SL){source}: {direction} {SYMBOL}", "INFO")
+                    log(f"   Entry range: {entry_high} - {entry_low} | TP1: {tp1} | SL: {sl}", "INFO")
+                    log(f"   Entry range msg_id: {pending_msg_id} | TP/SL msg_id: {msg_id}", "INFO")
+                    log(_LOG_SEP, "INFO")
+                    log_signal_attempt(direction, "RECEIVED", f"msg_id={pending_msg_id}{source} (range+followup)")
+
+                    result = await run_mt5(lambda: execute_signal_trade(direction, pending_msg_id, text))
+                    if result:
+                        ticket, entry_price, failsafe_sl, lot = result
+                        signal_queue.add_signal(
+                            signal_type="TRADE",
+                            side=direction,
+                            entry_price=entry_price,
+                            sl_price=failsafe_sl,
+                            lot_size=lot,
+                            tp_levels={},
+                            msg_id=pending_msg_id,
+                            msg_text=text[:100],
+                        )
+                        signal_queue.mark_executed(pending_msg_id)
+                        # Apply real SL/TP immediately since we have them from the follow-up
+                        await update_position_sl_tp(ticket, sl, tp1, source)
+                    return True
+
+            # ── No pending entry — update existing position (original behavior) ──
             positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
             if not positions:
                 log(f"SL/TP update received but no open positions{source}", "WARN")
@@ -1323,7 +1463,7 @@ async def main():
         When the signal provider edits the original message to add SL and TP1,
         we parse those values and update the trade. Then forget.
         """
-        global messages_received, messages_ignored, last_telegram_activity
+        global messages_received, messages_ignored, last_telegram_activity, _pending_entry
 
         try:
             log(f"EDIT (PUSH): chat_id={event.chat_id} | msg_id={event.message.id}", "INFO")
@@ -1365,6 +1505,38 @@ async def main():
                 return
 
             log(f"Parsed from edit: SL={f'${sl:.5f}' if sl else 'None'} | TP1={f'${tp1:.5f}' if tp1 else 'None'}", "INFO")
+
+            # ── Check if this edit completes a pending entry range signal ──
+            if _pending_entry and _pending_entry["msg_id"] == msg_id and (time.time() - _pending_entry["timestamp"]) < _PENDING_ENTRY_TIMEOUT:
+                direction = infer_direction(_pending_entry["high"], _pending_entry["low"], tp1, sl)
+                if direction:
+                    entry_high = _pending_entry["high"]
+                    entry_low = _pending_entry["low"]
+                    _pending_entry = None
+
+                    log(_LOG_SEP, "INFO")
+                    log(f"SIGNAL DETECTED (PENDING RANGE + EDIT TP/SL): {direction} {SYMBOL}", "INFO")
+                    log(f"   Entry range: {entry_high} - {entry_low} | TP1: {tp1} | SL: {sl}", "INFO")
+                    log(_LOG_SEP, "INFO")
+                    log_signal_attempt(direction, "RECEIVED", f"msg_id={msg_id} (range edit)")
+
+                    result = await run_mt5(lambda: execute_signal_trade(direction, msg_id, text))
+                    if result:
+                        ticket, entry_price, failsafe_sl, lot = result
+                        signal_queue.add_signal(
+                            signal_type="TRADE",
+                            side=direction,
+                            entry_price=entry_price,
+                            sl_price=failsafe_sl,
+                            lot_size=lot,
+                            tp_levels={},
+                            msg_id=msg_id,
+                            msg_text=text[:100],
+                        )
+                        signal_queue.mark_executed(msg_id)
+                        # Apply real SL/TP immediately
+                        await update_position_sl_tp(ticket, sl, tp1, " (EDIT)")
+                    return
 
             # Find the position for this message
             if msg_id in position_map:
