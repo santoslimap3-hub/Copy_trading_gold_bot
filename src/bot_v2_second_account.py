@@ -850,6 +850,8 @@ async def catch_up_messages(client, lookback_minutes: int = 5):
 
                 if caught_up > 0:
                     log(f"Caught up {caught_up} message(s) from chat {chat_id}", "INFO")
+            except TypeNotFoundError:
+                log(f"Catch-up: Telethon schema mismatch for {chat_id} (need newer Telethon). Skipping.", "WARN")
             except Exception as e:
                 log(f"Failed to catch up messages from chat {chat_id}: {e}", "WARN")
 
@@ -1686,6 +1688,8 @@ async def main():
                 if msgs:
                     last_seen_ids[chat_id] = msgs[0].id
                     log(f"   Poller seed: chat {chat_id} latest msg_id={msgs[0].id}", "DEBUG")
+            except TypeNotFoundError:
+                log(f"   Poller seed: Telethon schema mismatch for {chat_id} (need newer Telethon)", "WARN")
             except Exception as e:
                 log(f"   Poller seed failed for {chat_id}: {e}", "WARN")
 
@@ -1738,6 +1742,11 @@ async def main():
                         if msgs:
                             last_seen_ids[chat_id] = max(last_seen_ids.get(chat_id, 0), msgs[0].id)
 
+                    except TypeNotFoundError as te:
+                        # Telegram API has new constructors that Telethon doesn't support yet.
+                        # Sleep longer to avoid log spam — this won't resolve until Telethon is updated.
+                        log(f"Poller: Telethon schema mismatch for chat {chat_id} (need newer Telethon). Sleeping 120s.", "WARN")
+                        await asyncio.sleep(120)
                     except Exception as ce:
                         log(f"Poller error for chat {chat_id}: {ce}", "WARN")
 
