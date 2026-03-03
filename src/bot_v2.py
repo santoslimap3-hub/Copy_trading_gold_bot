@@ -73,6 +73,9 @@ tp_sl_updated: Dict[int, bool] = {}
 # Limit order tracking: msg_id -> {side, order_ticket, limit_price, zone_high, zone_low, lot, created_at}
 _pending_limit_orders: Dict[int, Dict] = {}
 
+# Track msg_ids where trade execution failed (to prevent edit fallback from modifying wrong position)
+_failed_msg_ids: set = set()
+
 # Signal attempt log: list of (timestamp, signal, result, details)
 signal_log: list = []
 
@@ -818,7 +821,9 @@ def cancel_limit_order(order_ticket: int) -> bool:
 
 
 def modify_limit_order_sl_tp(order_ticket: int, sl: float = 0.0, tp: float = 0.0) -> bool:
-    """Modify SL/TP on a pending limit order."""
+    """Modify SL/TP on a pending limit order.
+    Validates that SL is on the correct side of the limit price before sending.
+    """
     log(f"Modifying SL/TP on pending order {order_ticket}: SL=${sl:.2f} TP=${tp:.2f}", "INFO")
 
     orders = mt5.orders_get(ticket=order_ticket)
@@ -827,12 +832,28 @@ def modify_limit_order_sl_tp(order_ticket: int, sl: float = 0.0, tp: float = 0.0
         return False
 
     order = orders[0]
+    limit_price = float(order.price_open)
+
+    # Validate SL is on the correct side of the limit price
+    # BUY LIMIT: SL must be below limit price | SELL LIMIT: SL must be above limit price
+    actual_sl = sl if sl > 0 else float(order.sl)
+    actual_tp = tp if tp > 0 else float(order.tp)
+    is_buy = order.type in (mt5.ORDER_TYPE_BUY_LIMIT, mt5.ORDER_TYPE_BUY_STOP)
+
+    if actual_sl > 0:
+        if is_buy and actual_sl >= limit_price:
+            log(f"SL ${actual_sl:.2f} is above BUY LIMIT price ${limit_price:.2f} — cannot set on pending order (will apply after fill)", "WARN")
+            return False
+        if not is_buy and actual_sl <= limit_price:
+            log(f"SL ${actual_sl:.2f} is below SELL LIMIT price ${limit_price:.2f} — cannot set on pending order (will apply after fill)", "WARN")
+            return False
+
     request = {
         "action": mt5.TRADE_ACTION_MODIFY,
         "order": order_ticket,
-        "price": float(order.price_open),
-        "sl": sl if sl > 0 else float(order.sl),
-        "tp": tp if tp > 0 else float(order.tp),
+        "price": limit_price,
+        "sl": actual_sl,
+        "tp": actual_tp,
         "type_time": mt5.ORDER_TIME_GTC,
     }
 
@@ -1432,6 +1453,8 @@ def execute_signal_trade(side: str, msg_id: int, msg_text: str):
     else:
         log("POSITION OPEN FAILED - returning", "ERROR")
         log_signal_attempt(side, "FAILED", "Position open failed (see above for details)")
+        # Track this msg_id as failed so on_edit won't fallback to wrong position
+        _failed_msg_ids.add(msg_id)
         return None
 
 
@@ -1890,6 +1913,11 @@ async def main():
                 await update_position_sl_tp(ticket, sl, tp1, " (EDIT)")
 
             else:
+                # Check if this msg_id had a failed trade — do NOT fall back to another position
+                if msg_id in _failed_msg_ids:
+                    log(f"Message ID {msg_id} had a FAILED trade — ignoring edit to prevent modifying wrong position", "WARN")
+                    return
+
                 # Message ID not in map - find the most recent bot position
                 log(f"Message ID {msg_id} not in position_map - looking for recent bot positions", "WARN")
                 positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
