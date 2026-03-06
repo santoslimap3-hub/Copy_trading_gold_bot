@@ -50,7 +50,7 @@ FAILSAFE_SL_DISTANCE = 8.0  # failsafe SL: $8 away from entry
 FAILSAFE_TP_DISTANCE = 3.0  # failsafe TP: $3 away from entry (until real TP1 arrives)
 
 # Limit Order Entry Strategy
-LIMIT_ORDER_TIMEOUT = 300    # seconds: cancel unfilled limit orders after this (5 min)
+LIMIT_ORDER_TIMEOUT = 14400  # seconds: cancel unfilled limit orders after this (4 hours - generous to let zone fill)
 ZONE_WAIT_TIMEOUT = 120      # seconds: wait for zone via edit before falling back to market (2 min)
 ENTRY_STRATEGY = "LIMIT_ZONE" # "LIMIT_ZONE" = limit at zone edge | "MARKET" = immediate market (old behavior)
 
@@ -121,9 +121,10 @@ _RE_TP1 = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 # Entry zone pattern: matches "5396 - 5392" or "5396-5392" or "5396\u20135392"
 _RE_ENTRY_ZONE = re.compile(r"(\d{4,5}(?:\.\d{1,2})?)\s*[-\u2013\u2014]\s*(\d{4,5}(?:\.\d{1,2})?)")
 
-# Trade closure patterns: "TP1 HIT", "TP1 ,2,3,4 HIT", "SL HIT", "Close profit", "Profit"
+# Trade closure patterns: "TP1 HIT", "TP1 ,2,3,4 HIT", "SL HIT"
+# NOTE: "Profit" and "Close profit" are NOT closures - channel uses those to say trade is positive
 _RE_TRADE_CLOSURE = re.compile(
-    r"(?:TP\s*\d[\s,\d]*\s*HIT|SL\s+HIT|close\s+profit|^profit$)",
+    r"(?:TP\s*\d[\s,\d]*\s*HIT|SL\s+HIT)",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -172,6 +173,21 @@ async def run_mt5(func, *args):
     """Run a blocking MT5 function in a thread so the event loop stays responsive."""
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(_mt5_executor, func, *args)
+
+
+def is_market_open() -> bool:
+    """Check whether XAUUSD market is currently open for new trades.
+    Returns False when the broker only allows closing (retcode 10015 scenario)."""
+    info = mt5.symbol_info(SYMBOL)
+    if info is None:
+        return False
+    # trade_mode values: SYMBOL_TRADE_MODE_DISABLED=0, SYMBOL_TRADE_MODE_LONGONLY=1,
+    #   SYMBOL_TRADE_MODE_SHORTONLY=2, SYMBOL_TRADE_MODE_CLOSEONLY=3, SYMBOL_TRADE_MODE_FULL=4
+    if info.trade_mode == 3:  # CLOSEONLY
+        return False
+    if info.trade_mode == 0:  # DISABLED
+        return False
+    return True
 
 
 # ===================== HELPERS =====================
@@ -533,6 +549,29 @@ def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Op
         log("AutoTrading DISABLED - cannot trade!", "ERROR")
         return None
 
+    # Market closed / close-only (retcode 10015)
+    if result.retcode == 10015:
+        log("Market is CLOSE-ONLY (retcode 10015) - cannot open new positions right now", "ERROR")
+        log("   This typically means: market is closed (weekend/holiday) or account is in close-only mode", "ERROR")
+        # Retry a few times with increasing delay in case market is about to reopen
+        for attempt in range(1, 4):
+            delay = 5 * attempt  # 5s, 10s, 15s
+            log(f"   Retry {attempt}/3 for 10015 in {delay}s...", "INFO")
+            time.sleep(delay)
+            if not is_market_open():
+                log(f"   Market still close-only after {delay}s", "WARN")
+                continue
+            result = mt5.order_send(request)
+            if result.retcode == mt5.TRADE_RETCODE_DONE:
+                ticket = result.order
+                log(f"Position opened on 10015-retry {attempt} - Ticket: {ticket}", "INFO")
+                return ticket
+            if result.retcode != 10015:
+                break  # Different error, fall through
+            log(f"   Retry {attempt} still 10015", "WARN")
+        log("All 10015 retries exhausted - market remains closed", "ERROR")
+        return None
+
     log(f"Order failed - Retcode: {result.retcode} | Error: {result.comment}", "ERROR")
     log(f"   Human-readable: {get_error_message(result.retcode)}", "ERROR")
     log(f"   Last MT5 error: {mt5.last_error()}", "ERROR")
@@ -756,7 +795,8 @@ def parse_trade_closure(text: str) -> Optional[str]:
     """
     Detect trade closure messages from the channel.
     Returns closure type string or None.
-    Matches: "TP1 HIT", "TP1 ,2,3,4 HIT", "SL HIT", "Close profit!", "Profit"
+    Matches: "TP1 HIT", "TP1 ,2,3,4 HIT", "SL HIT"
+    Does NOT match "Profit" or "Close profit" - those are just status updates.
     """
     match = _RE_TRADE_CLOSURE.search(text)
     if match:
@@ -769,10 +809,34 @@ def parse_trade_closure(text: str) -> Optional[str]:
 # ===================== LIMIT ORDER FUNCTIONS =====================
 
 def place_limit_order(side: str, price: float, lot: float, sl: float = 0.0, tp: float = 0.0) -> Optional[int]:
-    """Place a pending limit order. Returns order ticket or None."""
-    log(f"Placing {side} LIMIT order at ${price:.2f} | Lot={lot:.4f} | SL=${sl:.2f} | TP=${tp:.2f}", "INFO")
+    """Place a pending limit or stop order at the specified price.
+    Automatically chooses LIMIT vs STOP based on current price position:
+      - BUY LIMIT if price is above order price (waiting for pullback)
+      - BUY STOP if price is below order price (waiting for price to rise into zone)
+      - SELL LIMIT if price is below order price (waiting for rally)
+      - SELL STOP if price is above order price (waiting for price to drop into zone)
+    Returns order ticket or None.
+    """
+    # Determine correct order type based on current price vs order price
+    current_price = get_market_price(side)
+    if side == "BUY":
+        if current_price and current_price < price:
+            order_type = mt5.ORDER_TYPE_BUY_STOP
+            order_label = "BUY STOP"
+        else:
+            order_type = mt5.ORDER_TYPE_BUY_LIMIT
+            order_label = "BUY LIMIT"
+    else:
+        if current_price and current_price > price:
+            order_type = mt5.ORDER_TYPE_SELL_STOP
+            order_label = "SELL STOP"
+        else:
+            order_type = mt5.ORDER_TYPE_SELL_LIMIT
+            order_label = "SELL LIMIT"
 
-    order_type = mt5.ORDER_TYPE_BUY_LIMIT if side == "BUY" else mt5.ORDER_TYPE_SELL_LIMIT
+    cp_str = f"${current_price:.2f}" if current_price else "N/A"
+    log(f"Placing {order_label} at ${price:.2f} (current={cp_str}) | Lot={lot:.4f} | SL=${sl:.2f} | TP=${tp:.2f}", "INFO")
+
     filling_mode = get_filling_mode()
 
     request = {
@@ -812,6 +876,26 @@ def place_limit_order(side: str, price: float, lot: float, sl: float = 0.0, tp: 
 
     log(f"Limit order failed - Retcode: {result.retcode} | {result.comment}", "ERROR")
     log(f"   Human-readable: {get_error_message(result.retcode)}", "ERROR")
+
+    # Market closed / close-only (retcode 10015) - retry with backoff
+    if result.retcode == 10015:
+        log("Market is CLOSE-ONLY (retcode 10015) - limit order cannot be placed now", "ERROR")
+        for attempt in range(1, 4):
+            delay = 5 * attempt
+            log(f"   Retry {attempt}/3 for 10015 in {delay}s...", "INFO")
+            time.sleep(delay)
+            if not is_market_open():
+                log(f"   Market still close-only", "WARN")
+                continue
+            result = mt5.order_send(request)
+            if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+                log(f"Limit order placed on 10015-retry {attempt} - ticket: {result.order}", "INFO")
+                return result.order
+            if result and result.retcode != 10015:
+                break
+            log(f"   Retry {attempt} still 10015", "WARN")
+        log("All 10015 retries exhausted for limit order", "ERROR")
+
     return None
 
 
@@ -853,7 +937,7 @@ def modify_limit_order_sl_tp(order_ticket: int, sl: float = 0.0, tp: float = 0.0
 def find_position_from_order(order_ticket: int) -> Optional[int]:
     """Find the position ticket from a filled pending order via deal history."""
     now = datetime.now()
-    deals = mt5.history_deals_get(now - timedelta(hours=1), now + timedelta(minutes=1))
+    deals = mt5.history_deals_get(now - timedelta(hours=24), now + timedelta(minutes=1))
     if deals:
         for deal in deals:
             if deal.order == order_ticket and deal.entry == 0:
@@ -864,7 +948,7 @@ def find_position_from_order(order_ticket: int) -> Optional[int]:
 def get_fill_price_from_order(order_ticket: int) -> Optional[float]:
     """Get the fill price of a filled pending order."""
     now = datetime.now()
-    deals = mt5.history_deals_get(now - timedelta(hours=1), now + timedelta(minutes=1))
+    deals = mt5.history_deals_get(now - timedelta(hours=24), now + timedelta(minutes=1))
     if deals:
         for deal in deals:
             if deal.order == order_ticket and deal.entry == 0:
@@ -897,6 +981,9 @@ def _load_entry_stats() -> Dict:
         "market_orders_in_zone": 0,
         "market_orders_fallback": 0,
         "total_limit_slippage": 0.0,
+        "zone_tracking_total": 0,
+        "zone_best_entry_reached": 0,
+        "zone_worst_entry_reached": 0,
         "entries": [],
     }
 
@@ -947,6 +1034,20 @@ def record_entry_stat(event_type: str, **kwargs):
         _entry_stats["market_orders_in_zone"] += 1
     elif event_type == "market_fallback":
         _entry_stats["market_orders_fallback"] += 1
+    elif event_type == "limit_placement_failed":
+        _entry_stats.setdefault("limit_placement_failed", 0)
+        _entry_stats["limit_placement_failed"] += 1
+
+    # Zone entry tracking — record whether price reached best/worst edge
+    if "best_reached" in kwargs:
+        _entry_stats.setdefault("zone_tracking_total", 0)
+        _entry_stats["zone_tracking_total"] += 1
+        if kwargs["best_reached"]:
+            _entry_stats.setdefault("zone_best_entry_reached", 0)
+            _entry_stats["zone_best_entry_reached"] += 1
+        if kwargs.get("worst_reached"):
+            _entry_stats.setdefault("zone_worst_entry_reached", 0)
+            _entry_stats["zone_worst_entry_reached"] += 1
 
     _entry_stats["entries"].append(entry_record)
     _entry_stats["entries"] = _entry_stats["entries"][-500:]
@@ -966,7 +1067,9 @@ def get_entry_stats_summary() -> str:
         f"timeout={s['limit_timeouts']} invalidated={inv} ({fill_rate:.0f}% fill) | "
         f"Buffered: {buf} (zone_edits={zfe} zone_timeout={zwt}) | "
         f"Market: no_zone={s.get('market_orders_no_zone',0)} in_zone={s.get('market_orders_in_zone',0)} "
-        f"fallback={s.get('market_orders_fallback',0)} | Avg slip: ${avg_slip:.2f}"
+        f"fallback={s.get('market_orders_fallback',0)} | Avg slip: ${avg_slip:.2f} | "
+        f"Zone: best_hit={s.get('zone_best_entry_reached',0)}/{s.get('zone_tracking_total',0)} "
+        f"worst_hit={s.get('zone_worst_entry_reached',0)}/{s.get('zone_tracking_total',0)}"
     )
 
 
@@ -1030,6 +1133,7 @@ def get_bot_metrics() -> Dict:
         "entry_strategy": ENTRY_STRATEGY,
         "buffered_signals": len(_buffered_signals),
         "pending_limit_orders": len(_pending_limit_orders),
+        "entry_stats": get_entry_stats_summary(),
     }
 
 
@@ -1046,8 +1150,10 @@ def print_bot_status():
     log(f"  Connections: MT5={('OK' if metrics['mt5_connected'] else 'DOWN')} | Telegram={('OK' if metrics['telegram_connected'] else 'DOWN')}", "INFO")
     log(f"  Connection Losses: MT5={metrics['mt5_connection_losses']} | Telegram={metrics['telegram_connection_losses']}", "INFO")
     log(f"  Strategy: {metrics['entry_strategy']} (SET & FORGET TP1)", "INFO")
+    log(f"  Zone Wait Timeout: {ZONE_WAIT_TIMEOUT}s | Limit Order Timeout: {LIMIT_ORDER_TIMEOUT}s", "INFO")
     log(f"  Active Positions: {metrics['active_positions']} ({metrics['positions_with_real_tp']} with real SL/TP)", "INFO")
     log(f"  Buffered Signals: {metrics['buffered_signals']} | Pending Limits: {metrics['pending_limit_orders']}", "INFO")
+    log(f"  {get_entry_stats_summary()}", "INFO")
 
     if last_message_time > 0:
         log(f"  Last Message: {metrics['seconds_since_last_message']:.0f}s ago", "INFO")
@@ -1197,23 +1303,31 @@ async def replay_pending_signals(client):
 
 
 async def heartbeat_monitor():
-    """Regular heartbeat to prove bot is alive - runs every 60 seconds"""
+    """Regular heartbeat to prove bot is alive - runs every 15 minutes (compact single-line)."""
     global heartbeat_counter
 
-    log("Heartbeat monitor started", "INFO")
+    HEARTBEAT_INTERVAL = 900  # 15 minutes
+    log(f"Heartbeat monitor started ({HEARTBEAT_INTERVAL}s interval)", "INFO")
 
     while True:
         try:
-            await asyncio.sleep(60)
+            await asyncio.sleep(HEARTBEAT_INTERVAL)
 
             heartbeat_counter += 1
             metrics = get_bot_metrics()
 
-            log("=" * 70, "INFO")
-            log(f"HEARTBEAT #{heartbeat_counter} - BOT ALIVE", "INFO")
-            log(f"  Uptime: {metrics['uptime_hours']:.2f}h | Msgs: {metrics['messages_received']} | Trades: {metrics['trades_executed']}", "INFO")
-            log(f"  MT5: {('OK' if metrics['mt5_connected'] else 'DOWN')} | Telegram: {('OK' if metrics['telegram_connected'] else 'DOWN')}", "INFO")
-            log("=" * 70, "INFO")
+            mt5_status = 'OK' if metrics['mt5_connected'] else 'DOWN'
+            tg_status = 'OK' if metrics['telegram_connected'] else 'DOWN'
+            log(
+                f"HEARTBEAT #{heartbeat_counter} | "
+                f"Up {metrics['uptime_hours']:.1f}h | "
+                f"Msgs {metrics['messages_received']} | "
+                f"Trades {metrics['trades_executed']} | "
+                f"MT5={mt5_status} TG={tg_status} | "
+                f"Pos {metrics['active_positions']} | "
+                f"Buf {metrics['buffered_signals']} Lim {metrics['pending_limit_orders']}",
+                "INFO",
+            )
 
         except Exception as e:
             log(f"CRITICAL: Heartbeat monitor exception: {str(e)}", "ERROR")
@@ -1222,38 +1336,51 @@ async def heartbeat_monitor():
             await asyncio.sleep(10)
 
 
-async def connection_health_monitor():
-    """Monitor MT5 and Telegram connection health - runs every 60 seconds"""
-    global mt5_connected, telegram_connected
+# Track previous connection states so we only log on change
+_prev_mt5_healthy: bool = True
+_prev_tg_healthy: bool = True
 
-    log("Connection health monitor started", "INFO")
+
+async def connection_health_monitor():
+    """Monitor MT5 and Telegram connection health - runs every 5 minutes.
+    Only logs when connection state *changes* (OK→DOWN or DOWN→OK) to reduce noise."""
+    global mt5_connected, telegram_connected, _prev_mt5_healthy, _prev_tg_healthy
+
+    HEALTH_CHECK_INTERVAL = 300  # 5 minutes
+    log(f"Connection health monitor started ({HEALTH_CHECK_INTERVAL}s interval)", "INFO")
 
     while True:
         try:
-            await asyncio.sleep(60)
-
-            log("Running connection health checks...", "DEBUG")
+            await asyncio.sleep(HEALTH_CHECK_INTERVAL)
 
             # Check MT5 connection (in executor to avoid blocking)
             mt5_healthy = await run_mt5(check_mt5_health)
             if not mt5_healthy:
-                log("MT5 connection unhealthy - attempting recovery", "WARN")
+                if _prev_mt5_healthy:
+                    log("MT5 connection went DOWN - attempting recovery", "WARN")
                 recovered = await run_mt5(recover_mt5_connection)
                 if recovered:
-                    log("MT5 connection recovered", "INFO")
+                    if not _prev_mt5_healthy:
+                        log("MT5 connection recovered", "INFO")
                     mt5_connected = True
                 else:
                     log("MT5 connection recovery failed", "ERROR")
                     mt5_connected = False
+                _prev_mt5_healthy = recovered
             else:
-                log("MT5 connection healthy", "DEBUG")
+                if not _prev_mt5_healthy:
+                    log("MT5 connection restored", "INFO")
+                _prev_mt5_healthy = True
+                mt5_connected = True
 
             # Telegram connectivity check
             if last_telegram_activity > 0:
                 time_since_telegram = time.time() - last_telegram_activity
 
                 if time_since_telegram < 120:
-                    log(f"Telegram active ({time_since_telegram:.0f}s since last message)", "DEBUG")
+                    if not _prev_tg_healthy:
+                        log("Telegram connection restored", "INFO")
+                    _prev_tg_healthy = True
                     telegram_connected = True
                 elif time_since_telegram > 300:
                     log(f"No Telegram activity for {time_since_telegram:.0f}s - running active connectivity check...", "WARN")
@@ -1277,11 +1404,14 @@ async def connection_health_monitor():
                                     reconnected = await reconnect_telegram(_telegram_client, reason="health_monitor_ping_failed")
                                     if not reconnected:
                                         log("Health monitor reconnection failed - main loop will handle restart", "ERROR")
+                                    _prev_tg_healthy = reconnected
                         except Exception as check_err:
                             log(f"Error during active Telegram check: {check_err}", "WARN")
                             telegram_connected = False
+                            _prev_tg_healthy = False
                     else:
                         telegram_connected = False
+                        _prev_tg_healthy = False
                 else:
                     telegram_connected = True
 
@@ -1343,18 +1473,23 @@ async def mt5_cache_refresher():
             await asyncio.sleep(5)
 
 
+# Last trade/msg counts when we last printed status (suppress unchanged reports)
+_last_status_trades: int = 0
+_last_status_msgs: int = 0
+
+
 async def cleanup_and_report():
-    """Periodic cleanup and reporting of system health."""
+    """Periodic cleanup and reporting of system health.
+    Full status report is only printed when there has been meaningful activity
+    (new messages or trades) since the last report."""
+    global _last_status_trades, _last_status_msgs
+
     while True:
         try:
             await asyncio.sleep(300)  # Every 5 minutes
 
-            log("Running periodic cleanup...", "DEBUG")
-
             if signal_queue:
                 signal_queue.remove_old_signals(days=7)
-                stats = signal_queue.get_stats()
-                log(f"Signal queue: {stats['total_signals']} total, {stats['pending']} pending", "DEBUG")
 
             if session_manager:
                 session_manager.cleanup_old_backups(keep_count=5)
@@ -1364,8 +1499,11 @@ async def cleanup_and_report():
                 if reconnect_monitor.get_stats()['total_reconnects'] > 0:
                     reconnect_monitor.print_summary()
 
-            # Print full status report
-            print_bot_status()
+            # Only print full status report when there has been activity
+            if trades_executed != _last_status_trades or messages_received != _last_status_msgs:
+                print_bot_status()
+                _last_status_trades = trades_executed
+                _last_status_msgs = messages_received
 
         except Exception as e:
             log(f"CRITICAL: Cleanup exception: {str(e)}", "ERROR")
@@ -1393,6 +1531,13 @@ def execute_signal_trade(side: str, msg_id: int, msg_text: str):
     if entry_price is None:
         log("Cannot get market price - aborting trade", "ERROR")
         log_signal_attempt(side, "FAILED", "Cannot get market price")
+        return None
+
+    # Check if market is open for new trades
+    if not is_market_open():
+        log("Market is CLOSED / CLOSE-ONLY - cannot open new positions", "ERROR")
+        log("   Signal will not be retried. Check market hours or broker restrictions.", "ERROR")
+        log_signal_attempt(side, "FAILED", "Market closed (close-only mode)")
         return None
 
     balance = get_account_balance()
@@ -1448,15 +1593,88 @@ def execute_signal_trade(side: str, msg_id: int, msg_text: str):
 
 def execute_limit_trade(side: str, msg_id: int, msg_text: str, limit_price: float, zone_low: float, zone_high: float):
     """
-    Place a limit order at the zone edge instead of a market order.
-    Returns (order_ticket, limit_price, failsafe_sl, lot) on success, or None.
+    Zone-aware entry: enter at market if price is inside the zone,
+    or place a pending order at the zone boundary if price is outside.
+    NEVER enters outside the zone.
+
+    Returns:
+      ("MARKET", ticket, entry_price, failsafe_sl, lot) on market fill
+      ("PENDING", order_ticket, limit_price, failsafe_sl, lot) on pending order
+      None on failure.
     Runs inside the MT5 executor thread.
     """
+    current_price = get_market_price(side)
+    if current_price is None:
+        log("Cannot get market price - aborting zone entry", "ERROR")
+        log_signal_attempt(side, "FAILED", "Cannot get market price")
+        return None
+
+    cp_str = f"${current_price:.2f}"
+    log(f"Zone entry: {side} | Price: {cp_str} | Zone: ${zone_low:.2f}-${zone_high:.2f}", "INFO")
+
     balance = get_account_balance()
     if balance <= 0:
-        log(f"Invalid balance: ${balance:.2f} - aborting limit order", "ERROR")
+        log(f"Invalid balance: ${balance:.2f} - aborting", "ERROR")
         log_signal_attempt(side, "FAILED", f"Invalid balance: ${balance:.2f}")
+        record_entry_stat("limit_placement_failed", side=side, limit_price=limit_price, reason="invalid_balance", balance=balance, current_price=current_price)
         return None
+
+    if not is_market_open():
+        log("Market is CLOSED / CLOSE-ONLY - cannot enter", "ERROR")
+        log_signal_attempt(side, "FAILED", "Market closed (close-only mode)")
+        record_entry_stat("limit_placement_failed", side=side, limit_price=limit_price, reason="market_closed", current_price=current_price)
+        return None
+
+    # ── Price INSIDE zone → enter at MARKET immediately ──
+    price_in_zone = zone_low <= current_price <= zone_high
+    if price_in_zone:
+        log(f"Price {cp_str} is INSIDE zone ${zone_low:.2f}-${zone_high:.2f} → MARKET {side}", "INFO")
+        entry_price = current_price
+        if side == "BUY":
+            failsafe_sl = entry_price - FAILSAFE_SL_DISTANCE
+            failsafe_tp = entry_price + FAILSAFE_TP_DISTANCE
+        else:
+            failsafe_sl = entry_price + FAILSAFE_SL_DISTANCE
+            failsafe_tp = entry_price - FAILSAFE_TP_DISTANCE
+
+        lot = calculate_lot_size(entry_price, failsafe_sl, balance)
+        if lot <= 0:
+            log(f"Invalid lot size: {lot} - aborting market entry", "ERROR")
+            log_signal_attempt(side, "FAILED", f"Invalid lot size: {lot}")
+            return None
+
+        log(f"Market entry: {side} at ~{cp_str} | SL=${failsafe_sl:.2f} | TP=${failsafe_tp:.2f} | Lot={lot:.4f}", "INFO")
+        ticket = open_position(side, lot, sl=failsafe_sl, tp=failsafe_tp)
+        if ticket:
+            log(_LOG_SEP, "INFO")
+            log(f"MARKET ENTRY (INSIDE ZONE)", "INFO")
+            log(f"   Ticket: {ticket} | {side} at ~{cp_str}", "INFO")
+            log(f"   Zone: ${zone_low:.2f} - ${zone_high:.2f}", "INFO")
+            log(f"   Failsafe SL: ${failsafe_sl:.2f} | TP: ${failsafe_tp:.2f} | Lot: {lot:.4f}", "INFO")
+            log(_LOG_SEP, "INFO")
+            log_signal_attempt(side, "SUCCESS", f"Ticket={ticket} | Entry=~{cp_str} (inside zone)")
+            position_map[msg_id] = ticket
+            entry_prices[ticket] = entry_price
+            tp_sl_updated[ticket] = False
+            return ("MARKET", ticket, entry_price, failsafe_sl, lot)
+        else:
+            log("MARKET ENTRY FAILED", "ERROR")
+            log_signal_attempt(side, "FAILED", "Market order failed (inside zone)")
+            return None
+
+    # ── Price OUTSIDE zone → place pending order at zone boundary ──
+    if side == "BUY":
+        if current_price < zone_low:
+            limit_price = zone_low
+        else:
+            limit_price = zone_high
+    else:  # SELL
+        if current_price > zone_high:
+            limit_price = zone_high
+        else:
+            limit_price = zone_low
+
+    log(f"Price {cp_str} is OUTSIDE zone ${zone_low:.2f}-${zone_high:.2f} → pending {side} at ${limit_price:.2f}", "INFO")
 
     if side == "BUY":
         failsafe_sl = limit_price - FAILSAFE_SL_DISTANCE
@@ -1467,29 +1685,28 @@ def execute_limit_trade(side: str, msg_id: int, msg_text: str, limit_price: floa
 
     lot = calculate_lot_size(limit_price, failsafe_sl, balance)
     if lot <= 0:
-        log(f"Invalid lot size: {lot} - aborting limit order", "ERROR")
+        log(f"Invalid lot size: {lot} - aborting pending order", "ERROR")
         log_signal_attempt(side, "FAILED", f"Invalid lot size: {lot}")
+        record_entry_stat("limit_placement_failed", side=side, limit_price=limit_price, reason="invalid_lot", lot=lot, balance=balance, current_price=current_price)
         return None
 
-    log(f"Limit trade: {side} at ${limit_price:.2f} | SL=${failsafe_sl:.2f} | TP=${failsafe_tp:.2f} | Lot={lot:.4f}", "INFO")
+    log(f"Pending order: {side} at ${limit_price:.2f} | SL=${failsafe_sl:.2f} | TP=${failsafe_tp:.2f} | Lot={lot:.4f}", "INFO")
 
     order_ticket = place_limit_order(side, limit_price, lot, failsafe_sl, failsafe_tp)
     if order_ticket:
         log(_LOG_SEP, "INFO")
-        log(f"LIMIT ORDER PLACED (ZONE ENTRY)", "INFO")
-        log(f"   Order: {order_ticket} | {side} LIMIT at ${limit_price:.2f}", "INFO")
+        log(f"PENDING ORDER PLACED (OUTSIDE ZONE)", "INFO")
+        log(f"   Order: {order_ticket} | {side} at ${limit_price:.2f}", "INFO")
         log(f"   Zone: ${zone_low:.2f} - ${zone_high:.2f}", "INFO")
         log(f"   Failsafe SL: ${failsafe_sl:.2f} | TP: ${failsafe_tp:.2f} | Lot: {lot:.4f}", "INFO")
         log(_LOG_SEP, "INFO")
         log_signal_attempt(side, "LIMIT_PLACED", f"Order={order_ticket} | Limit=${limit_price:.2f}")
-        return (order_ticket, limit_price, failsafe_sl, lot)
+        return ("PENDING", order_ticket, limit_price, failsafe_sl, lot)
     else:
-        log("LIMIT ORDER FAILED", "ERROR")
-        log_signal_attempt(side, "FAILED", "Limit order placement failed")
+        log("PENDING ORDER FAILED", "ERROR")
+        log_signal_attempt(side, "FAILED", "Pending order placement failed")
+        record_entry_stat("limit_placement_failed", side=side, limit_price=limit_price, reason="broker_rejected", current_price=current_price, balance=balance, lot=lot)
         return None
-
-
-# ===================== MAIN =====================
 
 async def main():
     global signal_queue, session_manager, reconnect_monitor
@@ -1519,10 +1736,10 @@ async def main():
     log(f"  Risk per trade: {RISK_PCT*100:.1f}%", "INFO")
     log(f"  Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.2f}", "INFO")
     log(f"  Failsafe TP distance: ${FAILSAFE_TP_DISTANCE:.2f}", "INFO")
+    log(f"  Strategy: SET & FORGET TP1", "INFO")
     log(f"  Entry Strategy: {ENTRY_STRATEGY}", "INFO")
     log(f"  Zone Wait Timeout: {ZONE_WAIT_TIMEOUT}s", "INFO")
     log(f"  Limit Order Timeout: {LIMIT_ORDER_TIMEOUT}s", "INFO")
-    log(f"  Strategy: SET & FORGET TP1", "INFO")
     log(f"  Magic number: {MAGIC}", "INFO")
     log(f"  Log level: {LOG_LEVEL}", "INFO")
     log("=" * 70, "INFO")
@@ -1600,30 +1817,43 @@ async def main():
             if ENTRY_STRATEGY == "LIMIT_ZONE":
                 zone = parse_entry_zone(text)
                 if zone:
-                    # Zone already in initial message (rare) → place limit immediately
+                    # Zone already in initial message (rare) → enter zone
                     zone_low, zone_high = zone
-                    limit_price = zone_low if side == "BUY" else zone_high
-                    log(f"Zone found in initial message: ${zone_low:.2f}-${zone_high:.2f} → limit at ${limit_price:.2f}", "INFO")
+                    log(f"Zone found in initial message: ${zone_low:.2f}-${zone_high:.2f}", "INFO")
 
-                    result = await run_mt5(lambda: execute_limit_trade(side, msg_id, text, limit_price, zone_low, zone_high))
+                    result = await run_mt5(lambda: execute_limit_trade(side, msg_id, text, 0, zone_low, zone_high))
                     if result:
-                        order_ticket, lp, fsl, lot = result
-                        sl = parse_stop_loss(text)
-                        tp1 = parse_tp1(text)
-                        _pending_limit_orders[msg_id] = {
-                            "order_ticket": order_ticket,
-                            "side": side,
-                            "limit_price": lp,
-                            "zone_low": zone_low,
-                            "zone_high": zone_high,
-                            "failsafe_sl": fsl,
-                            "lot": lot,
-                            "msg_id": msg_id,
-                            "placed_at": time.time(),
-                            "sl": sl,
-                            "tp1": tp1,
-                        }
-                        record_entry_stat("limit_placed", side=side, limit_price=lp, zone_low=zone_low, zone_high=zone_high)
+                        result_type = result[0]
+                        if result_type == "MARKET":
+                            _, ticket, entry_price, fsl, lot = result
+                            sl = parse_stop_loss(text)
+                            tp1 = parse_tp1(text)
+                            signal_queue.add_signal(signal_type="TRADE", side=side, entry_price=entry_price,
+                                                    sl_price=fsl, lot_size=lot, tp_levels={}, msg_id=msg_id, msg_text=text[:100])
+                            signal_queue.mark_executed(msg_id)
+                            if sl or tp1:
+                                await update_position_sl_tp(ticket, sl, tp1, source)
+                            record_entry_stat("market_entry_in_zone", side=side, entry_price=entry_price, zone_low=zone_low, zone_high=zone_high)
+                        else:  # PENDING
+                            _, order_ticket, lp, fsl, lot = result
+                            sl = parse_stop_loss(text)
+                            tp1 = parse_tp1(text)
+                            _pending_limit_orders[msg_id] = {
+                                "order_ticket": order_ticket,
+                                "side": side,
+                                "limit_price": lp,
+                                "zone_low": zone_low,
+                                "zone_high": zone_high,
+                                "failsafe_sl": fsl,
+                                "lot": lot,
+                                "msg_id": msg_id,
+                                "placed_at": time.time(),
+                                "sl": sl,
+                                "tp1": tp1,
+                                "price_min_seen": float('inf'),
+                                "price_max_seen": float('-inf'),
+                            }
+                            record_entry_stat("limit_placed", side=side, limit_price=lp, zone_low=zone_low, zone_high=zone_high)
                     return True
                 else:
                     # No zone yet → buffer signal and wait for zone via edit
@@ -1674,17 +1904,28 @@ async def main():
             cancelled_count = 0
             cleared_count = 0
 
-            # Cancel ALL pending limit orders (channel says trade is over)
-            for mid, info in list(_pending_limit_orders.items()):
-                ot = info["order_ticket"]
-                log(f"TRADE CLOSURE '{closure}' → cancelling pending limit order {ot} (msg_id={mid})", "INFO")
-                await run_mt5(lambda: cancel_limit_order(ot))
-                record_entry_stat("limit_invalidated", side=info["side"], limit_price=info["limit_price"],
-                                  reason=f"channel_closure: {closure}")
-                cancelled_count += 1
-            _pending_limit_orders.clear()
+            is_sl_hit = "SL" in closure.upper()
+            has_open_positions = bool(position_map)
 
-            # Clear ALL buffered signals (no point entering now)
+            # Pending limit orders:
+            #   SL HIT → always cancel (trade thesis invalidated, direction wrong)
+            #   TP HIT + open positions → cancel (provider closure applies to us)
+            #   TP HIT + NO open positions → KEEP limits active (our entry hasn't
+            #     filled yet; limit is still valid with its own SL/TP and timeout;
+            #     provider's TP doesn't apply to us since we never entered)
+            if is_sl_hit or has_open_positions:
+                for mid, info in list(_pending_limit_orders.items()):
+                    ot = info["order_ticket"]
+                    log(f"TRADE CLOSURE '{closure}' → cancelling pending limit order {ot} (msg_id={mid})", "INFO")
+                    await run_mt5(lambda: cancel_limit_order(ot))
+                    record_entry_stat("limit_invalidated", side=info["side"], limit_price=info["limit_price"],
+                                      reason=f"channel_closure: {closure}")
+                    cancelled_count += 1
+                _pending_limit_orders.clear()
+            elif _pending_limit_orders:
+                log(f"Trade closure '{closure}' but no open positions — keeping {len(_pending_limit_orders)} pending limit(s) active (entry still valid)", "INFO")
+
+            # Always clear buffered signals (provider already closed, no point waiting for zone)
             for mid, buf in list(_buffered_signals.items()):
                 log(f"TRADE CLOSURE '{closure}' → clearing buffered signal (msg_id={mid})", "INFO")
                 record_entry_stat("zone_wait_timeout", side=buf["side"])
@@ -1693,7 +1934,7 @@ async def main():
 
             if cancelled_count or cleared_count:
                 log(f"Trade closure cleanup: cancelled {cancelled_count} pending orders, cleared {cleared_count} buffered signals", "INFO")
-            else:
+            elif not _pending_limit_orders:
                 log(f"Trade closure '{closure}' received - no pending orders or buffered signals to clean up", "DEBUG")
 
             return True
@@ -1844,29 +2085,42 @@ async def main():
                 zone = parse_entry_zone(text)
                 if zone:
                     zone_low, zone_high = zone
-                    limit_price = zone_low if side == "BUY" else zone_high
-                    log(f"ZONE RECEIVED via edit: ${zone_low:.2f}-${zone_high:.2f} → limit at ${limit_price:.2f}", "INFO")
+                    log(f"ZONE RECEIVED via edit: ${zone_low:.2f}-${zone_high:.2f}", "INFO")
                     record_entry_stat("zone_from_edit", side=side, zone_low=zone_low, zone_high=zone_high, wait_time=wait_time)
 
-                    result = await run_mt5(lambda: execute_limit_trade(side, msg_id, text, limit_price, zone_low, zone_high))
+                    result = await run_mt5(lambda: execute_limit_trade(side, msg_id, text, 0, zone_low, zone_high))
                     if result:
-                        order_ticket, lp, fsl, lot = result
-                        sl = parse_stop_loss(text)
-                        tp1 = parse_tp1(text)
-                        _pending_limit_orders[msg_id] = {
-                            "order_ticket": order_ticket,
-                            "side": side,
-                            "limit_price": lp,
-                            "zone_low": zone_low,
-                            "zone_high": zone_high,
-                            "failsafe_sl": fsl,
-                            "lot": lot,
-                            "msg_id": msg_id,
-                            "placed_at": time.time(),
-                            "sl": sl,
-                            "tp1": tp1,
-                        }
-                        record_entry_stat("limit_placed", side=side, limit_price=lp, zone_low=zone_low, zone_high=zone_high)
+                        result_type = result[0]
+                        if result_type == "MARKET":
+                            _, ticket, entry_price, fsl, lot = result
+                            sl = parse_stop_loss(text)
+                            tp1 = parse_tp1(text)
+                            signal_queue.add_signal(signal_type="TRADE", side=side, entry_price=entry_price,
+                                                    sl_price=fsl, lot_size=lot, tp_levels={}, msg_id=msg_id, msg_text=text[:100])
+                            signal_queue.mark_executed(msg_id)
+                            if sl or tp1:
+                                await update_position_sl_tp(ticket, sl, tp1, "")
+                            record_entry_stat("market_entry_in_zone", side=side, entry_price=entry_price, zone_low=zone_low, zone_high=zone_high)
+                        else:  # PENDING
+                            _, order_ticket, lp, fsl, lot = result
+                            sl = parse_stop_loss(text)
+                            tp1 = parse_tp1(text)
+                            _pending_limit_orders[msg_id] = {
+                                "order_ticket": order_ticket,
+                                "side": side,
+                                "limit_price": lp,
+                                "zone_low": zone_low,
+                                "zone_high": zone_high,
+                                "failsafe_sl": fsl,
+                                "lot": lot,
+                                "msg_id": msg_id,
+                                "placed_at": time.time(),
+                                "sl": sl,
+                                "tp1": tp1,
+                                "price_min_seen": float('inf'),
+                                "price_max_seen": float('-inf'),
+                            }
+                            record_entry_stat("limit_placed", side=side, limit_price=lp, zone_low=zone_low, zone_high=zone_high)
 
                     # Remove from buffered signals regardless of success
                     del _buffered_signals[msg_id]
@@ -1982,34 +2236,8 @@ async def main():
                 for mid in expired_buffers:
                     buf = _buffered_signals.pop(mid)
                     side = buf["side"]
-                    log(f"ZONE WAIT TIMEOUT: msg_id={mid} waited {ZONE_WAIT_TIMEOUT}s - falling back to MARKET order", "WARN")
+                    log(f"ZONE WAIT TIMEOUT: msg_id={mid} waited {ZONE_WAIT_TIMEOUT}s - no zone received, cancelling signal", "WARN")
                     record_entry_stat("zone_wait_timeout", side=side)
-
-                    # Fallback: execute market order immediately
-                    result = await run_mt5(lambda: execute_signal_trade(side, mid, buf["text"]))
-                    if result:
-                        ticket, entry_price, failsafe_sl, lot = result
-                        signal_queue.add_signal(
-                            signal_type="TRADE",
-                            side=side,
-                            entry_price=entry_price,
-                            sl_price=failsafe_sl,
-                            lot_size=lot,
-                            tp_levels={},
-                            msg_id=mid,
-                            msg_text=buf["text"][:100],
-                        )
-                        signal_queue.mark_executed(mid)
-                        record_entry_stat("market_fallback", side=side, entry_price=entry_price)
-                        log(f"Market fallback executed: ticket={ticket} entry=${entry_price:.2f}", "INFO")
-
-                        # Apply any SL/TP we captured from edits while buffered
-                        sl_val = buf.get("sl")
-                        tp_val = buf.get("tp1")
-                        if sl_val or tp_val:
-                            await update_position_sl_tp(ticket, sl_val, tp_val, " (BUFFERED-FALLBACK)")
-                    else:
-                        log(f"Market fallback FAILED for msg_id={mid}", "ERROR")
 
                 # ── Check PENDING LIMIT ORDERS ──
                 completed_orders = []
@@ -2020,7 +2248,49 @@ async def main():
                     elapsed = now - info["placed_at"]
 
                     # 1. Check if order was filled (position exists)
+                    #    Also check if the pending order still exists on the broker.
+                    #    If it's gone from pending orders AND we can't find a deal, log a warning.
                     pos_ticket = await run_mt5(lambda: find_position_from_order(order_ticket))
+                    if not pos_ticket:
+                        # Double-check: is the pending order still alive on the broker?
+                        pending_order = await run_mt5(lambda: mt5.orders_get(ticket=order_ticket))
+                        if not pending_order:
+                            # Order is gone from broker and no deal found - it was likely filled
+                            # Try harder: search full history
+                            log(f"Pending order {order_ticket} no longer on broker - searching full deal history...", "WARN")
+                            now_dt = datetime.now()
+                            all_deals = await run_mt5(lambda: mt5.history_deals_get(now_dt - timedelta(days=7), now_dt + timedelta(minutes=1)))
+                            if all_deals:
+                                for d in all_deals:
+                                    if d.order == order_ticket and d.entry == 0:
+                                        pos_ticket = d.position_id
+                                        log(f"Found fill in extended history: order {order_ticket} → position {pos_ticket}", "INFO")
+                                        break
+                            if not pos_ticket:
+                                # Check if this order was intentionally canceled by trade closure
+                                if mid not in _pending_limit_orders:
+                                    log(f"Order {order_ticket} was canceled (trade closure) - skipping", "DEBUG")
+                                    completed_orders.append(mid)
+                                    continue
+                                # Last resort: check open positions for untracked fill
+                                all_positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+                                if all_positions:
+                                    tracked_tickets = set(position_map.values())
+                                    for p in all_positions:
+                                        if p.magic == MAGIC and int(p.ticket) not in tracked_tickets:
+                                            pos_ticket = int(p.ticket)
+                                            log(f"Found untracked position {pos_ticket} (MAGIC={MAGIC}) - likely filled from order {order_ticket}", "INFO")
+                                            break
+                                if not pos_ticket:
+                                    log(f"Order {order_ticket} disappeared without a fill - broker may have removed it", "ERROR")
+                                    _zl, _zh = info["zone_low"], info["zone_high"]
+                                    _pmin, _pmax = info.get("price_min_seen", float('inf')), info.get("price_max_seen", float('-inf'))
+                                    _best = (_pmin <= _zl) if side == "BUY" else (_pmax >= _zh)
+                                    _worst = (_pmin <= _zh) if side == "BUY" else (_pmax >= _zl)
+                                    record_entry_stat("limit_invalidated", side=side, limit_price=limit_price, reason="order_disappeared",
+                                                      best_reached=_best, worst_reached=_worst, zone_low=_zl, zone_high=_zh, price_min=_pmin, price_max=_pmax)
+                                    completed_orders.append(mid)
+                                    continue
                     if pos_ticket:
                         fill_price = await run_mt5(lambda: get_fill_price_from_order(order_ticket))
                         slippage = abs(fill_price - limit_price) if fill_price else 0
@@ -2037,7 +2307,10 @@ async def main():
                             entry_prices[pos_ticket] = fill_price
 
                         record_entry_stat("limit_filled", side=side, limit_price=limit_price,
-                                          fill_price=fill_price, slippage=slippage, fill_time=elapsed)
+                                          fill_price=fill_price, slippage=slippage, fill_time=elapsed,
+                                          best_reached=True, worst_reached=True,
+                                          zone_low=info["zone_low"], zone_high=info["zone_high"],
+                                          price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
                         # Apply SL/TP if we have them
                         sl_val = info.get("sl")
@@ -2048,17 +2321,26 @@ async def main():
                         completed_orders.append(mid)
                         continue
 
-                    # 2. Check timeout
+                    # 2. Check timeout (very generous - only as a safety net)
                     if elapsed >= LIMIT_ORDER_TIMEOUT:
-                        log(f"LIMIT ORDER TIMEOUT: order={order_ticket} after {elapsed:.0f}s - cancelling", "WARN")
+                        log(f"LIMIT ORDER TIMEOUT: order={order_ticket} after {elapsed:.0f}s ({elapsed/3600:.1f}h) - cancelling", "WARN")
                         cancelled = await run_mt5(lambda: cancel_limit_order(order_ticket))
-                        record_entry_stat("limit_timeout", side=side, limit_price=limit_price, elapsed=elapsed)
+                        _zl, _zh = info["zone_low"], info["zone_high"]
+                        _pmin, _pmax = info.get("price_min_seen", float('inf')), info.get("price_max_seen", float('-inf'))
+                        _best = (_pmin <= _zl) if side == "BUY" else (_pmax >= _zh)
+                        _worst = (_pmin <= _zh) if side == "BUY" else (_pmax >= _zl)
+                        record_entry_stat("limit_timeout", side=side, limit_price=limit_price, elapsed=elapsed,
+                                          best_reached=_best, worst_reached=_worst, zone_low=_zl, zone_high=_zh, price_min=_pmin, price_max=_pmax)
                         completed_orders.append(mid)
                         continue
 
                     # 3. Price invalidation: cancel if price already hit where SL or TP would be
                     current_price = await run_mt5(lambda: get_market_price(side))
                     if current_price:
+                        # Update price watermarks for zone entry tracking
+                        info["price_min_seen"] = min(info.get("price_min_seen", float('inf')), current_price)
+                        info["price_max_seen"] = max(info.get("price_max_seen", float('-inf')), current_price)
+
                         sl_val = info.get("sl") or info.get("failsafe_sl")
                         tp_val = info.get("tp1")
 
@@ -2082,9 +2364,19 @@ async def main():
                                 reason = f"Price ${current_price:.2f} <= TP ${tp_val:.2f}"
 
                         if invalidated:
-                            log(f"LIMIT ORDER INVALIDATED: order={order_ticket} | {reason}", "WARN")
+                            # Determine if we missed a winning trade (TP hit) vs avoided a loser (SL hit)
+                            if "TP" in reason:
+                                log(f"LIMIT ORDER INVALIDATED (MISSED WINNER): order={order_ticket} | {reason}", "WARN")
+                                log(f"   Trade was valid but limit at ${limit_price:.2f} never filled - price moved to TP without us", "WARN")
+                            else:
+                                log(f"LIMIT ORDER INVALIDATED (AVOIDED LOSS): order={order_ticket} | {reason}", "INFO")
                             cancelled = await run_mt5(lambda: cancel_limit_order(order_ticket))
-                            record_entry_stat("limit_invalidated", side=side, limit_price=limit_price, reason=reason)
+                            _zl, _zh = info["zone_low"], info["zone_high"]
+                            _pmin, _pmax = info.get("price_min_seen", float('inf')), info.get("price_max_seen", float('-inf'))
+                            _best = (_pmin <= _zl) if side == "BUY" else (_pmax >= _zh)
+                            _worst = (_pmin <= _zh) if side == "BUY" else (_pmax >= _zl)
+                            record_entry_stat("limit_invalidated", side=side, limit_price=limit_price, reason=reason,
+                                              best_reached=_best, worst_reached=_worst, zone_low=_zl, zone_high=_zh, price_min=_pmin, price_max=_pmax)
                             completed_orders.append(mid)
                             continue
 
@@ -2098,22 +2390,25 @@ async def main():
                 await asyncio.sleep(5)
 
     # ── Signal log printer ──
+    _last_signal_log_len = 0
+
     async def print_signal_log():
-        """Print signal log every 5 minutes for debugging"""
+        """Print signal log every 5 minutes, but only when there are new entries."""
+        nonlocal _last_signal_log_len
         while True:
             try:
                 await asyncio.sleep(300)
 
-                if signal_log:
+                if signal_log and len(signal_log) > _last_signal_log_len:
+                    new_entries = signal_log[_last_signal_log_len:]
+                    _last_signal_log_len = len(signal_log)
                     log("=" * 70, "INFO")
-                    log("SIGNAL LOG (Last 10 attempts)", "INFO")
+                    log(f"SIGNAL LOG ({len(new_entries)} new entries)", "INFO")
                     log("=" * 70, "INFO")
-                    for entry in signal_log[-10:]:
+                    for entry in new_entries[-10:]:
                         msg = f"  {entry['timestamp']} | {entry['signal']:4s} | {entry['result']:10s} | {entry['detail']}"
                         log(msg, "INFO")
                     log("=" * 70, "INFO")
-                else:
-                    log("Signal log empty - no signals received yet", "DEBUG")
 
             except Exception as e:
                 log(f"CRITICAL: Signal log printer exception: {str(e)}", "ERROR")
