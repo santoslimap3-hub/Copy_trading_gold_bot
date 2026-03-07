@@ -21,6 +21,7 @@ import concurrent.futures
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 from datetime import datetime, timedelta
@@ -52,8 +53,8 @@ FAILSAFE_TP_DISTANCE = 3.0  # failsafe TP: $3 away from entry (until real TP1 ar
 
 # Limit Order Entry Strategy
 LIMIT_ORDER_TIMEOUT = 14400  # seconds: cancel unfilled limit orders after this (4 hours - generous to let zone fill)
-ZONE_WAIT_TIMEOUT = 120   # seconds: buffer signal, wait for zone via edit before falling back to market
-ENTRY_STRATEGY = "LIMIT_ZONE"  # "LIMIT_ZONE" = limit at zone edge | "MARKET" = immediate market (old behavior)
+ZONE_WAIT_TIMEOUT = 120      # seconds: wait for zone via edit before falling back to market (2 min)
+ENTRY_STRATEGY = "LIMIT_ZONE" # "LIMIT_ZONE" = limit at zone edge | "MARKET" = immediate market (old behavior)
 
 # Telegram filters
 ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
@@ -72,10 +73,10 @@ entry_prices: Dict[int, float] = {}
 # Track whether real SL/TP has been applied (from message edit): ticket -> bool
 tp_sl_updated: Dict[int, bool] = {}
 
-# Limit order tracking: msg_id -> {side, order_ticket, limit_price, zone_high, zone_low, lot, placed_at}
+# Limit order tracking: msg_id -> {side, order_ticket, limit_price, zone_high, zone_low, lot, created_at, ...}
 _pending_limit_orders: Dict[int, Dict] = {}
 
-# Buffered signals: msg_id -> {side, symbol, text, buffered_at} — waiting for zone via edit
+# Buffered signals waiting for zone: msg_id -> {side, text, created_at, channel_name, source}
 _buffered_signals: Dict[int, Dict] = {}
 
 # Signal attempt log: list of (timestamp, signal, result, details)
@@ -120,7 +121,7 @@ _RE_TP_LEVELS = re.compile(r"TP\s*(\d+)\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_STOP_LOSS = re.compile(r"SL\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_TP1 = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 
-# Entry zone pattern: matches "5396 - 5392" or "5396-5392" or "5396 \u20135392"
+# Entry zone pattern: matches "5396 - 5392" or "5396-5392" or "5396\u20135392"
 _RE_ENTRY_ZONE = re.compile(r"(\d{4,5}(?:\.\d{1,2})?)\s*[-\u2013\u2014]\s*(\d{4,5}(?:\.\d{1,2})?)")
 
 # Trade closure patterns: "TP1 HIT", "TP1 ,2,3,4 HIT", "SL HIT"
@@ -135,6 +136,11 @@ _LOG_SEP = "=" * 70
 
 # Cached filling mode (symbol filling mode never changes during a session)
 _cached_filling_mode: Optional[int] = None
+
+# Maximum consecutive reconnection failures before self-restart
+MAX_CONSECUTIVE_FAILURES = 10
+# Flag to signal the bot should do a full self-restart
+_restart_requested = False
 
 # ===================== MT5 CACHE (refreshed every 5s in background) =====================
 # Caches symbol_info and account_info to avoid redundant MT5 calls in the hot trade path
@@ -550,6 +556,7 @@ def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Op
     if result.retcode == 10015:
         log("Market is CLOSE-ONLY (retcode 10015) - cannot open new positions right now", "ERROR")
         log("   This typically means: market is closed (weekend/holiday) or account is in close-only mode", "ERROR")
+        # Retry a few times with increasing delay in case market is about to reopen
         for attempt in range(1, 4):
             delay = 5 * attempt  # 5s, 10s, 15s
             log(f"   Retry {attempt}/3 for 10015 in {delay}s...", "INFO")
@@ -563,7 +570,7 @@ def open_position(side: str, lot: float, sl: float = 0.0, tp: float = 0.0) -> Op
                 log(f"Position opened on 10015-retry {attempt} - Ticket: {ticket}", "INFO")
                 return ticket
             if result.retcode != 10015:
-                break
+                break  # Different error, fall through
             log(f"   Retry {attempt} still 10015", "WARN")
         log("All 10015 retries exhausted - market remains closed", "ERROR")
         return None
@@ -779,7 +786,6 @@ def parse_entry_zone(text: str) -> Optional[Tuple[float, float]]:
     zone_low = min(val1, val2)
     zone_width = zone_high - zone_low
 
-    # Sanity check: typical zones are $2-$10 wide
     if zone_width > 30 or zone_width < 0.5:
         log(f"Entry zone rejected: ${zone_low:.2f}-${zone_high:.2f} (width ${zone_width:.2f})", "WARN")
         return None
@@ -847,31 +853,28 @@ def place_limit_order(side: str, price: float, lot: float, sl: float = 0.0, tp: 
         "magic": MAGIC,
         "comment": f"Zone {side}",
     }
-
     if sl > 0:
         request["sl"] = sl
     if tp > 0:
         request["tp"] = tp
 
-    log(f"   Limit request: {request}", "DEBUG")
     result = mt5.order_send(request)
-
     if result is None:
         log(f"Limit order failed - order_send returned None | Error: {mt5.last_error()}", "ERROR")
         return None
 
     if result.retcode == mt5.TRADE_RETCODE_DONE:
-        log(f"Limit order placed - Order ticket: {result.order}", "INFO")
+        log(f"Limit order placed - ticket: {result.order}", "INFO")
         return result.order
 
-    # If SL/TP caused rejection, retry without and set after fill
+    # Retry without SL/TP if they caused rejection
     if result.retcode in {5, 10040, 10041} and (sl > 0 or tp > 0):
-        log(f"Limit order with SL/TP rejected ({result.retcode}) - retrying without SL/TP", "WARN")
+        log(f"Limit order with SL/TP rejected ({result.retcode}) - retrying without", "WARN")
         request.pop("sl", None)
         request.pop("tp", None)
         result = mt5.order_send(request)
         if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-            log(f"Limit order placed (no SL/TP) - Order ticket: {result.order}", "INFO")
+            log(f"Limit order placed (no SL/TP) - ticket: {result.order}", "INFO")
             return result.order
 
     log(f"Limit order failed - Retcode: {result.retcode} | {result.comment}", "ERROR")
@@ -902,13 +905,10 @@ def place_limit_order(side: str, price: float, lot: float, sl: float = 0.0, tp: 
 def cancel_limit_order(order_ticket: int) -> bool:
     """Cancel a pending limit order."""
     log(f"Canceling limit order {order_ticket}...", "INFO")
-    request = {
-        "action": mt5.TRADE_ACTION_REMOVE,
-        "order": order_ticket,
-    }
+    request = {"action": mt5.TRADE_ACTION_REMOVE, "order": order_ticket}
     result = mt5.order_send(request)
     if result and result.retcode == mt5.TRADE_RETCODE_DONE:
-        log(f"Limit order {order_ticket} canceled successfully", "INFO")
+        log(f"Limit order {order_ticket} canceled", "INFO")
         return True
     log(f"Failed to cancel order {order_ticket}: {result.comment if result else 'None'}", "WARN")
     return False
@@ -916,13 +916,10 @@ def cancel_limit_order(order_ticket: int) -> bool:
 
 def modify_limit_order_sl_tp(order_ticket: int, sl: float = 0.0, tp: float = 0.0) -> bool:
     """Modify SL/TP on a pending limit order."""
-    log(f"Modifying SL/TP on pending order {order_ticket}: SL=${sl:.2f} TP=${tp:.2f}", "INFO")
-
     orders = mt5.orders_get(ticket=order_ticket)
     if not orders:
-        log(f"Pending order {order_ticket} not found (may have filled already)", "WARN")
+        log(f"Pending order {order_ticket} not found", "WARN")
         return False
-
     order = orders[0]
     request = {
         "action": mt5.TRADE_ACTION_MODIFY,
@@ -932,7 +929,6 @@ def modify_limit_order_sl_tp(order_ticket: int, sl: float = 0.0, tp: float = 0.0
         "tp": tp if tp > 0 else float(order.tp),
         "type_time": mt5.ORDER_TIME_GTC,
     }
-
     result = mt5.order_send(request)
     if result and result.retcode == mt5.TRADE_RETCODE_DONE:
         log(f"Pending order {order_ticket} modified: SL=${sl:.2f} TP=${tp:.2f}", "INFO")
@@ -942,16 +938,12 @@ def modify_limit_order_sl_tp(order_ticket: int, sl: float = 0.0, tp: float = 0.0
 
 
 def find_position_from_order(order_ticket: int) -> Optional[int]:
-    """
-    Find the position ticket that resulted from a filled pending order.
-    Returns position_id or None.
-    """
+    """Find the position ticket from a filled pending order via deal history."""
     now = datetime.now()
     deals = mt5.history_deals_get(now - timedelta(hours=24), now + timedelta(minutes=1))
     if deals:
         for deal in deals:
-            if deal.order == order_ticket and deal.entry == 0:  # DEAL_ENTRY_IN
-                log(f"Found position {deal.position_id} from filled order {order_ticket} (fill price ${deal.price:.2f})", "DEBUG")
+            if deal.order == order_ticket and deal.entry == 0:
                 return deal.position_id
     return None
 
@@ -973,7 +965,6 @@ STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dat
 
 
 def _load_entry_stats() -> Dict:
-    """Load entry stats from file or return defaults."""
     if os.path.exists(STATS_FILE):
         try:
             with open(STATS_FILE, "r") as f:
@@ -982,13 +973,15 @@ def _load_entry_stats() -> Dict:
             pass
     return {
         "total_signals": 0,
-        "signals_buffered": 0,
-        "zones_received_from_edit": 0,
-        "zone_wait_timeouts": 0,
         "limit_orders_placed": 0,
         "limit_fills": 0,
         "limit_timeouts": 0,
         "limit_invalidated": 0,
+        "signals_buffered": 0,
+        "zones_received_from_edit": 0,
+        "zone_wait_timeouts": 0,
+        "market_orders_no_zone": 0,
+        "market_orders_in_zone": 0,
         "market_orders_fallback": 0,
         "total_limit_slippage": 0.0,
         "zone_tracking_total": 0,
@@ -999,7 +992,6 @@ def _load_entry_stats() -> Dict:
 
 
 def _save_entry_stats():
-    """Persist entry stats to file."""
     os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
     try:
         with open(STATS_FILE, "w") as f:
@@ -1008,37 +1000,43 @@ def _save_entry_stats():
         log(f"Failed to save entry stats: {e}", "WARN")
 
 
-# Module-level stats (loaded once, saved on each update)
 _entry_stats: Dict = _load_entry_stats()
 
 
 def record_entry_stat(event_type: str, **kwargs):
-    """Record an entry quality event and persist to disk."""
+    """Record an entry quality event and persist."""
     global _entry_stats
-
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
     entry_record = {"time": ts, "type": event_type}
     entry_record.update(kwargs)
 
-    if event_type == "signal_buffered":
-        _entry_stats["total_signals"] = _entry_stats.get("total_signals", 0) + 1
-        _entry_stats["signals_buffered"] = _entry_stats.get("signals_buffered", 0) + 1
-    elif event_type == "zone_from_edit":
-        _entry_stats["zones_received_from_edit"] = _entry_stats.get("zones_received_from_edit", 0) + 1
-    elif event_type == "zone_wait_timeout":
-        _entry_stats["zone_wait_timeouts"] = _entry_stats.get("zone_wait_timeouts", 0) + 1
+    if event_type == "signal":
+        _entry_stats["total_signals"] += 1
     elif event_type == "limit_placed":
-        _entry_stats["limit_orders_placed"] = _entry_stats.get("limit_orders_placed", 0) + 1
-    elif event_type in ("limit_filled", "limit_fill"):
-        _entry_stats["limit_fills"] = _entry_stats.get("limit_fills", 0) + 1
-        slippage = kwargs.get("slippage", 0.0)
-        _entry_stats["total_limit_slippage"] = _entry_stats.get("total_limit_slippage", 0) + slippage
+        _entry_stats["limit_orders_placed"] += 1
+    elif event_type == "limit_fill":
+        _entry_stats["limit_fills"] += 1
+        _entry_stats["total_limit_slippage"] += kwargs.get("slippage", 0.0)
     elif event_type == "limit_timeout":
-        _entry_stats["limit_timeouts"] = _entry_stats.get("limit_timeouts", 0) + 1
+        _entry_stats["limit_timeouts"] += 1
     elif event_type == "limit_invalidated":
-        _entry_stats["limit_invalidated"] = _entry_stats.get("limit_invalidated", 0) + 1
+        _entry_stats.setdefault("limit_invalidated", 0)
+        _entry_stats["limit_invalidated"] += 1
+    elif event_type == "signal_buffered":
+        _entry_stats.setdefault("signals_buffered", 0)
+        _entry_stats["signals_buffered"] += 1
+    elif event_type == "zone_from_edit":
+        _entry_stats.setdefault("zones_received_from_edit", 0)
+        _entry_stats["zones_received_from_edit"] += 1
+    elif event_type == "zone_wait_timeout":
+        _entry_stats.setdefault("zone_wait_timeouts", 0)
+        _entry_stats["zone_wait_timeouts"] += 1
+    elif event_type == "market_no_zone":
+        _entry_stats["market_orders_no_zone"] += 1
+    elif event_type == "market_in_zone":
+        _entry_stats["market_orders_in_zone"] += 1
     elif event_type == "market_fallback":
-        _entry_stats["market_orders_fallback"] = _entry_stats.get("market_orders_fallback", 0) + 1
+        _entry_stats["market_orders_fallback"] += 1
     elif event_type == "limit_placement_failed":
         _entry_stats.setdefault("limit_placement_failed", 0)
         _entry_stats["limit_placement_failed"] += 1
@@ -1055,23 +1053,24 @@ def record_entry_stat(event_type: str, **kwargs):
             _entry_stats["zone_worst_entry_reached"] += 1
 
     _entry_stats["entries"].append(entry_record)
-    _entry_stats["entries"] = _entry_stats["entries"][-500:]  # Keep last 500
+    _entry_stats["entries"] = _entry_stats["entries"][-500:]
     _save_entry_stats()
 
 
 def get_entry_stats_summary() -> str:
-    """Get a one-line summary of entry stats for status display."""
     s = _entry_stats
-    placed = s.get("limit_orders_placed", 0)
-    fills = s.get("limit_fills", 0)
-    fill_rate = (fills / placed * 100) if placed > 0 else 0
-    avg_slip = (s.get("total_limit_slippage", 0) / fills) if fills > 0 else 0
+    fill_rate = (s["limit_fills"] / s["limit_orders_placed"] * 100) if s["limit_orders_placed"] > 0 else 0
+    avg_slip = (s["total_limit_slippage"] / s["limit_fills"]) if s["limit_fills"] > 0 else 0
+    inv = s.get("limit_invalidated", 0)
+    buf = s.get("signals_buffered", 0)
+    zfe = s.get("zones_received_from_edit", 0)
+    zwt = s.get("zone_wait_timeouts", 0)
     return (
-        f"Buffer: sig={s.get('signals_buffered',0)} zone_edits={s.get('zones_received_from_edit',0)} "
-        f"timeouts={s.get('zone_wait_timeouts',0)} | "
-        f"Limits: placed={placed} filled={fills} "
-        f"timeout={s.get('limit_timeouts',0)} invalidated={s.get('limit_invalidated',0)} ({fill_rate:.0f}% fill) | "
-        f"Market fallback={s.get('market_orders_fallback',0)} | Avg slip: ${avg_slip:.2f} | "
+        f"Limits: placed={s['limit_orders_placed']} filled={s['limit_fills']} "
+        f"timeout={s['limit_timeouts']} invalidated={inv} ({fill_rate:.0f}% fill) | "
+        f"Buffered: {buf} (zone_edits={zfe} zone_timeout={zwt}) | "
+        f"Market: no_zone={s.get('market_orders_no_zone',0)} in_zone={s.get('market_orders_in_zone',0)} "
+        f"fallback={s.get('market_orders_fallback',0)} | Avg slip: ${avg_slip:.2f} | "
         f"Zone: best_hit={s.get('zone_best_entry_reached',0)}/{s.get('zone_tracking_total',0)} "
         f"worst_hit={s.get('zone_worst_entry_reached',0)}/{s.get('zone_tracking_total',0)}"
     )
@@ -1172,6 +1171,90 @@ def print_bot_status():
 def init_telegram():
     """Create Telegram client"""
     return TelegramClient(SESSION_FILE, API_ID, API_HASH)
+
+
+async def reconnect_telegram(client, reason: str = "unknown") -> bool:
+    """
+    Robust Telegram reconnection with multiple retries and exponential backoff.
+    Returns True if reconnection succeeded, False if all attempts exhausted.
+    """
+    global telegram_connected, last_telegram_activity, telegram_connection_losses
+
+    max_attempts = 5
+    base_delay = 5
+    max_delay = 120
+
+    log(f"Starting Telegram reconnection sequence (reason: {reason})...", "WARN")
+
+    for attempt in range(1, max_attempts + 1):
+        delay = min(base_delay * (2 ** (attempt - 1)), max_delay)
+        log(f"  Reconnection attempt {attempt}/{max_attempts} (delay: {delay}s)...", "INFO")
+
+        # Ensure we're fully disconnected first
+        try:
+            if client.is_connected():
+                await client.disconnect()
+        except Exception:
+            pass
+
+        await asyncio.sleep(delay)
+
+        try:
+            await client.connect()
+            if not await client.is_user_authorized():
+                log("  Connected but not authorized - calling client.start()...", "WARN")
+                await client.start()
+
+            # Verify the connection actually works
+            me = await asyncio.wait_for(client.get_me(), timeout=15)
+            if me:
+                telegram_connected = True
+                last_telegram_activity = time.time()
+                log(f"  Telegram reconnected successfully on attempt {attempt}", "INFO")
+
+                # Refresh dialogs to re-initialize update state
+                try:
+                    await client.get_dialogs()
+                    log("  Dialogs refreshed after reconnect", "DEBUG")
+                except Exception:
+                    pass
+
+                # Catch up on any missed messages
+                await catch_up_messages(client, lookback_minutes=5)
+                return True
+            else:
+                log(f"  get_me() returned None on attempt {attempt}", "WARN")
+
+        except Exception as e:
+            log(f"  Reconnection attempt {attempt} failed: {e}", "ERROR")
+            telegram_connected = False
+
+    log(f"ALL {max_attempts} reconnection attempts failed", "ERROR")
+    return False
+
+
+def restart_bot():
+    """
+    Self-restart the bot process. Equivalent to Ctrl+C → re-run.
+    This replaces the current process entirely.
+    """
+    log("=" * 70, "WARN")
+    log("SELF-RESTART: Bot is restarting itself...", "WARN")
+    log("=" * 70, "WARN")
+
+    # Shutdown MT5 cleanly before restart
+    try:
+        mt5.shutdown()
+    except Exception:
+        pass
+
+    # Small delay to let logs flush
+    time.sleep(2)
+
+    # Re-execute the same script with the same Python interpreter
+    python = sys.executable
+    script = os.path.abspath(__file__)
+    os.execv(python, [python, script])
 
 
 async def catch_up_messages(client, lookback_minutes: int = 5):
@@ -1308,25 +1391,23 @@ async def connection_health_monitor():
                     if _telegram_client is not None:
                         try:
                             if not _telegram_client.is_connected():
-                                log("Telegram client.is_connected() = False - forcing disconnect to trigger reconnection", "WARN")
+                                log("Telegram client.is_connected() = False - attempting reconnection from health monitor", "WARN")
                                 telegram_connected = False
-                                try:
-                                    await _telegram_client.disconnect()
-                                except Exception:
-                                    pass
+                                reconnected = await reconnect_telegram(_telegram_client, reason="health_monitor_not_connected")
+                                if not reconnected:
+                                    log("Health monitor reconnection failed - main loop will handle restart", "ERROR")
                             else:
                                 try:
                                     await asyncio.wait_for(_telegram_client.get_me(), timeout=10)
                                     log("Telegram ping successful - connection alive, channel is just quiet", "DEBUG")
                                     telegram_connected = True
                                 except (asyncio.TimeoutError, Exception) as ping_err:
-                                    log(f"Telegram ping FAILED ({ping_err}) - connection is dead, forcing disconnect", "WARN")
+                                    log(f"Telegram ping FAILED ({ping_err}) - attempting reconnection", "WARN")
                                     telegram_connected = False
-                                    _prev_tg_healthy = False
-                                    try:
-                                        await _telegram_client.disconnect()
-                                    except Exception:
-                                        pass
+                                    reconnected = await reconnect_telegram(_telegram_client, reason="health_monitor_ping_failed")
+                                    if not reconnected:
+                                        log("Health monitor reconnection failed - main loop will handle restart", "ERROR")
+                                    _prev_tg_healthy = reconnected
                         except Exception as check_err:
                             log(f"Error during active Telegram check: {check_err}", "WARN")
                             telegram_connected = False
@@ -1587,17 +1668,13 @@ def execute_limit_trade(side: str, msg_id: int, msg_text: str, limit_price: floa
     # ── Price OUTSIDE zone → place pending order at zone boundary ──
     if side == "BUY":
         if current_price < zone_low:
-            # Below zone → BUY STOP at zone_low (enter when price rises into zone)
             limit_price = zone_low
         else:
-            # Above zone → BUY LIMIT at zone_high (enter when price pulls back)
             limit_price = zone_high
     else:  # SELL
         if current_price > zone_high:
-            # Above zone → SELL STOP at zone_high (enter when price drops into zone)
             limit_price = zone_high
         else:
-            # Below zone → SELL LIMIT at zone_low (enter when price rises back)
             limit_price = zone_low
 
     log(f"Price {cp_str} is OUTSIDE zone ${zone_low:.2f}-${zone_high:.2f} → pending {side} at ${limit_price:.2f}", "INFO")
@@ -1619,16 +1696,13 @@ def execute_limit_trade(side: str, msg_id: int, msg_text: str, limit_price: floa
     log(f"Pending order: {side} at ${limit_price:.2f} | SL=${failsafe_sl:.2f} | TP=${failsafe_tp:.2f} | Lot={lot:.4f}", "INFO")
 
     order_ticket = place_limit_order(side, limit_price, lot, failsafe_sl, failsafe_tp)
-
     if order_ticket:
         log(_LOG_SEP, "INFO")
         log(f"PENDING ORDER PLACED (OUTSIDE ZONE)", "INFO")
         log(f"   Order: {order_ticket} | {side} at ${limit_price:.2f}", "INFO")
         log(f"   Zone: ${zone_low:.2f} - ${zone_high:.2f}", "INFO")
-        log(f"   Failsafe SL: ${failsafe_sl:.2f} | Failsafe TP: ${failsafe_tp:.2f}", "INFO")
-        log(f"   Lot: {lot:.4f} | Timeout: {LIMIT_ORDER_TIMEOUT}s", "INFO")
+        log(f"   Failsafe SL: ${failsafe_sl:.2f} | TP: ${failsafe_tp:.2f} | Lot: {lot:.4f}", "INFO")
         log(_LOG_SEP, "INFO")
-
         log_signal_attempt(side, "LIMIT_PLACED", f"Order={order_ticket} | Limit=${limit_price:.2f}")
         return ("PENDING", order_ticket, limit_price, failsafe_sl, lot)
     else:
@@ -1814,8 +1888,11 @@ async def main():
 
             # ── MARKET strategy (legacy): immediate market order ──
             result = await run_mt5(lambda: execute_signal_trade(side, msg_id, text))
+
             if result:
                 ticket, entry_price, failsafe_sl, lot = result
+
+                # Persist to signal queue AFTER MT5 thread is free (file I/O off executor)
                 signal_queue.add_signal(
                     signal_type="TRADE",
                     side=side,
@@ -1827,15 +1904,17 @@ async def main():
                     msg_text=text[:100],
                 )
                 signal_queue.mark_executed(msg_id)
+
+                # If initial message already contains real SL/TP, apply immediately
                 if msg_id in position_map:
-                    sl_v = parse_stop_loss(text)
-                    tp1_v = parse_tp1(text)
+                    sl = parse_stop_loss(text)
+                    tp1 = parse_tp1(text)
                     all_tps = parse_tp_levels(text)
                     # Register with outcome tracker
                     if outcome_tracker:
-                        outcome_tracker.register_trade(ticket, side, entry_price, sl_v or failsafe_sl, all_tps)
-                    if sl_v or tp1_v:
-                        await update_position_sl_tp(ticket, sl_v, tp1_v, source, all_tp_levels=all_tps)
+                        outcome_tracker.register_trade(ticket, side, entry_price, sl or failsafe_sl, all_tps)
+                    if sl or tp1:
+                        await update_position_sl_tp(ticket, sl, tp1, source, all_tp_levels=all_tps)
 
             return True
 
@@ -2257,14 +2336,15 @@ async def main():
                                           zone_low=info["zone_low"], zone_high=info["zone_high"],
                                           price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
-                        # Register with outcome tracker on limit fill
-                        if outcome_tracker:
-                            actual_entry = fill_price if fill_price else limit_price
-                            outcome_tracker.register_trade(pos_ticket, side, actual_entry,
-                                                           info.get("sl", info.get("failsafe_sl", 0)),
-                                                           {1: info.get("tp1", 0)} if info.get("tp1") else {})
-
                         # Apply SL/TP if we have them
+                        # Register with outcome tracker
+                        actual_entry = fill_price or limit_price
+                        if outcome_tracker:
+                            tp_levels_info = {}
+                            if info.get("tp1"):
+                                tp_levels_info[1] = info["tp1"]
+                            outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), tp_levels_info)
+
                         sl_val = info.get("sl")
                         tp_val = info.get("tp1")
                         if sl_val or tp_val:
@@ -2368,7 +2448,6 @@ async def main():
                 log(f"   {traceback.format_exc()}", "ERROR")
                 await asyncio.sleep(10)
 
-    # ── Trade outcome level monitor ──
     async def trade_outcome_monitor():
         """
         Every 2 seconds, check current price against TP1-TP4, BE, and SL
@@ -2424,7 +2503,7 @@ async def main():
                                     break
 
                         seq = info.get("sequence_so_far", [])
-                        seq_str = " → ".join(seq) if seq else "NONE"
+                        seq_str = " \u2192 ".join(seq) if seq else "NONE"
                         log(f"OUTCOME TRACKER: Ticket {ticket} CLOSED | P&L=${final_profit:.2f} | "
                             f"Sequence: {seq_str} | Reason: {close_reason}", "INFO")
                         outcome_tracker.close_trade(ticket, final_profit, close_reason)
@@ -2609,12 +2688,28 @@ async def main():
     # ══════════════════════════════════════════════════════════════════════
     # Main loop with robust reconnection
     # ══════════════════════════════════════════════════════════════════════
-    max_reconnect_delay = 60
-    reconnect_delay = 5
     consecutive_failures = 0
 
     try:
         while True:
+            # ── Pre-flight: make sure we're connected before entering run_until_disconnected ──
+            if not client.is_connected():
+                log("Client not connected before run_until_disconnected - reconnecting first...", "WARN")
+                reconnected = await reconnect_telegram(client, reason="pre_flight_check")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
+                    consecutive_failures += 1
+                    log(f"Pre-flight reconnection failed (consecutive failures: {consecutive_failures})", "ERROR")
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
+                    # Wait before retrying the whole loop
+                    backoff = min(30 * (2 ** min(consecutive_failures - 1, 4)), 300)
+                    log(f"Waiting {backoff}s before next reconnection attempt...", "WARN")
+                    await asyncio.sleep(backoff)
+                    continue
+
             try:
                 await client.run_until_disconnected()
                 # run_until_disconnected() returned normally - connection was lost
@@ -2624,43 +2719,15 @@ async def main():
 
                 reconnect_monitor.record_reconnect("Disconnected", "run_until_disconnected returned")
 
-                await asyncio.sleep(reconnect_delay)
-
-                try:
-                    await client.connect()
-                    if await client.is_user_authorized():
-                        telegram_connected = True
-                        last_telegram_activity = time.time()
-                        consecutive_failures = 0
-                        reconnect_delay = 5
-                        log("Telegram reconnected successfully after disconnect", "INFO")
-                        try:
-                            await client.get_dialogs()
-                            log("Dialogs refreshed after reconnect", "DEBUG")
-                        except Exception:
-                            pass
-                        await catch_up_messages(client, lookback_minutes=5)
-                    else:
-                        log("Telegram connected but not authorized - restarting client...", "WARN")
-                        await client.start()
-                        telegram_connected = True
-                        last_telegram_activity = time.time()
-                        consecutive_failures = 0
-                        reconnect_delay = 5
-                        log("Telegram client restarted and authorized", "INFO")
-                        try:
-                            await client.get_dialogs()
-                            log("Dialogs refreshed after restart", "DEBUG")
-                        except Exception:
-                            pass
-                        await catch_up_messages(client, lookback_minutes=5)
-                except Exception as reconn_err:
+                reconnected = await reconnect_telegram(client, reason="run_until_disconnected_returned")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
                     consecutive_failures += 1
-                    reconnect_delay = min(reconnect_delay * 2, max_reconnect_delay)
-                    telegram_connected = False
-                    log(f"Telegram reconnection failed (attempt {consecutive_failures}): {reconn_err}", "ERROR")
-                    log(f"   Next retry in {reconnect_delay}s", "WARN")
-                    await asyncio.sleep(reconnect_delay)
+                    log(f"Reconnection failed after disconnect (consecutive failures: {consecutive_failures})", "ERROR")
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
 
                 continue
 
@@ -2688,35 +2755,57 @@ async def main():
                     client.on(events.NewMessage())(on_new_message)
                     client.on(events.MessageEdited())(on_edit)
 
-                try:
-                    await client.disconnect()
-                except Exception as ex:
-                    log(f"Error while disconnecting client: {ex}", "WARN")
-
-                await asyncio.sleep(5)
-
-                try:
-                    await client.start()
-                    telegram_connected = True
-                    last_telegram_activity = time.time()
-                    log("Telegram client restarted after TypeNotFoundError", "INFO")
-                    try:
-                        await client.get_dialogs()
-                        log("Dialogs refreshed after TypeNotFoundError restart", "DEBUG")
-                    except Exception:
-                        pass
-                    await catch_up_messages(client, lookback_minutes=3)
-                except Exception as ex2:
-                    telegram_connected = False
-                    log(f"Failed to restart Telegram client: {ex2}", "ERROR")
-                    await asyncio.sleep(5)
+                reconnected = await reconnect_telegram(client, reason="TypeNotFoundError")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
+                    consecutive_failures += 1
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
                 continue
+
+            except ConnectionError as e:
+                # This catches "Cannot send requests while disconnected" and similar
+                telegram_connected = False
+                telegram_connection_losses += 1
+                log(f"ConnectionError in main loop: {e} - attempting reconnection...", "ERROR")
+
+                reconnect_monitor.record_reconnect("ConnectionError", str(e)[:50])
+
+                reconnected = await reconnect_telegram(client, reason=f"ConnectionError: {e}")
+                if reconnected:
+                    consecutive_failures = 0
+                else:
+                    consecutive_failures += 1
+                    log(f"Reconnection after ConnectionError failed (consecutive failures: {consecutive_failures})", "ERROR")
+                    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                        log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                        restart_bot()
+                continue
+
             except Exception as e:
                 log(f"CRITICAL: Unexpected error in main loop: {str(e)}", "ERROR")
                 import traceback
                 log(f"   {traceback.format_exc()}", "ERROR")
-                log("Bot will attempt to continue...", "WARN")
-                await asyncio.sleep(10)
+
+                # Check if we're actually disconnected (common root cause)
+                if not client.is_connected():
+                    log("Client is disconnected - this error is likely due to lost connection. Reconnecting...", "WARN")
+                    telegram_connected = False
+                    reconnected = await reconnect_telegram(client, reason=f"exception_while_disconnected: {e}")
+                    if reconnected:
+                        consecutive_failures = 0
+                    else:
+                        consecutive_failures += 1
+                        if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                            log(f"CRITICAL: {consecutive_failures} consecutive failures - initiating self-restart", "ERROR")
+                            restart_bot()
+                else:
+                    # Truly unexpected error, but connection is fine
+                    log("Bot will attempt to continue (connection still active)...", "WARN")
+                    consecutive_failures = 0
+                    await asyncio.sleep(10)
                 continue
     finally:
         log("Bot shutting down...", "INFO")
