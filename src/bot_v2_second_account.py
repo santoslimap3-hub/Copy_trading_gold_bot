@@ -33,6 +33,7 @@ from typing import Optional, Dict, Tuple
 from signal_queue import SignalQueue
 from session_manager import SessionManager
 from reconnect_monitor import ReconnectMonitor
+from trade_outcome_tracker import TradeOutcomeTracker
 
 # ===================== CONFIGURATION =====================
 # Telegram
@@ -84,6 +85,7 @@ signal_log: list = []
 signal_queue: Optional[SignalQueue] = None
 session_manager: Optional[SessionManager] = None
 reconnect_monitor: Optional[ReconnectMonitor] = None
+outcome_tracker: Optional[TradeOutcomeTracker] = None
 
 # ===================== HEALTH MONITORING =====================
 # Global Telegram client reference (set in main(), used by health monitor for active checks)
@@ -1648,6 +1650,7 @@ async def main():
     signal_queue = SignalQueue("signal_queue.json")
     session_manager = SessionManager("trading_bot_session", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
+    outcome_tracker = TradeOutcomeTracker(magic=MAGIC)
 
     client = init_telegram()
     _telegram_client = client
@@ -1672,7 +1675,7 @@ async def main():
     log("=" * 70, "INFO")
 
     # ── Helper: update SL and TP1 on a position from parsed values ──
-    async def update_position_sl_tp(ticket: int, sl: float = None, tp1: float = None, source: str = ""):
+    async def update_position_sl_tp(ticket: int, sl: float = None, tp1: float = None, source: str = "", all_tp_levels: Dict[int, float] = None):
         """Update SL and/or TP1 on a position. Set-and-forget: once updated, done."""
         pos = await run_mt5(lambda: mt5.positions_get(ticket=ticket))
         if not pos:
@@ -1720,6 +1723,14 @@ async def main():
         tp_sl_updated[ticket] = True
         log(f"SET & FORGET: Ticket {ticket} now has real SL/TP1. Broker handles exit.", "INFO")
 
+        # Update outcome tracker with real SL/TP levels
+        if outcome_tracker and outcome_tracker.is_tracking(ticket):
+            tp_update = all_tp_levels.copy() if all_tp_levels else {}
+            if tp1 and 1 not in tp_update:
+                tp_update[1] = tp1
+            outcome_tracker.update_levels(ticket, sl_price=sl, tp_levels=tp_update if tp_update else None)
+            log(f"Outcome tracker updated for ticket {ticket}", "DEBUG")
+
     # ── Process any message text through the signal pipeline ──
     async def process_message(text: str, msg_id: int, channel_name: str, source: str = ""):
         """
@@ -1755,11 +1766,15 @@ async def main():
                             _, ticket, entry_price, fsl, lot = result
                             sl = parse_stop_loss(text)
                             tp1 = parse_tp1(text)
+                            all_tps = parse_tp_levels(text)
                             signal_queue.add_signal(signal_type="TRADE", side=side, entry_price=entry_price,
                                                     sl_price=fsl, lot_size=lot, tp_levels={}, msg_id=msg_id, msg_text=text[:100])
                             signal_queue.mark_executed(msg_id)
+                            # Register with outcome tracker
+                            if outcome_tracker:
+                                outcome_tracker.register_trade(ticket, side, entry_price, sl or fsl, all_tps)
                             if sl or tp1:
-                                await update_position_sl_tp(ticket, sl, tp1, source)
+                                await update_position_sl_tp(ticket, sl, tp1, source, all_tp_levels=all_tps)
                             record_entry_stat("market_entry_in_zone", side=side, entry_price=entry_price, zone_low=zone_low, zone_high=zone_high)
                         else:  # PENDING
                             _, order_ticket, lp, fsl, lot = result
@@ -1815,8 +1830,12 @@ async def main():
                 if msg_id in position_map:
                     sl_v = parse_stop_loss(text)
                     tp1_v = parse_tp1(text)
+                    all_tps = parse_tp_levels(text)
+                    # Register with outcome tracker
+                    if outcome_tracker:
+                        outcome_tracker.register_trade(ticket, side, entry_price, sl_v or failsafe_sl, all_tps)
                     if sl_v or tp1_v:
-                        await update_position_sl_tp(ticket, sl_v, tp1_v, source)
+                        await update_position_sl_tp(ticket, sl_v, tp1_v, source, all_tp_levels=all_tps)
 
             return True
 
@@ -1885,7 +1904,7 @@ async def main():
 
             ticket = int(bot_positions[-1].ticket)
             log(f"Applying SL/TP from new message to most recent bot position: ticket {ticket}{source}", "INFO")
-            await update_position_sl_tp(ticket, sl, tp1, source)
+            await update_position_sl_tp(ticket, sl, tp1, source, all_tp_levels=tp_levels_parsed)
             return True
 
         # Not recognized
@@ -2017,11 +2036,15 @@ async def main():
                             _, ticket, entry_price, fsl, lot = result
                             sl = parse_stop_loss(text)
                             tp1 = parse_tp1(text)
+                            all_tps = parse_tp_levels(text)
                             signal_queue.add_signal(signal_type="TRADE", side=side, entry_price=entry_price,
                                                     sl_price=fsl, lot_size=lot, tp_levels={}, msg_id=msg_id, msg_text=text[:100])
                             signal_queue.mark_executed(msg_id)
+                            # Register with outcome tracker
+                            if outcome_tracker:
+                                outcome_tracker.register_trade(ticket, side, entry_price, sl or fsl, all_tps)
                             if sl or tp1:
-                                await update_position_sl_tp(ticket, sl, tp1, "")
+                                await update_position_sl_tp(ticket, sl, tp1, "", all_tp_levels=all_tps)
                             record_entry_stat("market_entry_in_zone", side=side, entry_price=entry_price, zone_low=zone_low, zone_high=zone_high)
                         else:  # PENDING
                             _, order_ticket, lp, fsl, lot = result
@@ -2089,7 +2112,7 @@ async def main():
                     pos_ticket = await run_mt5(lambda: find_position_from_order(order_ticket))
                     if pos_ticket:
                         log(f"Order {order_ticket} already filled → position {pos_ticket}, updating SL/TP", "INFO")
-                        await update_position_sl_tp(pos_ticket, sl, tp1, " (EDIT-LIMIT)")
+                        await update_position_sl_tp(pos_ticket, sl, tp1, " (EDIT-LIMIT)", all_tp_levels=tp_levels_parsed)
                 return
 
             # ── 3. Standard edit: update existing position SL/TP (set & forget) ──
@@ -2125,7 +2148,7 @@ async def main():
                 ticket = int(bot_positions[-1].ticket)
                 log(f"   Using most recent bot position: ticket {ticket}", "INFO")
 
-            await update_position_sl_tp(ticket, sl, tp1, " (EDIT)")
+            await update_position_sl_tp(ticket, sl, tp1, " (EDIT)", all_tp_levels=tp_levels_parsed)
 
         except Exception as e:
             log(f"CRITICAL EXCEPTION in on_edit: {str(e)}", "ERROR")
@@ -2234,6 +2257,13 @@ async def main():
                                           zone_low=info["zone_low"], zone_high=info["zone_high"],
                                           price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
+                        # Register with outcome tracker on limit fill
+                        if outcome_tracker:
+                            actual_entry = fill_price if fill_price else limit_price
+                            outcome_tracker.register_trade(pos_ticket, side, actual_entry,
+                                                           info.get("sl", info.get("failsafe_sl", 0)),
+                                                           {1: info.get("tp1", 0)} if info.get("tp1") else {})
+
                         # Apply SL/TP if we have them
                         sl_val = info.get("sl")
                         tp_val = info.get("tp1")
@@ -2338,6 +2368,73 @@ async def main():
                 log(f"   {traceback.format_exc()}", "ERROR")
                 await asyncio.sleep(10)
 
+    # ── Trade outcome level monitor ──
+    async def trade_outcome_monitor():
+        """
+        Every 2 seconds, check current price against TP1-TP4, BE, and SL
+        for all trades being tracked by the outcome tracker.
+        Also detect when tracked positions have been closed by the broker.
+        """
+        log("Trade outcome monitor started (2s interval)", "INFO")
+        while True:
+            try:
+                await asyncio.sleep(2)
+
+                if not outcome_tracker:
+                    continue
+
+                active_tickets = outcome_tracker.get_active_tickets()
+                if not active_tickets:
+                    continue
+
+                # Get current market price
+                tick = await run_mt5(lambda: mt5.symbol_info_tick(SYMBOL))
+                if tick is None:
+                    continue
+                bid = float(tick.bid)
+                ask = float(tick.ask)
+
+                for ticket in active_tickets:
+                    info = outcome_tracker.get_trade_info(ticket)
+                    if info is None:
+                        continue
+
+                    # Use bid for BUY exits (selling), ask for SELL exits (buying)
+                    current_price = bid if info["side"] == "BUY" else ask
+
+                    newly_hit = outcome_tracker.check_levels(ticket, current_price)
+                    for level in newly_hit:
+                        log(f"OUTCOME TRACKER: Ticket {ticket} hit {level} at ${current_price:.2f}", "INFO")
+
+                    # Check if position is still open
+                    pos = await run_mt5(lambda t=ticket: mt5.positions_get(ticket=t))
+                    if not pos:
+                        # Position closed — finalize tracking
+                        # Try to get final profit from deal history
+                        final_profit = 0.0
+                        close_reason = "unknown"
+                        now_dt = datetime.now()
+                        deals = await run_mt5(lambda: mt5.history_deals_get(
+                            now_dt - timedelta(hours=24), now_dt + timedelta(minutes=1)))
+                        if deals:
+                            for d in deals:
+                                if d.position_id == ticket and d.entry == 1:  # DEAL_ENTRY_OUT
+                                    final_profit = float(d.profit)
+                                    close_reason = d.comment if d.comment else "broker"
+                                    break
+
+                        seq = info.get("sequence_so_far", [])
+                        seq_str = " → ".join(seq) if seq else "NONE"
+                        log(f"OUTCOME TRACKER: Ticket {ticket} CLOSED | P&L=${final_profit:.2f} | "
+                            f"Sequence: {seq_str} | Reason: {close_reason}", "INFO")
+                        outcome_tracker.close_trade(ticket, final_profit, close_reason)
+
+            except Exception as e:
+                log(f"Trade outcome monitor error: {str(e)}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+                await asyncio.sleep(5)
+
     # ══════════════════════════════════════════════════════════════════════
     # Start background monitoring tasks
     # ══════════════════════════════════════════════════════════════════════
@@ -2363,6 +2460,9 @@ async def main():
 
     asyncio.create_task(limit_order_monitor())
     log("  Limit order & buffer monitor task created (1s interval)", "INFO")
+
+    asyncio.create_task(trade_outcome_monitor())
+    log("  Trade outcome monitor task created (2s interval)", "INFO")
 
     # ══════════════════════════════════════════════════════════════════════
     # Connect to Telegram
