@@ -282,6 +282,10 @@
                 <span style="font-weight: bold; color: #2c3e50;">Filter by:</span>
                 <button class="time-filter-btn active" onclick="filterByPeriod('all')">All Time</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('24h')">Last 24 Hours</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('2d')">Last 2 Days</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('3d')">Last 3 Days</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('4d')">Last 4 Days</button>
+                <button class="time-filter-btn" onclick="filterByPeriod('5d')">Last 5 Days</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('7d')">Last 7 Days</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('14d')">Last 2 Weeks</button>
                 <button class="time-filter-btn" onclick="filterByPeriod('30d')">Last 30 Days</button>
@@ -390,6 +394,18 @@
                 filteredTrades = [...allTrades];
             } else if (period === '24h') {
                 cutoffTime = now - (24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '2d') {
+                cutoffTime = now - (2 * 24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '3d') {
+                cutoffTime = now - (3 * 24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '4d') {
+                cutoffTime = now - (4 * 24 * 60 * 60);
+                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else if (period === '5d') {
+                cutoffTime = now - (5 * 24 * 60 * 60);
                 filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
             } else if (period === '7d') {
                 cutoffTime = now - (7 * 24 * 60 * 60);
