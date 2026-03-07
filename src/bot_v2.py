@@ -2335,16 +2335,19 @@ async def main():
                                           zone_low=info["zone_low"], zone_high=info["zone_high"],
                                           price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
-                        # Register with outcome tracker
-                        if outcome_tracker:
-                            all_tps_fill = parse_tp_levels(info.get("msg_text", "")) if info.get("msg_text") else {}
-                            outcome_tracker.register_trade(pos_ticket, side, fill_price or limit_price, info.get("sl") or info.get("failsafe_sl"), all_tps_fill)
-
                         # Apply SL/TP if we have them
+                        # Register with outcome tracker
+                        actual_entry = fill_price or limit_price
+                        if outcome_tracker:
+                            tp_levels_info = {}
+                            if info.get("tp1"):
+                                tp_levels_info[1] = info["tp1"]
+                            outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), tp_levels_info)
+
                         sl_val = info.get("sl")
                         tp_val = info.get("tp1")
                         if sl_val or tp_val:
-                            await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)", all_tp_levels=parse_tp_levels(info.get("msg_text", "")) if info.get("msg_text") else None)
+                            await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)")
 
                         completed_orders.append(mid)
                         continue
@@ -2444,6 +2447,72 @@ async def main():
                 log(f"   {traceback.format_exc()}", "ERROR")
                 await asyncio.sleep(10)
 
+    async def trade_outcome_monitor():
+        """
+        Every 2 seconds, check current price against TP1-TP4, BE, and SL
+        for all trades being tracked by the outcome tracker.
+        Also detect when tracked positions have been closed by the broker.
+        """
+        log("Trade outcome monitor started (2s interval)", "INFO")
+        while True:
+            try:
+                await asyncio.sleep(2)
+
+                if not outcome_tracker:
+                    continue
+
+                active_tickets = outcome_tracker.get_active_tickets()
+                if not active_tickets:
+                    continue
+
+                # Get current market price
+                tick = await run_mt5(lambda: mt5.symbol_info_tick(SYMBOL))
+                if tick is None:
+                    continue
+                bid = float(tick.bid)
+                ask = float(tick.ask)
+
+                for ticket in active_tickets:
+                    info = outcome_tracker.get_trade_info(ticket)
+                    if info is None:
+                        continue
+
+                    # Use bid for BUY exits (selling), ask for SELL exits (buying)
+                    current_price = bid if info["side"] == "BUY" else ask
+
+                    newly_hit = outcome_tracker.check_levels(ticket, current_price)
+                    for level in newly_hit:
+                        log(f"OUTCOME TRACKER: Ticket {ticket} hit {level} at ${current_price:.2f}", "INFO")
+
+                    # Check if position is still open
+                    pos = await run_mt5(lambda t=ticket: mt5.positions_get(ticket=t))
+                    if not pos:
+                        # Position closed — finalize tracking
+                        # Try to get final profit from deal history
+                        final_profit = 0.0
+                        close_reason = "unknown"
+                        now_dt = datetime.now()
+                        deals = await run_mt5(lambda: mt5.history_deals_get(
+                            now_dt - timedelta(hours=24), now_dt + timedelta(minutes=1)))
+                        if deals:
+                            for d in deals:
+                                if d.position_id == ticket and d.entry == 1:  # DEAL_ENTRY_OUT
+                                    final_profit = float(d.profit)
+                                    close_reason = d.comment if d.comment else "broker"
+                                    break
+
+                        seq = info.get("sequence_so_far", [])
+                        seq_str = " \u2192 ".join(seq) if seq else "NONE"
+                        log(f"OUTCOME TRACKER: Ticket {ticket} CLOSED | P&L=${final_profit:.2f} | "
+                            f"Sequence: {seq_str} | Reason: {close_reason}", "INFO")
+                        outcome_tracker.close_trade(ticket, final_profit, close_reason)
+
+            except Exception as e:
+                log(f"Trade outcome monitor error: {str(e)}", "ERROR")
+                import traceback
+                log(f"   {traceback.format_exc()}", "ERROR")
+                await asyncio.sleep(5)
+
     # ══════════════════════════════════════════════════════════════════════
     # Start background monitoring tasks
     # ══════════════════════════════════════════════════════════════════════
@@ -2469,26 +2538,6 @@ async def main():
 
     asyncio.create_task(limit_order_monitor())
     log("  Limit order & buffer monitor task created (1s interval)", "INFO")
-
-    # ── Trade outcome monitor ──
-    async def trade_outcome_monitor():
-        """Background task: poll price levels and detect closed trades."""
-        while True:
-            try:
-                if outcome_tracker and outcome_tracker.active_trades:
-                    tick = await run_mt5(lambda: mt5.symbol_info_tick(SYMBOL))
-                    if tick:
-                        outcome_tracker.check_levels(tick.bid, tick.ask)
-
-                    # Detect closed trades
-                    for tkt in list(outcome_tracker.active_trades.keys()):
-                        pos = await run_mt5(lambda t=tkt: mt5.positions_get(ticket=t))
-                        if not pos:
-                            outcome_tracker.close_trade(tkt)
-                            log(f"Trade {tkt} closed - outcome recorded", "INFO")
-            except Exception as e:
-                log(f"Outcome monitor error: {e}", "ERROR")
-            await asyncio.sleep(2)
 
     asyncio.create_task(trade_outcome_monitor())
     log("  Trade outcome monitor task created (2s interval)", "INFO")
