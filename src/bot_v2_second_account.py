@@ -2395,7 +2395,7 @@ async def main():
                         if fill_price:
                             entry_prices[pos_ticket] = fill_price
 
-                        record_entry_stat("limit_filled", side=side, limit_price=limit_price,
+                        record_entry_stat("limit_fill", side=side, limit_price=limit_price,
                                           fill_price=fill_price, slippage=slippage, fill_time=elapsed,
                                           best_reached=True, worst_reached=True,
                                           zone_low=info["zone_low"], zone_high=info["zone_high"],

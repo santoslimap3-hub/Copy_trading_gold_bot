@@ -95,6 +95,18 @@
       "msg_text": "XAU USD BUY NOW\n\n5100 - 5096",
       "timestamp": "2026-03-06T16:30:07.615999",
       "executed": true
+    },
+    {
+      "id": 3927,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5089.52,
+      "sl_price": 5081.52,
+      "lot_size": 0.01,
+      "tp_levels": {},
+      "msg_text": "XAU USD BUY NOW\n\n5092 - 5088",
+      "timestamp": "2026-03-09T15:03:41.888721",
+      "executed": true
     }
   ]
 }
