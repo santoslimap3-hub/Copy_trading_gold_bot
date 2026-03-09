@@ -80,6 +80,13 @@ class TradeOutcomeTracker:
             for ticket_str, trade in data.items():
                 # Convert levels_hit back from list to set
                 trade["levels_hit"] = set(trade.get("levels_hit", []))
+                # levels_breached tracks which levels price is CURRENTLY past
+                # (vs levels_hit which tracks levels EVER crossed)
+                if "levels_breached" in trade:
+                    trade["levels_breached"] = set(trade.get("levels_breached", []))
+                else:
+                    # Backward compat: assume all ever-hit levels are currently breached
+                    trade["levels_breached"] = trade["levels_hit"].copy()
                 trades[int(ticket_str)] = trade
             if trades:
                 print(f"[TradeOutcomeTracker] Restored {len(trades)} active trade(s) from disk")
@@ -95,6 +102,7 @@ class TradeOutcomeTracker:
         for ticket, trade in self._active_trades.items():
             t = trade.copy()
             t["levels_hit"] = sorted(list(trade["levels_hit"]))
+            t["levels_breached"] = sorted(list(trade["levels_breached"]))
             serializable[str(ticket)] = t
         tmp_file = self._active_file + ".tmp"
         try:
@@ -163,7 +171,8 @@ class TradeOutcomeTracker:
             "tp_levels": tp_levels.copy(),
             "monitored_levels": levels,
             "sequence": [],           # List of {"level": str, "time": str, "price": float}
-            "levels_hit": set(),      # Set of level names already recorded
+            "levels_hit": set(),      # Set of level names EVER crossed (for finalization logic)
+            "levels_breached": set(), # Set of levels price is CURRENTLY past (for re-visit detection)
             "registered_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "registered_ts": time.time(),
             "position_closed": False,      # True once the real MT5 position is closed
@@ -293,7 +302,9 @@ class TradeOutcomeTracker:
         Check if the current price has crossed any monitored levels for a trade.
         Returns a list of newly hit level names (e.g. ["TP1", "BE"]).
 
-        Each level is recorded only once — subsequent crossings are ignored.
+        Tracks the full price movement including re-visits. If price crosses
+        TP3, retraces past TP2, then crosses TP3 again, the sequence will
+        record: TP3 → TP2 → TP3 (each transition is captured).
         """
         if ticket not in self._active_trades:
             return []
@@ -301,48 +312,53 @@ class TradeOutcomeTracker:
         trade = self._active_trades[ticket]
         side = trade["side"]
         newly_hit = []
+        state_changed = False
 
         for level_name, level_price in trade["monitored_levels"].items():
-            if level_name in trade["levels_hit"]:
-                continue
-
-            hit = False
+            breached = False
             if level_name.startswith("TP"):
-                # TP is hit when price reaches or exceeds the TP level
+                # TP is breached when price reaches or exceeds the TP level
                 if side == "BUY" and current_price >= level_price:
-                    hit = True
+                    breached = True
                 elif side == "SELL" and current_price <= level_price:
-                    hit = True
+                    breached = True
             elif level_name == "BE":
-                # Breakeven is hit when price returns to entry after initially moving away
-                # For BUY: price must have gone up first, then come back down to entry
-                # For SELL: price must have gone down first, then come back up to entry
-                # We simplify: BE is "hit" when price crosses back through entry
-                # Only meaningful if at least one TP was already hit (trade was in profit)
-                if trade["levels_hit"]:  # Only track BE after some movement
+                # Breakeven is breached when price returns to entry after moving in profit
+                # Only meaningful if at least one TP was already hit
+                if trade["levels_hit"]:
                     if side == "BUY" and current_price <= level_price:
-                        hit = True
+                        breached = True
                     elif side == "SELL" and current_price >= level_price:
-                        hit = True
+                        breached = True
             elif level_name == "SL":
-                # SL is hit when price reaches or exceeds the SL level
+                # SL is breached when price reaches or exceeds the SL level
                 if side == "BUY" and current_price <= level_price:
-                    hit = True
+                    breached = True
                 elif side == "SELL" and current_price >= level_price:
-                    hit = True
+                    breached = True
 
-            if hit:
+            was_breached = level_name in trade["levels_breached"]
+
+            if breached and not was_breached:
+                # Level newly crossed (first time or re-visit after retrace)
+                revisit = level_name in trade["levels_hit"]
+                trade["levels_breached"].add(level_name)
                 trade["levels_hit"].add(level_name)
                 event = {
                     "level": level_name,
                     "time": time.strftime("%Y-%m-%d %H:%M:%S"),
                     "timestamp": time.time(),
                     "price": current_price,
+                    "revisit": revisit,
                 }
                 trade["sequence"].append(event)
                 newly_hit.append(level_name)
+            elif not breached and was_breached:
+                # Price retraced back past this level — no longer breached
+                trade["levels_breached"].discard(level_name)
+                state_changed = True
 
-        if newly_hit:
+        if newly_hit or state_changed:
             self._save_active_trades()
 
         return newly_hit
