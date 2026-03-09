@@ -1,0 +1,485 @@
+{
+  "magic": 776,
+  "total_tracked": 13,
+  "last_updated": "2026-03-09 21:42:52",
+  "outcomes": [
+    {
+      "ticket": -138,
+      "side": "BUY",
+      "entry_price": 5107.41,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0,
+        "2": 5178.0,
+        "3": 5180.0,
+        "4": 5182.0,
+        "5": 5190.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:36:23",
+          "timestamp": 1773063383.8581889,
+          "price": 5107.65,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:36:23",
+      "closed_at": "2026-03-09 21:36:23",
+      "duration_seconds": 0.10336899757385254,
+      "position_closed_at": 1773063383.765851,
+      "position_close_reason": "not_entered:price_invalidated:Price $5107.79 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.09828066825866699,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -139,
+      "side": "SELL",
+      "entry_price": 5106.93,
+      "sl_price": 5180.0,
+      "tp_levels": {
+        "1": 5164.0,
+        "2": 5162.0,
+        "3": 5160.0,
+        "4": 5158.0,
+        "5": 5150.0
+      },
+      "sequence": [
+        {
+          "level": "TP1",
+          "time": "2026-03-09 21:36:47",
+          "timestamp": 1773063407.3780189,
+          "price": 5106.62,
+          "revisit": false
+        },
+        {
+          "level": "TP2",
+          "time": "2026-03-09 21:36:47",
+          "timestamp": 1773063407.3780243,
+          "price": 5106.62,
+          "revisit": false
+        },
+        {
+          "level": "TP3",
+          "time": "2026-03-09 21:36:47",
+          "timestamp": 1773063407.378028,
+          "price": 5106.62,
+          "revisit": false
+        },
+        {
+          "level": "TP4",
+          "time": "2026-03-09 21:36:47",
+          "timestamp": 1773063407.3780313,
+          "price": 5106.62,
+          "revisit": false
+        },
+        {
+          "level": "TP5",
+          "time": "2026-03-09 21:36:47",
+          "timestamp": 1773063407.3780355,
+          "price": 5106.62,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "TP1 \u2192 TP2 \u2192 TP3 \u2192 TP4 \u2192 TP5",
+      "levels_hit": [
+        "TP1",
+        "TP2",
+        "TP3",
+        "TP4",
+        "TP5"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:36:47",
+      "closed_at": "2026-03-09 21:36:47",
+      "duration_seconds": 0.267824649810791,
+      "position_closed_at": 1773063407.1198518,
+      "position_close_reason": "not_entered:price_invalidated:Price $5106.54 <= TP $5164.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.2641434669494629,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -140,
+      "side": "BUY",
+      "entry_price": 5106.18,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0,
+        "2": 5178.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:37:02",
+          "timestamp": 1773063422.6804273,
+          "price": 5106.34,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:37:02",
+      "closed_at": "2026-03-09 21:37:02",
+      "duration_seconds": 0.2639505863189697,
+      "position_closed_at": 1773063422.4240766,
+      "position_close_reason": "not_entered:price_invalidated:Price $5106.34 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.2609522342681885,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -141,
+      "side": "BUY",
+      "entry_price": 5104.09,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:37:34",
+          "timestamp": 1773063454.91226,
+          "price": 5103.59,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:37:34",
+      "closed_at": "2026-03-09 21:37:34",
+      "duration_seconds": 0.07926201820373535,
+      "position_closed_at": 1773063454.8403764,
+      "position_close_reason": "not_entered:price_invalidated:Price $5103.72 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.07573747634887695,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -142,
+      "side": "BUY",
+      "entry_price": 5103.76,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:37:58",
+          "timestamp": 1773063478.4471798,
+          "price": 5102.82,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:37:58",
+      "closed_at": "2026-03-09 21:37:58",
+      "duration_seconds": 0.27159833908081055,
+      "position_closed_at": 1773063478.1956024,
+      "position_close_reason": "not_entered:price_invalidated:Price $5102.96 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.26842665672302246,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -144,
+      "side": "SELL",
+      "entry_price": 5102.35,
+      "sl_price": 5180.0,
+      "tp_levels": {
+        "1": 5164.0
+      },
+      "sequence": [
+        {
+          "level": "TP1",
+          "time": "2026-03-09 21:38:27",
+          "timestamp": 1773063507.0597265,
+          "price": 5101.11,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "TP1",
+      "levels_hit": [
+        "TP1"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:38:26",
+      "closed_at": "2026-03-09 21:38:27",
+      "duration_seconds": 0.5000832080841064,
+      "position_closed_at": 1773063506.5675385,
+      "position_close_reason": "not_entered:price_invalidated:Price $5101.04 <= TP $5164.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.4960646629333496,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -146,
+      "side": "BUY",
+      "entry_price": 5099.34,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:38:56",
+          "timestamp": 1773063536.137628,
+          "price": 5100.48,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:38:55",
+      "closed_at": "2026-03-09 21:38:56",
+      "duration_seconds": 0.15499520301818848,
+      "position_closed_at": 1773063535.9891388,
+      "position_close_reason": "not_entered:price_invalidated:Price $5100.08 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.15163087844848633,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -150,
+      "side": "BUY",
+      "entry_price": 5098.36,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:39:35",
+          "timestamp": 1773063575.46678,
+          "price": 5097.49,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:39:35",
+      "closed_at": "2026-03-09 21:39:35",
+      "duration_seconds": 0.06452631950378418,
+      "position_closed_at": 1773063575.4107575,
+      "position_close_reason": "not_entered:price_invalidated:Price $5097.70 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.06024980545043945,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -153,
+      "side": "BUY",
+      "entry_price": 5097.03,
+      "sl_price": 5215.0,
+      "tp_levels": {
+        "1": 5240.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:40:17",
+          "timestamp": 1773063617.6004303,
+          "price": 5094.7,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:40:17",
+      "closed_at": "2026-03-09 21:40:17",
+      "duration_seconds": 0.5038998126983643,
+      "position_closed_at": 1773063617.1036775,
+      "position_close_reason": "not_entered:price_invalidated:Price $5095.38 <= SL $5215.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.49984049797058105,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -155,
+      "side": "SELL",
+      "entry_price": 5093.19,
+      "sl_price": 5125.0,
+      "tp_levels": {
+        "1": 5100.0
+      },
+      "sequence": [
+        {
+          "level": "TP1",
+          "time": "2026-03-09 21:40:48",
+          "timestamp": 1773063648.6730654,
+          "price": 5093.34,
+          "revisit": false
+        },
+        {
+          "level": "BE",
+          "time": "2026-03-09 21:40:48",
+          "timestamp": 1773063648.6730697,
+          "price": 5093.34,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "TP1 \u2192 BE",
+      "levels_hit": [
+        "BE",
+        "TP1"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:40:48",
+      "closed_at": "2026-03-09 21:40:48",
+      "duration_seconds": 0.20601511001586914,
+      "position_closed_at": 1773063648.4734745,
+      "position_close_reason": "not_entered:price_invalidated:Price $5092.74 <= TP $5100.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.2027451992034912,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -157,
+      "side": "BUY",
+      "entry_price": 5087.49,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5230.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:41:25",
+          "timestamp": 1773063685.8692043,
+          "price": 5083.11,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:41:25",
+      "closed_at": "2026-03-09 21:41:25",
+      "duration_seconds": 0.4981038570404053,
+      "position_closed_at": 1773063685.3769577,
+      "position_close_reason": "not_entered:channel_closure:SL HIT",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.4953911304473877,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -159,
+      "side": "BUY",
+      "entry_price": 5087.45,
+      "sl_price": 5165.0,
+      "tp_levels": {
+        "1": 5175.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:41:51",
+          "timestamp": 1773063711.3856544,
+          "price": 5083.84,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:41:51",
+      "closed_at": "2026-03-09 21:41:51",
+      "duration_seconds": 0.2033073902130127,
+      "position_closed_at": 1773063711.1889727,
+      "position_close_reason": "not_entered:channel_closure:SL HIT",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.19987988471984863,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -168,
+      "side": "BUY",
+      "entry_price": 5079.46,
+      "sl_price": 5160.0,
+      "tp_levels": {
+        "1": 5176.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 21:42:52",
+          "timestamp": 1773063772.097902,
+          "price": 5079.24,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 21:42:51",
+      "closed_at": "2026-03-09 21:42:52",
+      "duration_seconds": 0.5035748481750488,
+      "position_closed_at": 1773063771.6005015,
+      "position_close_reason": "not_entered:price_invalidated:Price $5079.06 <= SL $5160.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.5005166530609131,
+      "virtual": true,
+      "position_close_price": null
+    }
+  ]
+}
