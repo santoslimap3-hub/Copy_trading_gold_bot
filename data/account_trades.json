@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-02-23T23:03:34.335216",
+    "created_at": "2026-03-09T21:02:56.592213",
     "days_back": 365,
     "exporter": "account_trades_exporter"
   },
@@ -8,51 +8,84 @@
     "login": 22840119,
     "server": "VantageInternational-Live 14",
     "currency": "EUR",
-    "balance": 88.39,
-    "equity": 88.39,
-    "margin": 0.0,
-    "free_margin": 88.39,
-    "margin_level": 0,
-    "floating_pnl": 0.0,
-    "leverage": 500,
-    "open_positions": [],
-    "open_positions_count": 0
+    "balance": 133.42,
+    "equity": 132.91,
+    "margin": 11.51,
+    "free_margin": 121.4,
+    "margin_level": 1154.74,
+    "floating_pnl": -0.42,
+    "leverage": 300,
+    "open_positions": [
+      {
+        "ticket": 42215883,
+        "symbol": "GBPUSD",
+        "type": "SELL",
+        "volume": 0.02,
+        "price_open": 1.33703,
+        "price_current": 1.33552,
+        "sl": 1.3432,
+        "tp": 1.3242,
+        "profit": 2.61,
+        "swap": -0.09,
+        "magic": 0,
+        "comment": "",
+        "time": 1772640335,
+        "time_str": "2026-03-05T00:05:35"
+      },
+      {
+        "ticket": 45193046,
+        "symbol": "GBPUSD",
+        "type": "SELL",
+        "volume": 0.01,
+        "price_open": 1.33202,
+        "price_current": 1.33552,
+        "sl": 1.341,
+        "tp": 1.31564,
+        "profit": -3.03,
+        "swap": 0.0,
+        "magic": 0,
+        "comment": "pendingOrder",
+        "time": 1773055214,
+        "time_str": "2026-03-09T19:20:14"
+      }
+    ],
+    "open_positions_count": 2
   },
   "summary": {
-    "total_trades": 294,
-    "buy_trades": 132,
-    "sell_trades": 162,
-    "winning_trades": 169,
-    "losing_trades": 119,
-    "breakeven_trades": 6,
-    "win_rate": 57.48,
-    "total_profit": 1149.56,
-    "total_loss": 1061.11,
-    "net_pnl": 88.45,
+    "total_trades": 395,
+    "buy_trades": 169,
+    "sell_trades": 226,
+    "winning_trades": 220,
+    "losing_trades": 168,
+    "breakeven_trades": 7,
+    "win_rate": 55.7,
+    "total_profit": 1471.69,
+    "total_loss": 1438.62,
+    "net_pnl": 33.07,
     "total_commission": 0.0,
-    "total_swap": -0.06,
+    "total_swap": 0.35,
     "total_fees": 0.0,
-    "net_after_costs": 88.39,
-    "profit_factor": 1.08,
-    "avg_pnl": 0.3,
-    "avg_win": 6.8,
-    "avg_loss": 8.92,
+    "net_after_costs": 33.42,
+    "profit_factor": 1.02,
+    "avg_pnl": 0.08,
+    "avg_win": 6.69,
+    "avg_loss": 8.56,
     "largest_win": 74.26,
     "largest_loss": -129.22,
     "max_consecutive_wins": 10,
-    "max_consecutive_losses": 7,
+    "max_consecutive_losses": 9,
     "max_drawdown": 170.31,
-    "max_drawdown_pct": 329.8,
-    "initial_balance": -0.0,
-    "final_balance": 88.39,
-    "profitable_days": 23,
-    "losing_days": 15,
+    "max_drawdown_pct": 112.31,
+    "initial_balance": 100.0,
+    "final_balance": 133.42,
+    "profitable_days": 27,
+    "losing_days": 22,
     "best_day": {
-      "date": "2026-01-31",
-      "pnl": 74.26,
-      "trades": 1,
-      "wins": 1,
-      "losses": 0
+      "date": "2026-02-27",
+      "pnl": 79.13,
+      "trades": 14,
+      "wins": 12,
+      "losses": 2
     },
     "worst_day": {
       "date": "2026-01-28",
@@ -61,80 +94,80 @@
       "wins": 4,
       "losses": 7
     },
-    "trades_per_day": 6.3,
-    "avg_daily_pnl": 1.9,
-    "trading_days": 46,
+    "trades_per_day": 6.51,
+    "avg_daily_pnl": 0.55,
+    "trading_days": 60,
     "first_trade": "2026-01-08T08:33:53",
-    "last_trade": "2026-02-24T00:40:03",
+    "last_trade": "2026-03-09T23:42:36",
     "balance_curve": [
       {
         "time": 1767832433,
         "time_str": "2026-01-08T08:33:53",
-        "balance": -6.45,
+        "balance": 93.55,
         "pnl": -6.62,
         "drawdown": 6.45,
-        "drawdown_pct": 0
+        "drawdown_pct": 6.45
       },
       {
         "time": 1767885928,
         "time_str": "2026-01-08T23:25:28",
-        "balance": -14.36,
+        "balance": 85.64,
         "pnl": -7.91,
         "drawdown": 14.36,
-        "drawdown_pct": 0
+        "drawdown_pct": 14.36
       },
       {
         "time": 1767898946,
         "time_str": "2026-01-09T03:02:26",
-        "balance": -3.18,
+        "balance": 96.82,
         "pnl": 11.18,
         "drawdown": 3.18,
-        "drawdown_pct": 0
+        "drawdown_pct": 3.18
       },
       {
         "time": 1767943853,
         "time_str": "2026-01-09T15:30:53",
-        "balance": -7.65,
+        "balance": 92.35,
         "pnl": -4.29,
         "drawdown": 7.65,
-        "drawdown_pct": 0
+        "drawdown_pct": 7.65
       },
       {
         "time": 1767968163,
         "time_str": "2026-01-09T22:16:03",
-        "balance": -2.67,
+        "balance": 97.33,
         "pnl": 5.0,
         "drawdown": 2.67,
-        "drawdown_pct": 0
+        "drawdown_pct": 2.67
       },
       {
         "time": 1767976571,
         "time_str": "2026-01-10T00:36:11",
-        "balance": -2.88,
+        "balance": 97.12,
         "pnl": -0.21,
         "drawdown": 2.88,
-        "drawdown_pct": 0
+        "drawdown_pct": 2.88
       },
       {
         "time": 1767976628,
         "time_str": "2026-01-10T00:37:08",
-        "balance": -2.65,
+        "balance": 97.35,
         "pnl": 0.23,
         "drawdown": 2.65,
-        "drawdown_pct": 0
+        "drawdown_pct": 2.65
       },
       {
         "time": 1767976667,
         "time_str": "2026-01-10T00:37:47",
-        "balance": -1.26,
+        "balance": 98.74,
         "pnl": 1.39,
         "drawdown": 1.26,
-        "drawdown_pct": 0
+        "drawdown_pct": 1.26
       },
       {
         "time": 1767977701,
         "time_str": "2026-01-10T00:55:01",
-        "balance": 2.94,
+        "balance": 102.94,
         "pnl": 4.2,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -142,7 +175,7 @@
       {
         "time": 1767979699,
         "time_str": "2026-01-10T01:28:19",
-        "balance": 13.11,
+        "balance": 113.11,
         "pnl": 10.17,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -150,103 +183,103 @@
       {
         "time": 1768213026,
         "time_str": "2026-01-12T18:17:06",
-        "balance": 11.81,
+        "balance": 111.81,
         "pnl": -1.3,
         "drawdown": 1.3,
-        "drawdown_pct": 9.92
+        "drawdown_pct": 1.15
       },
       {
         "time": 1768213919,
         "time_str": "2026-01-12T18:31:59",
-        "balance": 7.25,
+        "balance": 107.25,
         "pnl": -4.56,
         "drawdown": 5.86,
-        "drawdown_pct": 44.7
+        "drawdown_pct": 5.18
       },
       {
         "time": 1768216999,
         "time_str": "2026-01-12T19:23:19",
-        "balance": 2.39,
+        "balance": 102.39,
         "pnl": -4.86,
         "drawdown": 10.72,
-        "drawdown_pct": 81.77
+        "drawdown_pct": 9.48
       },
       {
         "time": 1768217355,
         "time_str": "2026-01-12T19:29:15",
-        "balance": 3.36,
+        "balance": 103.36,
         "pnl": 0.97,
         "drawdown": 9.75,
-        "drawdown_pct": 74.37
+        "drawdown_pct": 8.62
       },
       {
         "time": 1768224919,
         "time_str": "2026-01-12T21:35:19",
-        "balance": 5.57,
+        "balance": 105.57,
         "pnl": 2.21,
         "drawdown": 7.54,
-        "drawdown_pct": 57.51
+        "drawdown_pct": 6.67
       },
       {
         "time": 1768226392,
         "time_str": "2026-01-12T21:59:52",
-        "balance": 7.22,
+        "balance": 107.22,
         "pnl": 1.65,
         "drawdown": 5.89,
-        "drawdown_pct": 44.93
+        "drawdown_pct": 5.21
       },
       {
         "time": 1768230758,
         "time_str": "2026-01-12T23:12:38",
-        "balance": 1.78,
+        "balance": 101.78,
         "pnl": -5.44,
         "drawdown": 11.33,
-        "drawdown_pct": 86.42
+        "drawdown_pct": 10.02
       },
       {
         "time": 1768233632,
         "time_str": "2026-01-13T00:00:32",
-        "balance": 4.54,
+        "balance": 104.54,
         "pnl": 2.76,
         "drawdown": 8.57,
-        "drawdown_pct": 65.37
+        "drawdown_pct": 7.58
       },
       {
         "time": 1768241290,
         "time_str": "2026-01-13T02:08:10",
-        "balance": 0.38,
+        "balance": 100.38,
         "pnl": -4.16,
         "drawdown": 12.73,
-        "drawdown_pct": 97.1
+        "drawdown_pct": 11.25
       },
       {
         "time": 1768243525,
         "time_str": "2026-01-13T02:45:25",
-        "balance": 2.4,
+        "balance": 102.4,
         "pnl": 2.02,
         "drawdown": 10.71,
-        "drawdown_pct": 81.69
+        "drawdown_pct": 9.47
       },
       {
         "time": 1768258447,
         "time_str": "2026-01-13T06:54:07",
-        "balance": 2.47,
+        "balance": 102.47,
         "pnl": 0.07,
         "drawdown": 10.64,
-        "drawdown_pct": 81.16
+        "drawdown_pct": 9.41
       },
       {
         "time": 1768258841,
         "time_str": "2026-01-13T07:00:41",
-        "balance": 2.45,
+        "balance": 102.45,
         "pnl": -0.02,
         "drawdown": 10.66,
-        "drawdown_pct": 81.31
+        "drawdown_pct": 9.42
       },
       {
         "time": 1768266060,
         "time_str": "2026-01-13T09:01:00",
-        "balance": 13.69,
+        "balance": 113.69,
         "pnl": 11.81,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -254,7 +287,7 @@
       {
         "time": 1768300584,
         "time_str": "2026-01-13T18:36:24",
-        "balance": 18.19,
+        "balance": 118.19,
         "pnl": 4.5,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -262,7 +295,7 @@
       {
         "time": 1768304664,
         "time_str": "2026-01-13T19:44:24",
-        "balance": 20.19,
+        "balance": 120.19,
         "pnl": 2.0,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -270,7 +303,7 @@
       {
         "time": 1768306921,
         "time_str": "2026-01-13T20:22:01",
-        "balance": 24.34,
+        "balance": 124.34,
         "pnl": 4.15,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -278,7 +311,7 @@
       {
         "time": 1768309242,
         "time_str": "2026-01-13T21:00:42",
-        "balance": 27.96,
+        "balance": 127.96,
         "pnl": 3.62,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -286,15 +319,15 @@
       {
         "time": 1768315049,
         "time_str": "2026-01-13T22:37:29",
-        "balance": 27.21,
+        "balance": 127.21,
         "pnl": -0.75,
         "drawdown": 0.75,
-        "drawdown_pct": 2.68
+        "drawdown_pct": 0.59
       },
       {
         "time": 1768319905,
         "time_str": "2026-01-13T23:58:25",
-        "balance": 30.02,
+        "balance": 130.02,
         "pnl": 2.81,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -302,23 +335,23 @@
       {
         "time": 1768324083,
         "time_str": "2026-01-14T01:08:03",
-        "balance": 26.14,
+        "balance": 126.14,
         "pnl": -3.88,
         "drawdown": 3.88,
-        "drawdown_pct": 12.92
+        "drawdown_pct": 2.98
       },
       {
         "time": 1768324888,
         "time_str": "2026-01-14T01:21:28",
-        "balance": 26.76,
+        "balance": 126.76,
         "pnl": 0.62,
         "drawdown": 3.26,
-        "drawdown_pct": 10.86
+        "drawdown_pct": 2.51
       },
       {
         "time": 1768360199,
         "time_str": "2026-01-14T11:09:59",
-        "balance": 44.1,
+        "balance": 144.1,
         "pnl": 16.99,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -326,7 +359,7 @@
       {
         "time": 1768384993,
         "time_str": "2026-01-14T18:03:13",
-        "balance": 46.68,
+        "balance": 146.68,
         "pnl": 2.58,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -334,7 +367,7 @@
       {
         "time": 1768385449,
         "time_str": "2026-01-14T18:10:49",
-        "balance": 47.31,
+        "balance": 147.31,
         "pnl": 0.63,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -342,7 +375,7 @@
       {
         "time": 1768386640,
         "time_str": "2026-01-14T18:30:40",
-        "balance": 51.64,
+        "balance": 151.64,
         "pnl": 4.33,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -350,839 +383,839 @@
       {
         "time": 1768387879,
         "time_str": "2026-01-14T18:51:19",
-        "balance": 44.5,
+        "balance": 144.5,
         "pnl": -7.14,
         "drawdown": 7.14,
-        "drawdown_pct": 13.83
+        "drawdown_pct": 4.71
       },
       {
         "time": 1768395877,
         "time_str": "2026-01-14T21:04:37",
-        "balance": 47.21,
+        "balance": 147.21,
         "pnl": 2.71,
         "drawdown": 4.43,
-        "drawdown_pct": 8.58
+        "drawdown_pct": 2.92
       },
       {
         "time": 1768399476,
         "time_str": "2026-01-14T22:04:36",
-        "balance": 12.5,
+        "balance": 112.5,
         "pnl": -34.71,
         "drawdown": 39.14,
-        "drawdown_pct": 75.79
+        "drawdown_pct": 25.81
       },
       {
         "time": 1768400700,
         "time_str": "2026-01-14T22:25:00",
-        "balance": 5.51,
+        "balance": 105.51,
         "pnl": -6.99,
         "drawdown": 46.13,
-        "drawdown_pct": 89.33
+        "drawdown_pct": 30.42
       },
       {
         "time": 1768404946,
         "time_str": "2026-01-14T23:35:46",
-        "balance": 13.49,
+        "balance": 113.49,
         "pnl": 7.98,
         "drawdown": 38.15,
-        "drawdown_pct": 73.88
+        "drawdown_pct": 25.16
       },
       {
         "time": 1768405503,
         "time_str": "2026-01-14T23:45:03",
-        "balance": 10.73,
+        "balance": 110.73,
         "pnl": -2.76,
         "drawdown": 40.91,
-        "drawdown_pct": 79.22
+        "drawdown_pct": 26.98
       },
       {
         "time": 1768405503,
         "time_str": "2026-01-14T23:45:03",
-        "balance": 6.3,
+        "balance": 106.3,
         "pnl": -4.43,
         "drawdown": 45.34,
-        "drawdown_pct": 87.8
+        "drawdown_pct": 29.9
       },
       {
         "time": 1768408608,
         "time_str": "2026-01-15T00:36:48",
-        "balance": 8.67,
+        "balance": 108.67,
         "pnl": 2.37,
         "drawdown": 42.97,
-        "drawdown_pct": 83.21
+        "drawdown_pct": 28.34
       },
       {
         "time": 1768409195,
         "time_str": "2026-01-15T00:46:35",
-        "balance": 7.23,
+        "balance": 107.23,
         "pnl": -1.44,
         "drawdown": 44.41,
-        "drawdown_pct": 86.0
+        "drawdown_pct": 29.29
       },
       {
         "time": 1768409385,
         "time_str": "2026-01-15T00:49:45",
-        "balance": 12.89,
+        "balance": 112.89,
         "pnl": 5.66,
         "drawdown": 38.75,
-        "drawdown_pct": 75.04
+        "drawdown_pct": 25.55
       },
       {
         "time": 1768416117,
         "time_str": "2026-01-15T02:41:57",
-        "balance": 13.85,
+        "balance": 113.85,
         "pnl": 0.96,
         "drawdown": 37.79,
-        "drawdown_pct": 73.18
+        "drawdown_pct": 24.92
       },
       {
         "time": 1768428987,
         "time_str": "2026-01-15T06:16:27",
-        "balance": 13.85,
+        "balance": 113.85,
         "pnl": 0.0,
         "drawdown": 37.79,
-        "drawdown_pct": 73.18
+        "drawdown_pct": 24.92
       },
       {
         "time": 1768432499,
         "time_str": "2026-01-15T07:14:59",
-        "balance": 31.02,
+        "balance": 131.02,
         "pnl": 17.17,
         "drawdown": 20.62,
-        "drawdown_pct": 39.93
+        "drawdown_pct": 13.6
       },
       {
         "time": 1768465996,
         "time_str": "2026-01-15T16:33:16",
-        "balance": 30.78,
+        "balance": 130.78,
         "pnl": -0.24,
         "drawdown": 20.86,
-        "drawdown_pct": 40.4
+        "drawdown_pct": 13.76
       },
       {
         "time": 1768471427,
         "time_str": "2026-01-15T18:03:47",
-        "balance": 16.33,
+        "balance": 116.33,
         "pnl": -14.45,
         "drawdown": 35.31,
-        "drawdown_pct": 68.38
+        "drawdown_pct": 23.29
       },
       {
         "time": 1768473039,
         "time_str": "2026-01-15T18:30:39",
-        "balance": 23.73,
+        "balance": 123.73,
         "pnl": 7.4,
         "drawdown": 27.91,
-        "drawdown_pct": 54.05
+        "drawdown_pct": 18.41
       },
       {
         "time": 1768487134,
         "time_str": "2026-01-15T22:25:34",
-        "balance": 27.77,
+        "balance": 127.77,
         "pnl": 4.04,
         "drawdown": 23.87,
-        "drawdown_pct": 46.22
+        "drawdown_pct": 15.74
       },
       {
         "time": 1768488925,
         "time_str": "2026-01-15T22:55:25",
-        "balance": 10.91,
+        "balance": 110.91,
         "pnl": -16.86,
         "drawdown": 40.73,
-        "drawdown_pct": 78.87
+        "drawdown_pct": 26.86
       },
       {
         "time": 1768489661,
         "time_str": "2026-01-15T23:07:41",
-        "balance": 11.1,
+        "balance": 111.1,
         "pnl": 0.19,
         "drawdown": 40.54,
-        "drawdown_pct": 78.51
+        "drawdown_pct": 26.73
       },
       {
         "time": 1768490432,
         "time_str": "2026-01-15T23:20:32",
-        "balance": 11.1,
+        "balance": 111.1,
         "pnl": 0.0,
         "drawdown": 40.54,
-        "drawdown_pct": 78.51
+        "drawdown_pct": 26.73
       },
       {
         "time": 1768490494,
         "time_str": "2026-01-15T23:21:34",
-        "balance": 14.39,
+        "balance": 114.39,
         "pnl": 3.29,
         "drawdown": 37.25,
-        "drawdown_pct": 72.13
+        "drawdown_pct": 24.56
       },
       {
         "time": 1768491931,
         "time_str": "2026-01-15T23:45:31",
-        "balance": 3.65,
+        "balance": 103.65,
         "pnl": -10.74,
         "drawdown": 47.99,
-        "drawdown_pct": 92.93
+        "drawdown_pct": 31.65
       },
       {
         "time": 1768491931,
         "time_str": "2026-01-15T23:45:31",
-        "balance": -14.74,
+        "balance": 85.26,
         "pnl": -18.39,
         "drawdown": 66.38,
-        "drawdown_pct": 128.54
+        "drawdown_pct": 43.77
       },
       {
         "time": 1768492118,
         "time_str": "2026-01-15T23:48:38",
-        "balance": -12.48,
+        "balance": 87.52,
         "pnl": 2.26,
         "drawdown": 64.12,
-        "drawdown_pct": 124.17
+        "drawdown_pct": 42.28
       },
       {
         "time": 1768492639,
         "time_str": "2026-01-15T23:57:19",
-        "balance": -10.15,
+        "balance": 89.85,
         "pnl": 2.33,
         "drawdown": 61.79,
-        "drawdown_pct": 119.66
+        "drawdown_pct": 40.75
       },
       {
         "time": 1768553815,
         "time_str": "2026-01-16T16:56:55",
-        "balance": -8.45,
+        "balance": 91.55,
         "pnl": 1.7,
         "drawdown": 60.09,
-        "drawdown_pct": 116.36
+        "drawdown_pct": 39.63
       },
       {
         "time": 1768556732,
         "time_str": "2026-01-16T17:45:32",
-        "balance": -7.09,
+        "balance": 92.91,
         "pnl": 1.36,
         "drawdown": 58.73,
-        "drawdown_pct": 113.73
+        "drawdown_pct": 38.73
       },
       {
         "time": 1768559346,
         "time_str": "2026-01-16T18:29:06",
-        "balance": -3.66,
+        "balance": 96.34,
         "pnl": 3.43,
         "drawdown": 55.3,
-        "drawdown_pct": 107.09
+        "drawdown_pct": 36.47
       },
       {
         "time": 1768563582,
         "time_str": "2026-01-16T19:39:42",
-        "balance": -3.51,
+        "balance": 96.49,
         "pnl": 0.15,
         "drawdown": 55.15,
-        "drawdown_pct": 106.8
+        "drawdown_pct": 36.37
       },
       {
         "time": 1768576738,
         "time_str": "2026-01-16T23:18:58",
-        "balance": -0.91,
+        "balance": 99.09,
         "pnl": 2.6,
         "drawdown": 52.55,
-        "drawdown_pct": 101.76
+        "drawdown_pct": 34.65
       },
       {
         "time": 1768584367,
         "time_str": "2026-01-17T01:26:07",
-        "balance": -8.11,
+        "balance": 91.89,
         "pnl": -7.2,
         "drawdown": 59.75,
-        "drawdown_pct": 115.7
+        "drawdown_pct": 39.4
       },
       {
         "time": 1768585330,
         "time_str": "2026-01-17T01:42:10",
-        "balance": 8.04,
+        "balance": 108.04,
         "pnl": 16.15,
         "drawdown": 43.6,
-        "drawdown_pct": 84.43
+        "drawdown_pct": 28.75
       },
       {
         "time": 1768817221,
         "time_str": "2026-01-19T18:07:01",
-        "balance": -7.55,
+        "balance": 92.45,
         "pnl": -15.59,
         "drawdown": 59.19,
-        "drawdown_pct": 114.62
+        "drawdown_pct": 39.03
       },
       {
         "time": 1768830989,
         "time_str": "2026-01-19T21:56:29",
-        "balance": -20.45,
+        "balance": 79.55,
         "pnl": -12.9,
         "drawdown": 72.09,
-        "drawdown_pct": 139.6
+        "drawdown_pct": 47.54
       },
       {
         "time": 1768840010,
         "time_str": "2026-01-20T00:26:50",
-        "balance": -30.66,
+        "balance": 69.34,
         "pnl": -10.21,
         "drawdown": 82.3,
-        "drawdown_pct": 159.37
+        "drawdown_pct": 54.27
       },
       {
         "time": 1768840234,
         "time_str": "2026-01-20T00:30:34",
-        "balance": -26.09,
+        "balance": 73.91,
         "pnl": 4.57,
         "drawdown": 77.73,
-        "drawdown_pct": 150.52
+        "drawdown_pct": 51.26
       },
       {
         "time": 1768841345,
         "time_str": "2026-01-20T00:49:05",
-        "balance": -40.69,
+        "balance": 59.31,
         "pnl": -14.6,
         "drawdown": 92.33,
-        "drawdown_pct": 178.8
+        "drawdown_pct": 60.89
       },
       {
         "time": 1768852267,
         "time_str": "2026-01-20T03:51:07",
-        "balance": -32.1,
+        "balance": 67.9,
         "pnl": 8.59,
         "drawdown": 83.74,
-        "drawdown_pct": 162.16
+        "drawdown_pct": 55.22
       },
       {
         "time": 1768900151,
         "time_str": "2026-01-20T17:09:11",
-        "balance": -14.26,
+        "balance": 85.74,
         "pnl": 17.84,
         "drawdown": 65.9,
-        "drawdown_pct": 127.61
+        "drawdown_pct": 43.46
       },
       {
         "time": 1768901031,
         "time_str": "2026-01-20T17:23:51",
-        "balance": -25.63,
+        "balance": 74.37,
         "pnl": -11.37,
         "drawdown": 77.27,
-        "drawdown_pct": 149.63
+        "drawdown_pct": 50.96
       },
       {
         "time": 1768901750,
         "time_str": "2026-01-20T17:35:50",
-        "balance": -36.08,
+        "balance": 63.92,
         "pnl": -10.45,
         "drawdown": 87.72,
-        "drawdown_pct": 169.87
+        "drawdown_pct": 57.85
       },
       {
         "time": 1768905411,
         "time_str": "2026-01-20T18:36:51",
-        "balance": -30.58,
+        "balance": 69.42,
         "pnl": 5.5,
         "drawdown": 82.22,
-        "drawdown_pct": 159.22
+        "drawdown_pct": 54.22
       },
       {
         "time": 1768907629,
         "time_str": "2026-01-20T19:13:49",
-        "balance": -28.33,
+        "balance": 71.67,
         "pnl": 2.25,
         "drawdown": 79.97,
-        "drawdown_pct": 154.86
+        "drawdown_pct": 52.74
       },
       {
         "time": 1768922530,
         "time_str": "2026-01-20T23:22:10",
-        "balance": -21.55,
+        "balance": 78.45,
         "pnl": 6.78,
         "drawdown": 73.19,
-        "drawdown_pct": 141.73
+        "drawdown_pct": 48.27
       },
       {
         "time": 1768984999,
         "time_str": "2026-01-21T16:43:19",
-        "balance": -26.34,
+        "balance": 73.66,
         "pnl": -4.79,
         "drawdown": 77.98,
-        "drawdown_pct": 151.01
+        "drawdown_pct": 51.42
       },
       {
         "time": 1768986204,
         "time_str": "2026-01-21T17:03:24",
-        "balance": -33.11,
+        "balance": 66.89,
         "pnl": -6.77,
         "drawdown": 84.75,
-        "drawdown_pct": 164.12
+        "drawdown_pct": 55.89
       },
       {
         "time": 1768990807,
         "time_str": "2026-01-21T18:20:07",
-        "balance": -29.52,
+        "balance": 70.48,
         "pnl": 3.59,
         "drawdown": 81.16,
-        "drawdown_pct": 157.16
+        "drawdown_pct": 53.52
       },
       {
         "time": 1768993219,
         "time_str": "2026-01-21T19:00:19",
-        "balance": -31.13,
+        "balance": 68.87,
         "pnl": -1.61,
         "drawdown": 82.77,
-        "drawdown_pct": 160.28
+        "drawdown_pct": 54.58
       },
       {
         "time": 1769007119,
         "time_str": "2026-01-21T22:51:59",
-        "balance": -39.65,
+        "balance": 60.35,
         "pnl": -8.52,
         "drawdown": 91.29,
-        "drawdown_pct": 176.78
+        "drawdown_pct": 60.2
       },
       {
         "time": 1769011805,
         "time_str": "2026-01-22T00:10:05",
-        "balance": -49.2,
+        "balance": 50.8,
         "pnl": -9.55,
         "drawdown": 100.84,
-        "drawdown_pct": 195.27
+        "drawdown_pct": 66.5
       },
       {
         "time": 1769080443,
         "time_str": "2026-01-22T19:14:03",
-        "balance": -48.28,
+        "balance": 51.72,
         "pnl": 0.92,
         "drawdown": 99.92,
-        "drawdown_pct": 193.49
+        "drawdown_pct": 65.89
       },
       {
         "time": 1769088948,
         "time_str": "2026-01-22T21:35:48",
-        "balance": -46.61,
+        "balance": 53.39,
         "pnl": 1.67,
         "drawdown": 98.25,
-        "drawdown_pct": 190.26
+        "drawdown_pct": 64.79
       },
       {
         "time": 1769090304,
         "time_str": "2026-01-22T21:58:24",
-        "balance": -45.36,
+        "balance": 54.64,
         "pnl": 1.25,
         "drawdown": 97.0,
-        "drawdown_pct": 187.84
+        "drawdown_pct": 63.97
       },
       {
         "time": 1769094008,
         "time_str": "2026-01-22T23:00:08",
-        "balance": -36.93,
+        "balance": 63.07,
         "pnl": 8.43,
         "drawdown": 88.57,
-        "drawdown_pct": 171.51
+        "drawdown_pct": 58.41
       },
       {
         "time": 1769094274,
         "time_str": "2026-01-22T23:04:34",
-        "balance": -36.07,
+        "balance": 63.93,
         "pnl": 0.86,
         "drawdown": 87.71,
-        "drawdown_pct": 169.85
+        "drawdown_pct": 57.84
       },
       {
         "time": 1769096614,
         "time_str": "2026-01-22T23:43:34",
-        "balance": -36.07,
+        "balance": 63.93,
         "pnl": 0.0,
         "drawdown": 87.71,
-        "drawdown_pct": 169.85
+        "drawdown_pct": 57.84
       },
       {
         "time": 1769434578,
         "time_str": "2026-01-26T21:36:18",
-        "balance": -34.68,
+        "balance": 65.32,
         "pnl": 1.39,
         "drawdown": 86.32,
-        "drawdown_pct": 167.16
+        "drawdown_pct": 56.92
       },
       {
         "time": 1769441531,
         "time_str": "2026-01-26T23:32:11",
-        "balance": -43.13,
+        "balance": 56.87,
         "pnl": -8.45,
         "drawdown": 94.77,
-        "drawdown_pct": 183.52
+        "drawdown_pct": 62.5
       },
       {
         "time": 1769441600,
         "time_str": "2026-01-26T23:33:20",
-        "balance": -41.13,
+        "balance": 58.87,
         "pnl": 2.0,
         "drawdown": 92.77,
-        "drawdown_pct": 179.65
+        "drawdown_pct": 61.18
       },
       {
         "time": 1769445705,
         "time_str": "2026-01-27T00:41:45",
-        "balance": -35.01,
+        "balance": 64.99,
         "pnl": 6.12,
         "drawdown": 86.65,
-        "drawdown_pct": 167.8
+        "drawdown_pct": 57.14
       },
       {
         "time": 1769446374,
         "time_str": "2026-01-27T00:52:54",
-        "balance": -9.83,
+        "balance": 90.17,
         "pnl": 25.18,
         "drawdown": 61.47,
-        "drawdown_pct": 119.04
+        "drawdown_pct": 40.54
       },
       {
         "time": 1769506456,
         "time_str": "2026-01-27T17:34:16",
-        "balance": -11.28,
+        "balance": 88.72,
         "pnl": -1.45,
         "drawdown": 62.92,
-        "drawdown_pct": 121.84
+        "drawdown_pct": 41.49
       },
       {
         "time": 1769517782,
         "time_str": "2026-01-27T20:43:02",
-        "balance": 5.68,
+        "balance": 105.68,
         "pnl": 16.96,
         "drawdown": 45.96,
-        "drawdown_pct": 89.0
+        "drawdown_pct": 30.31
       },
       {
         "time": 1769521996,
         "time_str": "2026-01-27T21:53:16",
-        "balance": 7.23,
+        "balance": 107.23,
         "pnl": 1.55,
         "drawdown": 44.41,
-        "drawdown_pct": 86.0
+        "drawdown_pct": 29.29
       },
       {
         "time": 1769525214,
         "time_str": "2026-01-27T22:46:54",
-        "balance": -0.4,
+        "balance": 99.6,
         "pnl": -7.63,
         "drawdown": 52.04,
-        "drawdown_pct": 100.77
+        "drawdown_pct": 34.32
       },
       {
         "time": 1769526581,
         "time_str": "2026-01-27T23:09:41",
-        "balance": 0.67,
+        "balance": 100.67,
         "pnl": 1.07,
         "drawdown": 50.97,
-        "drawdown_pct": 98.7
+        "drawdown_pct": 33.61
       },
       {
         "time": 1769528307,
         "time_str": "2026-01-27T23:38:27",
-        "balance": 1.94,
+        "balance": 101.94,
         "pnl": 1.27,
         "drawdown": 49.7,
-        "drawdown_pct": 96.24
+        "drawdown_pct": 32.77
       },
       {
         "time": 1769530020,
         "time_str": "2026-01-28T00:07:00",
-        "balance": 4.76,
+        "balance": 104.76,
         "pnl": 2.82,
         "drawdown": 46.88,
-        "drawdown_pct": 90.78
+        "drawdown_pct": 30.92
       },
       {
         "time": 1769538112,
         "time_str": "2026-01-28T02:21:52",
-        "balance": 31.68,
+        "balance": 131.68,
         "pnl": 26.92,
         "drawdown": 19.96,
-        "drawdown_pct": 38.65
+        "drawdown_pct": 13.16
       },
       {
         "time": 1769542678,
         "time_str": "2026-01-28T03:37:58",
-        "balance": 38.16,
+        "balance": 138.16,
         "pnl": 6.48,
         "drawdown": 13.48,
-        "drawdown_pct": 26.1
+        "drawdown_pct": 8.89
       },
       {
         "time": 1769554035,
         "time_str": "2026-01-28T06:47:15",
-        "balance": 32.34,
+        "balance": 132.34,
         "pnl": -5.82,
         "drawdown": 19.3,
-        "drawdown_pct": 37.37
+        "drawdown_pct": 12.73
       },
       {
         "time": 1769592360,
         "time_str": "2026-01-28T17:26:00",
-        "balance": -96.88,
+        "balance": 3.12,
         "pnl": -129.22,
         "drawdown": 148.52,
-        "drawdown_pct": 287.61
+        "drawdown_pct": 97.94
       },
       {
         "time": 1769597249,
         "time_str": "2026-01-28T18:47:29",
-        "balance": -101.92,
+        "balance": -1.92,
         "pnl": -5.04,
         "drawdown": 153.56,
-        "drawdown_pct": 297.37
+        "drawdown_pct": 101.27
       },
       {
         "time": 1769604310,
         "time_str": "2026-01-28T20:45:10",
-        "balance": -102.08,
+        "balance": -2.08,
         "pnl": -0.16,
         "drawdown": 153.72,
-        "drawdown_pct": 297.68
+        "drawdown_pct": 101.37
       },
       {
         "time": 1769604991,
         "time_str": "2026-01-28T20:56:31",
-        "balance": -102.13,
+        "balance": -2.13,
         "pnl": -0.05,
         "drawdown": 153.77,
-        "drawdown_pct": 297.77
+        "drawdown_pct": 101.4
       },
       {
         "time": 1769605479,
         "time_str": "2026-01-28T21:04:39",
-        "balance": -109.94,
+        "balance": -9.94,
         "pnl": -7.81,
         "drawdown": 161.58,
-        "drawdown_pct": 312.9
+        "drawdown_pct": 106.55
       },
       {
         "time": 1769612486,
         "time_str": "2026-01-28T23:01:26",
-        "balance": -116.88,
+        "balance": -16.88,
         "pnl": -6.94,
         "drawdown": 168.52,
-        "drawdown_pct": 326.34
+        "drawdown_pct": 111.13
       },
       {
         "time": 1769612731,
         "time_str": "2026-01-28T23:05:31",
-        "balance": -115.68,
+        "balance": -15.68,
         "pnl": 1.2,
         "drawdown": 167.32,
-        "drawdown_pct": 324.01
+        "drawdown_pct": 110.34
       },
       {
         "time": 1769619909,
         "time_str": "2026-01-29T01:05:09",
-        "balance": -112.81,
+        "balance": -12.81,
         "pnl": 2.87,
         "drawdown": 164.45,
-        "drawdown_pct": 318.45
+        "drawdown_pct": 108.45
       },
       {
         "time": 1769620471,
         "time_str": "2026-01-29T01:14:31",
-        "balance": -109.64,
+        "balance": -9.64,
         "pnl": 3.17,
         "drawdown": 161.28,
-        "drawdown_pct": 312.32
+        "drawdown_pct": 106.36
       },
       {
         "time": 1769639425,
         "time_str": "2026-01-29T06:30:25",
-        "balance": -118.67,
+        "balance": -18.67,
         "pnl": -9.03,
         "drawdown": 170.31,
-        "drawdown_pct": 329.8
+        "drawdown_pct": 112.31
       },
       {
         "time": 1769641365,
         "time_str": "2026-01-29T07:02:45",
-        "balance": -114.86,
+        "balance": -14.86,
         "pnl": 3.81,
         "drawdown": 166.5,
-        "drawdown_pct": 322.42
+        "drawdown_pct": 109.8
       },
       {
         "time": 1769641365,
         "time_str": "2026-01-29T07:02:45",
-        "balance": -104.37,
+        "balance": -4.37,
         "pnl": 10.49,
         "drawdown": 156.01,
-        "drawdown_pct": 302.11
+        "drawdown_pct": 102.88
       },
       {
         "time": 1769681167,
         "time_str": "2026-01-29T18:06:07",
-        "balance": -105.91,
+        "balance": -5.91,
         "pnl": -1.54,
         "drawdown": 157.55,
-        "drawdown_pct": 305.09
+        "drawdown_pct": 103.9
       },
       {
         "time": 1769689982,
         "time_str": "2026-01-29T20:33:02",
-        "balance": -104.18,
+        "balance": -4.18,
         "pnl": 1.73,
         "drawdown": 155.82,
-        "drawdown_pct": 301.74
+        "drawdown_pct": 102.76
       },
       {
         "time": 1769693528,
         "time_str": "2026-01-29T21:32:08",
-        "balance": -66.19,
+        "balance": 33.81,
         "pnl": 37.99,
         "drawdown": 117.83,
-        "drawdown_pct": 228.18
+        "drawdown_pct": 77.7
       },
       {
         "time": 1769695029,
         "time_str": "2026-01-29T21:57:09",
-        "balance": -64.11,
+        "balance": 35.89,
         "pnl": 2.08,
         "drawdown": 115.75,
-        "drawdown_pct": 224.15
+        "drawdown_pct": 76.33
       },
       {
         "time": 1769699599,
         "time_str": "2026-01-29T23:13:19",
-        "balance": -62.8,
+        "balance": 37.2,
         "pnl": 1.31,
         "drawdown": 114.44,
-        "drawdown_pct": 221.61
+        "drawdown_pct": 75.47
       },
       {
         "time": 1769704551,
         "time_str": "2026-01-30T00:35:51",
-        "balance": -70.32,
+        "balance": 29.68,
         "pnl": -7.52,
         "drawdown": 121.96,
-        "drawdown_pct": 236.17
+        "drawdown_pct": 80.43
       },
       {
         "time": 1769704641,
         "time_str": "2026-01-30T00:37:21",
-        "balance": -63.19,
+        "balance": 36.81,
         "pnl": 7.13,
         "drawdown": 114.83,
-        "drawdown_pct": 222.37
+        "drawdown_pct": 75.73
       },
       {
         "time": 1769706279,
         "time_str": "2026-01-30T01:04:39",
-        "balance": -67.21,
+        "balance": 32.79,
         "pnl": -4.02,
         "drawdown": 118.85,
-        "drawdown_pct": 230.15
+        "drawdown_pct": 78.38
       },
       {
         "time": 1769751552,
         "time_str": "2026-01-30T13:39:12",
-        "balance": -64.76,
+        "balance": 35.24,
         "pnl": 2.45,
         "drawdown": 116.4,
-        "drawdown_pct": 225.41
+        "drawdown_pct": 76.76
       },
       {
         "time": 1769751735,
         "time_str": "2026-01-30T13:42:15",
-        "balance": -65.23,
+        "balance": 34.77,
         "pnl": -0.47,
         "drawdown": 116.87,
-        "drawdown_pct": 226.32
+        "drawdown_pct": 77.07
       },
       {
         "time": 1769771253,
         "time_str": "2026-01-30T19:07:33",
-        "balance": -70.95,
+        "balance": 29.05,
         "pnl": -5.72,
         "drawdown": 122.59,
-        "drawdown_pct": 237.39
+        "drawdown_pct": 80.84
       },
       {
         "time": 1769771856,
         "time_str": "2026-01-30T19:17:36",
-        "balance": -66.73,
+        "balance": 33.27,
         "pnl": 4.22,
         "drawdown": 118.37,
-        "drawdown_pct": 229.22
+        "drawdown_pct": 78.06
       },
       {
         "time": 1769772357,
         "time_str": "2026-01-30T19:25:57",
-        "balance": -60.12,
+        "balance": 39.88,
         "pnl": 6.61,
         "drawdown": 111.76,
-        "drawdown_pct": 216.42
+        "drawdown_pct": 73.7
       },
       {
         "time": 1769773913,
         "time_str": "2026-01-30T19:51:53",
-        "balance": -53.09,
+        "balance": 46.91,
         "pnl": 7.03,
         "drawdown": 104.73,
-        "drawdown_pct": 202.81
+        "drawdown_pct": 69.06
       },
       {
         "time": 1769778096,
         "time_str": "2026-01-30T21:01:36",
-        "balance": -49.06,
+        "balance": 50.94,
         "pnl": 4.03,
         "drawdown": 100.7,
-        "drawdown_pct": 195.0
+        "drawdown_pct": 66.41
       },
       {
         "time": 1769791748,
         "time_str": "2026-01-31T00:49:08",
-        "balance": 25.2,
+        "balance": 125.2,
         "pnl": 74.26,
         "drawdown": 26.44,
-        "drawdown_pct": 51.2
+        "drawdown_pct": 17.44
       },
       {
         "time": 1770027599,
         "time_str": "2026-02-02T18:19:59",
-        "balance": 32.06,
+        "balance": 132.06,
         "pnl": 6.86,
         "drawdown": 19.58,
-        "drawdown_pct": 37.92
+        "drawdown_pct": 12.91
       },
       {
         "time": 1770031706,
         "time_str": "2026-02-02T19:28:26",
-        "balance": 15.6,
+        "balance": 115.6,
         "pnl": -16.46,
         "drawdown": 36.04,
-        "drawdown_pct": 69.79
+        "drawdown_pct": 23.77
       },
       {
         "time": 1770031761,
         "time_str": "2026-02-02T19:29:21",
-        "balance": 22.99,
+        "balance": 122.99,
         "pnl": 7.39,
         "drawdown": 28.65,
-        "drawdown_pct": 55.48
+        "drawdown_pct": 18.89
       },
       {
         "time": 1770042363,
         "time_str": "2026-02-02T22:26:03",
-        "balance": 28.08,
+        "balance": 128.08,
         "pnl": 5.09,
         "drawdown": 23.56,
-        "drawdown_pct": 45.62
+        "drawdown_pct": 15.54
       },
       {
         "time": 1770046457,
         "time_str": "2026-02-02T23:34:17",
-        "balance": 31.06,
+        "balance": 131.06,
         "pnl": 2.98,
         "drawdown": 20.58,
-        "drawdown_pct": 39.85
+        "drawdown_pct": 13.57
       },
       {
         "time": 1770087682,
         "time_str": "2026-02-03T11:01:22",
-        "balance": 73.37,
+        "balance": 173.37,
         "pnl": 42.31,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1190,63 +1223,63 @@
       {
         "time": 1770091482,
         "time_str": "2026-02-03T12:04:42",
-        "balance": 57.04,
+        "balance": 157.04,
         "pnl": -16.33,
         "drawdown": 16.33,
-        "drawdown_pct": 22.26
+        "drawdown_pct": 9.42
       },
       {
         "time": 1770093016,
         "time_str": "2026-02-03T12:30:16",
-        "balance": 44.18,
+        "balance": 144.18,
         "pnl": -12.86,
         "drawdown": 29.19,
-        "drawdown_pct": 39.78
+        "drawdown_pct": 16.84
       },
       {
         "time": 1770104266,
         "time_str": "2026-02-03T15:37:46",
-        "balance": 33.21,
+        "balance": 133.21,
         "pnl": -10.97,
         "drawdown": 40.16,
-        "drawdown_pct": 54.74
+        "drawdown_pct": 23.16
       },
       {
         "time": 1770111284,
         "time_str": "2026-02-03T17:34:44",
-        "balance": 38.38,
+        "balance": 138.38,
         "pnl": 5.17,
         "drawdown": 34.99,
-        "drawdown_pct": 47.69
+        "drawdown_pct": 20.18
       },
       {
         "time": 1770113222,
         "time_str": "2026-02-03T18:07:02",
-        "balance": 46.02,
+        "balance": 146.02,
         "pnl": 7.64,
         "drawdown": 27.35,
-        "drawdown_pct": 37.28
+        "drawdown_pct": 15.78
       },
       {
         "time": 1770116408,
         "time_str": "2026-02-03T19:00:08",
-        "balance": 48.85,
+        "balance": 148.85,
         "pnl": 2.83,
         "drawdown": 24.52,
-        "drawdown_pct": 33.42
+        "drawdown_pct": 14.14
       },
       {
         "time": 1770116423,
         "time_str": "2026-02-03T19:00:23",
-        "balance": 49.66,
+        "balance": 149.66,
         "pnl": 0.81,
         "drawdown": 23.71,
-        "drawdown_pct": 32.32
+        "drawdown_pct": 13.68
       },
       {
         "time": 1770117391,
         "time_str": "2026-02-03T19:16:31",
-        "balance": 82.62,
+        "balance": 182.62,
         "pnl": 32.77,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1254,7 +1287,7 @@
       {
         "time": 1770118261,
         "time_str": "2026-02-03T19:31:01",
-        "balance": 86.66,
+        "balance": 186.66,
         "pnl": 4.04,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1262,55 +1295,55 @@
       {
         "time": 1770119933,
         "time_str": "2026-02-03T19:58:53",
-        "balance": 76.27,
+        "balance": 176.27,
         "pnl": -10.39,
         "drawdown": 10.39,
-        "drawdown_pct": 11.99
+        "drawdown_pct": 5.57
       },
       {
         "time": 1770123779,
         "time_str": "2026-02-03T21:02:59",
-        "balance": 61.06,
+        "balance": 161.06,
         "pnl": -15.21,
         "drawdown": 25.6,
-        "drawdown_pct": 29.54
+        "drawdown_pct": 13.71
       },
       {
         "time": 1770132666,
         "time_str": "2026-02-03T23:31:06",
-        "balance": 49.87,
+        "balance": 149.87,
         "pnl": -11.19,
         "drawdown": 36.79,
-        "drawdown_pct": 42.45
+        "drawdown_pct": 19.71
       },
       {
         "time": 1770133627,
         "time_str": "2026-02-03T23:47:07",
-        "balance": 58.26,
+        "balance": 158.26,
         "pnl": 8.39,
         "drawdown": 28.4,
-        "drawdown_pct": 32.77
+        "drawdown_pct": 15.21
       },
       {
         "time": 1770134902,
         "time_str": "2026-02-04T00:08:22",
-        "balance": 61.58,
+        "balance": 161.58,
         "pnl": 3.32,
         "drawdown": 25.08,
-        "drawdown_pct": 28.94
+        "drawdown_pct": 13.44
       },
       {
         "time": 1770135428,
         "time_str": "2026-02-04T00:17:08",
-        "balance": 86.44,
+        "balance": 186.44,
         "pnl": 24.86,
         "drawdown": 0.22,
-        "drawdown_pct": 0.25
+        "drawdown_pct": 0.12
       },
       {
         "time": 1770142661,
         "time_str": "2026-02-04T02:17:41",
-        "balance": 91.55,
+        "balance": 191.55,
         "pnl": 5.11,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1318,127 +1351,127 @@
       {
         "time": 1770150754,
         "time_str": "2026-02-04T04:32:34",
-        "balance": 74.18,
+        "balance": 174.18,
         "pnl": -17.37,
         "drawdown": 17.37,
-        "drawdown_pct": 18.97
+        "drawdown_pct": 9.07
       },
       {
         "time": 1770187622,
         "time_str": "2026-02-04T14:47:02",
-        "balance": 60.28,
+        "balance": 160.28,
         "pnl": -13.9,
         "drawdown": 31.27,
-        "drawdown_pct": 34.16
+        "drawdown_pct": 16.32
       },
       {
         "time": 1770198633,
         "time_str": "2026-02-04T17:50:33",
-        "balance": 59.94,
+        "balance": 159.94,
         "pnl": -0.34,
         "drawdown": 31.61,
-        "drawdown_pct": 34.53
+        "drawdown_pct": 16.5
       },
       {
         "time": 1770202930,
         "time_str": "2026-02-04T19:02:10",
-        "balance": 60.02,
+        "balance": 160.02,
         "pnl": 0.08,
         "drawdown": 31.53,
-        "drawdown_pct": 34.44
+        "drawdown_pct": 16.46
       },
       {
         "time": 1770203827,
         "time_str": "2026-02-04T19:17:07",
-        "balance": 65.83,
+        "balance": 165.83,
         "pnl": 5.81,
         "drawdown": 25.72,
-        "drawdown_pct": 28.09
+        "drawdown_pct": 13.43
       },
       {
         "time": 1770204759,
         "time_str": "2026-02-04T19:32:39",
-        "balance": 44.89,
+        "balance": 144.89,
         "pnl": -20.94,
         "drawdown": 46.66,
-        "drawdown_pct": 50.97
+        "drawdown_pct": 24.36
       },
       {
         "time": 1770210414,
         "time_str": "2026-02-04T21:06:54",
-        "balance": 56.92,
+        "balance": 156.92,
         "pnl": 12.03,
         "drawdown": 34.63,
-        "drawdown_pct": 37.83
+        "drawdown_pct": 18.08
       },
       {
         "time": 1770210961,
         "time_str": "2026-02-04T21:16:01",
-        "balance": 35.43,
+        "balance": 135.43,
         "pnl": -21.49,
         "drawdown": 56.12,
-        "drawdown_pct": 61.3
+        "drawdown_pct": 29.3
       },
       {
         "time": 1770213496,
         "time_str": "2026-02-04T21:58:16",
-        "balance": 37.66,
+        "balance": 137.66,
         "pnl": 2.23,
         "drawdown": 53.89,
-        "drawdown_pct": 58.86
+        "drawdown_pct": 28.13
       },
       {
         "time": 1770221510,
         "time_str": "2026-02-05T00:11:50",
-        "balance": 53.24,
+        "balance": 153.24,
         "pnl": 15.58,
         "drawdown": 38.31,
-        "drawdown_pct": 41.85
+        "drawdown_pct": 20.0
       },
       {
         "time": 1770227018,
         "time_str": "2026-02-05T01:43:38",
-        "balance": 52.11,
+        "balance": 152.11,
         "pnl": -1.13,
         "drawdown": 39.44,
-        "drawdown_pct": 43.08
+        "drawdown_pct": 20.59
       },
       {
         "time": 1770227524,
         "time_str": "2026-02-05T01:52:04",
-        "balance": 69.65,
+        "balance": 169.65,
         "pnl": 17.54,
         "drawdown": 21.9,
-        "drawdown_pct": 23.92
+        "drawdown_pct": 11.43
       },
       {
         "time": 1770230911,
         "time_str": "2026-02-05T02:48:31",
-        "balance": 60.71,
+        "balance": 160.71,
         "pnl": -8.94,
         "drawdown": 30.84,
-        "drawdown_pct": 33.69
+        "drawdown_pct": 16.1
       },
       {
         "time": 1770232223,
         "time_str": "2026-02-05T03:10:23",
-        "balance": 86.54,
+        "balance": 186.54,
         "pnl": 25.83,
         "drawdown": 5.01,
-        "drawdown_pct": 5.47
+        "drawdown_pct": 2.62
       },
       {
         "time": 1770270646,
         "time_str": "2026-02-05T13:50:46",
-        "balance": 69.13,
+        "balance": 169.13,
         "pnl": -17.41,
         "drawdown": 22.42,
-        "drawdown_pct": 24.49
+        "drawdown_pct": 11.7
       },
       {
         "time": 1770292698,
         "time_str": "2026-02-05T19:58:18",
-        "balance": 92.43,
+        "balance": 192.43,
         "pnl": 23.3,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1446,7 +1479,7 @@
       {
         "time": 1770297857,
         "time_str": "2026-02-05T21:24:17",
-        "balance": 92.43,
+        "balance": 192.43,
         "pnl": 0.0,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1454,7 +1487,7 @@
       {
         "time": 1770306409,
         "time_str": "2026-02-05T23:46:49",
-        "balance": 97.33,
+        "balance": 197.33,
         "pnl": 4.9,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1462,7 +1495,7 @@
       {
         "time": 1770313720,
         "time_str": "2026-02-06T01:48:40",
-        "balance": 98.15,
+        "balance": 198.15,
         "pnl": 0.82,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1470,7 +1503,7 @@
       {
         "time": 1770374206,
         "time_str": "2026-02-06T18:36:46",
-        "balance": 104.41,
+        "balance": 204.41,
         "pnl": 6.26,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1478,15 +1511,15 @@
       {
         "time": 1770376264,
         "time_str": "2026-02-06T19:11:04",
-        "balance": 103.73,
+        "balance": 203.73,
         "pnl": -0.68,
         "drawdown": 0.68,
-        "drawdown_pct": 0.65
+        "drawdown_pct": 0.33
       },
       {
         "time": 1770383086,
         "time_str": "2026-02-06T21:04:46",
-        "balance": 114.79,
+        "balance": 214.79,
         "pnl": 11.06,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1494,23 +1527,23 @@
       {
         "time": 1770385854,
         "time_str": "2026-02-06T21:50:54",
-        "balance": 114.28,
+        "balance": 214.28,
         "pnl": -0.51,
         "drawdown": 0.51,
-        "drawdown_pct": 0.44
+        "drawdown_pct": 0.24
       },
       {
         "time": 1770633570,
         "time_str": "2026-02-09T18:39:30",
-        "balance": 113.66,
+        "balance": 213.66,
         "pnl": -0.62,
         "drawdown": 1.13,
-        "drawdown_pct": 0.98
+        "drawdown_pct": 0.53
       },
       {
         "time": 1770638771,
         "time_str": "2026-02-09T20:06:11",
-        "balance": 130.25,
+        "balance": 230.25,
         "pnl": 16.59,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1518,71 +1551,71 @@
       {
         "time": 1770662401,
         "time_str": "2026-02-10T02:40:01",
-        "balance": 128.79,
+        "balance": 228.79,
         "pnl": -1.46,
         "drawdown": 1.46,
-        "drawdown_pct": 1.12
+        "drawdown_pct": 0.63
       },
       {
         "time": 1770720369,
         "time_str": "2026-02-10T18:46:09",
-        "balance": 121.97,
+        "balance": 221.97,
         "pnl": -6.82,
         "drawdown": 8.28,
-        "drawdown_pct": 6.36
+        "drawdown_pct": 3.6
       },
       {
         "time": 1770726166,
         "time_str": "2026-02-10T20:22:46",
-        "balance": 127.28,
+        "balance": 227.28,
         "pnl": 5.31,
         "drawdown": 2.97,
-        "drawdown_pct": 2.28
+        "drawdown_pct": 1.29
       },
       {
         "time": 1770734688,
         "time_str": "2026-02-10T22:44:48",
-        "balance": 111.58,
+        "balance": 211.58,
         "pnl": -15.7,
         "drawdown": 18.67,
-        "drawdown_pct": 14.33
+        "drawdown_pct": 8.11
       },
       {
         "time": 1770801222,
         "time_str": "2026-02-11T17:13:42",
-        "balance": 119.63,
+        "balance": 219.63,
         "pnl": 8.05,
         "drawdown": 10.62,
-        "drawdown_pct": 8.15
+        "drawdown_pct": 4.61
       },
       {
         "time": 1770802085,
         "time_str": "2026-02-11T17:28:05",
-        "balance": 120.22,
+        "balance": 220.22,
         "pnl": 0.59,
         "drawdown": 10.03,
-        "drawdown_pct": 7.7
+        "drawdown_pct": 4.36
       },
       {
         "time": 1770805093,
         "time_str": "2026-02-11T18:18:13",
-        "balance": 120.01,
+        "balance": 220.01,
         "pnl": -0.21,
         "drawdown": 10.24,
-        "drawdown_pct": 7.86
+        "drawdown_pct": 4.45
       },
       {
         "time": 1770806026,
         "time_str": "2026-02-11T18:33:46",
-        "balance": 120.54,
+        "balance": 220.54,
         "pnl": 0.53,
         "drawdown": 9.71,
-        "drawdown_pct": 7.45
+        "drawdown_pct": 4.22
       },
       {
         "time": 1770807609,
         "time_str": "2026-02-11T19:00:09",
-        "balance": 132.22,
+        "balance": 232.22,
         "pnl": 11.68,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1590,7 +1623,7 @@
       {
         "time": 1770807627,
         "time_str": "2026-02-11T19:00:27",
-        "balance": 143.34,
+        "balance": 243.34,
         "pnl": 11.12,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1598,7 +1631,7 @@
       {
         "time": 1770808236,
         "time_str": "2026-02-11T19:10:36",
-        "balance": 154.1,
+        "balance": 254.1,
         "pnl": 10.76,
         "drawdown": 0.0,
         "drawdown_pct": 0.0
@@ -1606,818 +1639,1626 @@
       {
         "time": 1770810255,
         "time_str": "2026-02-11T19:44:15",
-        "balance": 153.4,
+        "balance": 253.4,
         "pnl": -0.7,
         "drawdown": 0.7,
-        "drawdown_pct": 0.45
+        "drawdown_pct": 0.28
       },
       {
         "time": 1770810267,
         "time_str": "2026-02-11T19:44:27",
-        "balance": 142.22,
+        "balance": 242.22,
         "pnl": -11.18,
         "drawdown": 11.88,
-        "drawdown_pct": 7.71
+        "drawdown_pct": 4.68
       },
       {
         "time": 1770810614,
         "time_str": "2026-02-11T19:50:14",
-        "balance": 153.88,
+        "balance": 253.88,
         "pnl": 11.66,
         "drawdown": 0.22,
-        "drawdown_pct": 0.14
+        "drawdown_pct": 0.09
       },
       {
         "time": 1770811994,
         "time_str": "2026-02-11T20:13:14",
-        "balance": 141.11,
+        "balance": 241.11,
         "pnl": -12.77,
         "drawdown": 12.99,
-        "drawdown_pct": 8.43
+        "drawdown_pct": 5.11
       },
       {
         "time": 1770812115,
         "time_str": "2026-02-11T20:15:15",
-        "balance": 140.04,
+        "balance": 240.04,
         "pnl": -1.07,
         "drawdown": 14.06,
-        "drawdown_pct": 9.12
+        "drawdown_pct": 5.53
       },
       {
         "time": 1770812678,
         "time_str": "2026-02-11T20:24:38",
-        "balance": 129.63,
+        "balance": 229.63,
         "pnl": -10.41,
         "drawdown": 24.47,
-        "drawdown_pct": 15.88
+        "drawdown_pct": 9.63
       },
       {
         "time": 1770812840,
         "time_str": "2026-02-11T20:27:20",
-        "balance": 139.21,
+        "balance": 239.21,
         "pnl": 9.58,
         "drawdown": 14.89,
-        "drawdown_pct": 9.66
+        "drawdown_pct": 5.86
       },
       {
         "time": 1770813858,
         "time_str": "2026-02-11T20:44:18",
-        "balance": 122.37,
+        "balance": 222.37,
         "pnl": -16.84,
         "drawdown": 31.73,
-        "drawdown_pct": 20.59
+        "drawdown_pct": 12.49
       },
       {
         "time": 1770816890,
         "time_str": "2026-02-11T21:34:50",
-        "balance": 122.4,
+        "balance": 222.4,
         "pnl": 0.03,
         "drawdown": 31.7,
-        "drawdown_pct": 20.57
+        "drawdown_pct": 12.48
       },
       {
         "time": 1770818401,
         "time_str": "2026-02-11T22:00:01",
-        "balance": 122.35,
+        "balance": 222.35,
         "pnl": -0.05,
         "drawdown": 31.75,
-        "drawdown_pct": 20.6
+        "drawdown_pct": 12.5
       },
       {
         "time": 1770819651,
         "time_str": "2026-02-11T22:20:51",
-        "balance": 108.62,
+        "balance": 208.62,
         "pnl": -13.73,
         "drawdown": 45.48,
-        "drawdown_pct": 29.51
+        "drawdown_pct": 17.9
       },
       {
         "time": 1770820681,
         "time_str": "2026-02-11T22:38:01",
-        "balance": 113.76,
+        "balance": 213.76,
         "pnl": 5.14,
         "drawdown": 40.34,
-        "drawdown_pct": 26.18
+        "drawdown_pct": 15.88
       },
       {
         "time": 1770826715,
         "time_str": "2026-02-12T00:18:35",
-        "balance": 113.59,
+        "balance": 213.59,
         "pnl": -0.17,
         "drawdown": 40.51,
-        "drawdown_pct": 26.29
+        "drawdown_pct": 15.94
       },
       {
         "time": 1770828048,
         "time_str": "2026-02-12T00:40:48",
-        "balance": 107.87,
+        "balance": 207.87,
         "pnl": -5.72,
         "drawdown": 46.23,
-        "drawdown_pct": 30.0
+        "drawdown_pct": 18.19
       },
       {
         "time": 1770828228,
         "time_str": "2026-02-12T00:43:48",
-        "balance": 105.98,
+        "balance": 205.98,
         "pnl": -1.89,
         "drawdown": 48.12,
-        "drawdown_pct": 31.23
+        "drawdown_pct": 18.94
       },
       {
         "time": 1770829859,
         "time_str": "2026-02-12T01:10:59",
-        "balance": 105.69,
+        "balance": 205.69,
         "pnl": -0.29,
         "drawdown": 48.41,
-        "drawdown_pct": 31.41
+        "drawdown_pct": 19.05
       },
       {
         "time": 1770831350,
         "time_str": "2026-02-12T01:35:50",
-        "balance": 117.97,
+        "balance": 217.97,
         "pnl": 12.28,
         "drawdown": 36.13,
-        "drawdown_pct": 23.45
+        "drawdown_pct": 14.22
       },
       {
         "time": 1770885303,
         "time_str": "2026-02-12T16:35:03",
-        "balance": 112.43,
+        "balance": 212.43,
         "pnl": -5.54,
         "drawdown": 41.67,
-        "drawdown_pct": 27.04
+        "drawdown_pct": 16.4
       },
       {
         "time": 1770885819,
         "time_str": "2026-02-12T16:43:39",
-        "balance": 118.26,
+        "balance": 218.26,
         "pnl": 5.83,
         "drawdown": 35.84,
-        "drawdown_pct": 23.26
+        "drawdown_pct": 14.1
       },
       {
         "time": 1770890820,
         "time_str": "2026-02-12T18:07:00",
-        "balance": 106.61,
+        "balance": 206.61,
         "pnl": -11.65,
         "drawdown": 47.49,
-        "drawdown_pct": 30.82
+        "drawdown_pct": 18.69
       },
       {
         "time": 1770891921,
         "time_str": "2026-02-12T18:25:21",
-        "balance": 111.17,
+        "balance": 211.17,
         "pnl": 4.56,
         "drawdown": 42.93,
-        "drawdown_pct": 27.86
+        "drawdown_pct": 16.89
       },
       {
         "time": 1770895887,
         "time_str": "2026-02-12T19:31:27",
-        "balance": 110.9,
+        "balance": 210.9,
         "pnl": -0.27,
         "drawdown": 43.2,
-        "drawdown_pct": 28.03
+        "drawdown_pct": 17.0
       },
       {
         "time": 1770896254,
         "time_str": "2026-02-12T19:37:34",
-        "balance": 111.37,
+        "balance": 211.37,
         "pnl": 0.47,
         "drawdown": 42.73,
-        "drawdown_pct": 27.73
+        "drawdown_pct": 16.82
       },
       {
         "time": 1770897983,
         "time_str": "2026-02-12T20:06:23",
-        "balance": 111.62,
+        "balance": 211.62,
         "pnl": 0.25,
         "drawdown": 42.48,
-        "drawdown_pct": 27.57
+        "drawdown_pct": 16.72
       },
       {
         "time": 1770898289,
         "time_str": "2026-02-12T20:11:29",
-        "balance": 103.3,
+        "balance": 203.3,
         "pnl": -8.32,
         "drawdown": 50.8,
-        "drawdown_pct": 32.97
+        "drawdown_pct": 19.99
       },
       {
         "time": 1770899243,
         "time_str": "2026-02-12T20:27:23",
-        "balance": 92.66,
+        "balance": 192.66,
         "pnl": -10.64,
         "drawdown": 61.44,
-        "drawdown_pct": 39.87
+        "drawdown_pct": 24.18
       },
       {
         "time": 1770899749,
         "time_str": "2026-02-12T20:35:49",
-        "balance": 98.92,
+        "balance": 198.92,
         "pnl": 6.26,
         "drawdown": 55.18,
-        "drawdown_pct": 35.81
+        "drawdown_pct": 21.72
       },
       {
         "time": 1770905142,
         "time_str": "2026-02-12T22:05:42",
-        "balance": 103.89,
+        "balance": 203.89,
         "pnl": 4.97,
         "drawdown": 50.21,
-        "drawdown_pct": 32.58
+        "drawdown_pct": 19.76
       },
       {
         "time": 1770905290,
         "time_str": "2026-02-12T22:08:10",
-        "balance": 109.78,
+        "balance": 209.78,
         "pnl": 5.89,
         "drawdown": 44.32,
-        "drawdown_pct": 28.76
+        "drawdown_pct": 17.44
       },
       {
         "time": 1770908576,
         "time_str": "2026-02-12T23:02:56",
-        "balance": 117.27,
+        "balance": 217.27,
         "pnl": 7.49,
         "drawdown": 36.83,
-        "drawdown_pct": 23.9
+        "drawdown_pct": 14.49
       },
       {
         "time": 1770910139,
         "time_str": "2026-02-12T23:28:59",
-        "balance": 124.8,
+        "balance": 224.8,
         "pnl": 7.53,
         "drawdown": 29.3,
-        "drawdown_pct": 19.01
+        "drawdown_pct": 11.53
       },
       {
         "time": 1770912233,
         "time_str": "2026-02-13T00:03:53",
-        "balance": 136.92,
+        "balance": 236.92,
         "pnl": 12.12,
         "drawdown": 17.18,
-        "drawdown_pct": 11.15
+        "drawdown_pct": 6.76
       },
       {
         "time": 1770913606,
         "time_str": "2026-02-13T00:26:46",
-        "balance": 138.47,
+        "balance": 238.47,
         "pnl": 1.55,
         "drawdown": 15.63,
-        "drawdown_pct": 10.14
+        "drawdown_pct": 6.15
       },
       {
         "time": 1770914500,
         "time_str": "2026-02-13T00:41:40",
-        "balance": 138.49,
+        "balance": 238.49,
         "pnl": 0.02,
         "drawdown": 15.61,
-        "drawdown_pct": 10.13
+        "drawdown_pct": 6.14
       },
       {
         "time": 1770916677,
         "time_str": "2026-02-13T01:17:57",
-        "balance": 130.48,
+        "balance": 230.48,
         "pnl": -8.01,
         "drawdown": 23.62,
-        "drawdown_pct": 15.33
+        "drawdown_pct": 9.3
       },
       {
         "time": 1770917582,
         "time_str": "2026-02-13T01:33:02",
-        "balance": 130.48,
+        "balance": 230.48,
         "pnl": 0.0,
         "drawdown": 23.62,
-        "drawdown_pct": 15.33
+        "drawdown_pct": 9.3
       },
       {
         "time": 1770919151,
         "time_str": "2026-02-13T01:59:11",
-        "balance": 142.27,
+        "balance": 242.27,
         "pnl": 11.79,
         "drawdown": 11.83,
-        "drawdown_pct": 7.68
+        "drawdown_pct": 4.66
       },
       {
         "time": 1770919995,
         "time_str": "2026-02-13T02:13:15",
-        "balance": 128.02,
+        "balance": 228.02,
         "pnl": -14.25,
         "drawdown": 26.08,
-        "drawdown_pct": 16.92
+        "drawdown_pct": 10.26
       },
       {
         "time": 1770920066,
         "time_str": "2026-02-13T02:14:26",
-        "balance": 114.57,
+        "balance": 214.57,
         "pnl": -13.45,
         "drawdown": 39.53,
-        "drawdown_pct": 25.65
+        "drawdown_pct": 15.56
       },
       {
         "time": 1770920364,
         "time_str": "2026-02-13T02:19:24",
-        "balance": 125.03,
+        "balance": 225.03,
         "pnl": 10.46,
         "drawdown": 29.07,
-        "drawdown_pct": 18.86
+        "drawdown_pct": 11.44
       },
       {
         "time": 1770926288,
         "time_str": "2026-02-13T03:58:08",
-        "balance": 103.4,
+        "balance": 203.4,
         "pnl": -21.63,
         "drawdown": 50.7,
-        "drawdown_pct": 32.9
+        "drawdown_pct": 19.95
       },
       {
         "time": 1770926502,
         "time_str": "2026-02-13T04:01:42",
-        "balance": 105.41,
+        "balance": 205.41,
         "pnl": 2.01,
         "drawdown": 48.69,
-        "drawdown_pct": 31.6
+        "drawdown_pct": 19.16
       },
       {
         "time": 1770934843,
         "time_str": "2026-02-13T06:20:43",
-        "balance": 92.04,
+        "balance": 192.04,
         "pnl": -13.37,
         "drawdown": 62.06,
-        "drawdown_pct": 40.27
+        "drawdown_pct": 24.42
       },
       {
         "time": 1770973280,
         "time_str": "2026-02-13T17:01:20",
-        "balance": 104.12,
+        "balance": 204.12,
         "pnl": 12.08,
         "drawdown": 49.98,
-        "drawdown_pct": 32.43
+        "drawdown_pct": 19.67
       },
       {
         "time": 1770974696,
         "time_str": "2026-02-13T17:24:56",
-        "balance": 119.93,
+        "balance": 219.93,
         "pnl": 15.81,
         "drawdown": 34.17,
-        "drawdown_pct": 22.17
+        "drawdown_pct": 13.45
       },
       {
         "time": 1770975763,
         "time_str": "2026-02-13T17:42:43",
-        "balance": 132.87,
+        "balance": 232.87,
         "pnl": 12.94,
         "drawdown": 21.23,
-        "drawdown_pct": 13.78
+        "drawdown_pct": 8.35
       },
       {
         "time": 1770977439,
         "time_str": "2026-02-13T18:10:39",
-        "balance": 126.52,
+        "balance": 226.52,
         "pnl": -6.35,
         "drawdown": 27.58,
-        "drawdown_pct": 17.9
+        "drawdown_pct": 10.85
       },
       {
         "time": 1770977528,
         "time_str": "2026-02-13T18:12:08",
-        "balance": 136.98,
+        "balance": 236.98,
         "pnl": 10.46,
         "drawdown": 17.12,
-        "drawdown_pct": 11.11
+        "drawdown_pct": 6.74
       },
       {
         "time": 1770980068,
         "time_str": "2026-02-13T18:54:28",
-        "balance": 143.86,
+        "balance": 243.86,
         "pnl": 6.88,
         "drawdown": 10.24,
-        "drawdown_pct": 6.65
+        "drawdown_pct": 4.03
       },
       {
         "time": 1770982181,
         "time_str": "2026-02-13T19:29:41",
-        "balance": 130.46,
+        "balance": 230.46,
         "pnl": -13.4,
         "drawdown": 23.64,
-        "drawdown_pct": 15.34
+        "drawdown_pct": 9.3
       },
       {
         "time": 1770982423,
         "time_str": "2026-02-13T19:33:43",
-        "balance": 140.57,
+        "balance": 240.57,
         "pnl": 10.11,
         "drawdown": 13.53,
-        "drawdown_pct": 8.78
+        "drawdown_pct": 5.32
       },
       {
         "time": 1770982423,
         "time_str": "2026-02-13T19:33:43",
-        "balance": 147.0,
+        "balance": 247.0,
         "pnl": 6.43,
         "drawdown": 7.1,
-        "drawdown_pct": 4.61
+        "drawdown_pct": 2.79
       },
       {
         "time": 1770986982,
         "time_str": "2026-02-13T20:49:42",
-        "balance": 149.73,
+        "balance": 249.73,
         "pnl": 2.73,
         "drawdown": 4.37,
-        "drawdown_pct": 2.84
+        "drawdown_pct": 1.72
       },
       {
         "time": 1770987631,
         "time_str": "2026-02-13T21:00:31",
-        "balance": 147.81,
+        "balance": 247.81,
         "pnl": -1.92,
         "drawdown": 6.29,
-        "drawdown_pct": 4.08
+        "drawdown_pct": 2.48
       },
       {
         "time": 1770991301,
         "time_str": "2026-02-13T22:01:41",
-        "balance": 145.03,
+        "balance": 245.03,
         "pnl": -2.78,
         "drawdown": 9.07,
-        "drawdown_pct": 5.89
+        "drawdown_pct": 3.57
       },
       {
         "time": 1770991436,
         "time_str": "2026-02-13T22:03:56",
-        "balance": 132.46,
+        "balance": 232.46,
         "pnl": -12.57,
         "drawdown": 21.64,
-        "drawdown_pct": 14.04
+        "drawdown_pct": 8.52
       },
       {
         "time": 1770991808,
         "time_str": "2026-02-13T22:10:08",
-        "balance": 138.01,
+        "balance": 238.01,
         "pnl": 5.55,
         "drawdown": 16.09,
-        "drawdown_pct": 10.44
+        "drawdown_pct": 6.33
       },
       {
         "time": 1770991866,
         "time_str": "2026-02-13T22:11:06",
-        "balance": 137.17,
+        "balance": 237.17,
         "pnl": -0.84,
         "drawdown": 16.93,
-        "drawdown_pct": 10.99
+        "drawdown_pct": 6.66
       },
       {
         "time": 1770993259,
         "time_str": "2026-02-13T22:34:19",
-        "balance": 137.63,
+        "balance": 237.63,
         "pnl": 0.46,
         "drawdown": 16.47,
-        "drawdown_pct": 10.69
+        "drawdown_pct": 6.48
       },
       {
         "time": 1770996970,
         "time_str": "2026-02-13T23:36:10",
-        "balance": 152.31,
+        "balance": 252.31,
         "pnl": 14.68,
         "drawdown": 1.79,
-        "drawdown_pct": 1.16
+        "drawdown_pct": 0.7
       },
       {
         "time": 1770999301,
         "time_str": "2026-02-14T00:15:01",
-        "balance": 137.62,
+        "balance": 237.62,
         "pnl": -14.69,
         "drawdown": 16.48,
-        "drawdown_pct": 10.69
+        "drawdown_pct": 6.49
       },
       {
         "time": 1770999691,
         "time_str": "2026-02-14T00:21:31",
-        "balance": 136.76,
+        "balance": 236.76,
         "pnl": -0.86,
         "drawdown": 17.34,
-        "drawdown_pct": 11.25
+        "drawdown_pct": 6.82
       },
       {
         "time": 1771003060,
         "time_str": "2026-02-14T01:17:40",
-        "balance": 124.22,
+        "balance": 224.22,
         "pnl": -12.54,
         "drawdown": 29.88,
-        "drawdown_pct": 19.39
+        "drawdown_pct": 11.76
       },
       {
         "time": 1771004208,
         "time_str": "2026-02-14T01:36:48",
-        "balance": 105.38,
+        "balance": 205.38,
         "pnl": -18.84,
         "drawdown": 48.72,
-        "drawdown_pct": 31.62
+        "drawdown_pct": 19.17
       },
       {
         "time": 1771004244,
         "time_str": "2026-02-14T01:37:24",
-        "balance": 110.39,
+        "balance": 210.39,
         "pnl": 5.01,
         "drawdown": 43.71,
-        "drawdown_pct": 28.36
+        "drawdown_pct": 17.2
       },
       {
         "time": 1771004858,
         "time_str": "2026-02-14T01:47:38",
-        "balance": 109.35,
+        "balance": 209.35,
         "pnl": -1.04,
         "drawdown": 44.75,
-        "drawdown_pct": 29.04
+        "drawdown_pct": 17.61
       },
       {
         "time": 1771005027,
         "time_str": "2026-02-14T01:50:27",
-        "balance": 122.35,
+        "balance": 222.35,
         "pnl": 13.0,
         "drawdown": 31.75,
-        "drawdown_pct": 20.6
+        "drawdown_pct": 12.5
       },
       {
         "time": 1771005534,
         "time_str": "2026-02-14T01:58:54",
-        "balance": 95.97,
+        "balance": 195.97,
         "pnl": -26.38,
         "drawdown": 58.13,
-        "drawdown_pct": 37.72
+        "drawdown_pct": 22.88
       },
       {
         "time": 1771006986,
         "time_str": "2026-02-14T02:23:06",
-        "balance": 93.86,
+        "balance": 193.86,
         "pnl": -2.11,
         "drawdown": 60.24,
-        "drawdown_pct": 39.09
+        "drawdown_pct": 23.71
       },
       {
         "time": 1771230675,
         "time_str": "2026-02-16T16:31:15",
-        "balance": 93.86,
+        "balance": 193.86,
         "pnl": 0.0,
         "drawdown": 60.24,
-        "drawdown_pct": 39.09
+        "drawdown_pct": 23.71
       },
       {
         "time": 1771231483,
         "time_str": "2026-02-16T16:44:43",
-        "balance": 89.65,
+        "balance": 189.65,
         "pnl": -4.21,
         "drawdown": 64.45,
-        "drawdown_pct": 41.82
+        "drawdown_pct": 25.36
       },
       {
         "time": 1771235245,
         "time_str": "2026-02-16T17:47:25",
-        "balance": 85.44,
+        "balance": 185.44,
         "pnl": -4.21,
         "drawdown": 68.66,
-        "drawdown_pct": 44.56
+        "drawdown_pct": 27.02
       },
       {
         "time": 1771236837,
         "time_str": "2026-02-16T18:13:57",
-        "balance": 81.06,
+        "balance": 181.06,
         "pnl": -4.38,
         "drawdown": 73.04,
-        "drawdown_pct": 47.4
+        "drawdown_pct": 28.74
       },
       {
         "time": 1771239757,
         "time_str": "2026-02-16T19:02:37",
-        "balance": 89.79,
+        "balance": 189.79,
         "pnl": 8.73,
         "drawdown": 64.31,
-        "drawdown_pct": 41.73
+        "drawdown_pct": 25.31
       },
       {
         "time": 1771254882,
         "time_str": "2026-02-16T23:14:42",
-        "balance": 101.63,
+        "balance": 201.63,
         "pnl": 11.84,
         "drawdown": 52.47,
-        "drawdown_pct": 34.05
+        "drawdown_pct": 20.65
       },
       {
         "time": 1771260487,
         "time_str": "2026-02-17T00:48:07",
-        "balance": 103.48,
+        "balance": 203.48,
         "pnl": 1.85,
         "drawdown": 50.62,
-        "drawdown_pct": 32.85
+        "drawdown_pct": 19.92
       },
       {
         "time": 1771326717,
         "time_str": "2026-02-17T19:11:57",
-        "balance": 110.53,
+        "balance": 210.53,
         "pnl": 7.05,
         "drawdown": 43.57,
-        "drawdown_pct": 28.27
+        "drawdown_pct": 17.15
       },
       {
         "time": 1771326717,
         "time_str": "2026-02-17T19:11:57",
-        "balance": 112.26,
+        "balance": 212.26,
         "pnl": 1.73,
         "drawdown": 41.84,
-        "drawdown_pct": 27.15
+        "drawdown_pct": 16.47
       },
       {
         "time": 1771329303,
         "time_str": "2026-02-17T19:55:03",
-        "balance": 114.86,
+        "balance": 214.86,
         "pnl": 2.6,
         "drawdown": 39.24,
-        "drawdown_pct": 25.46
+        "drawdown_pct": 15.44
       },
       {
         "time": 1771330790,
         "time_str": "2026-02-17T20:19:50",
-        "balance": 116.37,
+        "balance": 216.37,
         "pnl": 1.51,
         "drawdown": 37.73,
-        "drawdown_pct": 24.48
+        "drawdown_pct": 14.85
       },
       {
         "time": 1771337727,
         "time_str": "2026-02-17T22:15:27",
-        "balance": 108.8,
+        "balance": 208.8,
         "pnl": -7.57,
         "drawdown": 45.3,
-        "drawdown_pct": 29.4
+        "drawdown_pct": 17.83
       },
       {
         "time": 1771351411,
         "time_str": "2026-02-18T02:03:31",
-        "balance": 109.81,
+        "balance": 209.81,
         "pnl": 1.01,
         "drawdown": 44.29,
-        "drawdown_pct": 28.74
+        "drawdown_pct": 17.43
       },
       {
         "time": 1771404544,
         "time_str": "2026-02-18T16:49:04",
-        "balance": 108.04,
+        "balance": 208.04,
         "pnl": -1.77,
         "drawdown": 46.06,
-        "drawdown_pct": 29.89
+        "drawdown_pct": 18.13
       },
       {
         "time": 1771412366,
         "time_str": "2026-02-18T18:59:26",
-        "balance": 100.92,
+        "balance": 200.92,
         "pnl": -7.12,
         "drawdown": 53.18,
-        "drawdown_pct": 34.51
+        "drawdown_pct": 20.93
       },
       {
         "time": 1771422500,
         "time_str": "2026-02-18T21:48:20",
-        "balance": 103.36,
+        "balance": 203.36,
         "pnl": 2.44,
         "drawdown": 50.74,
-        "drawdown_pct": 32.93
+        "drawdown_pct": 19.97
       },
       {
         "time": 1771426927,
         "time_str": "2026-02-18T23:02:07",
-        "balance": 105.54,
+        "balance": 205.54,
         "pnl": 2.18,
         "drawdown": 48.56,
-        "drawdown_pct": 31.51
+        "drawdown_pct": 19.11
       },
       {
         "time": 1771427633,
         "time_str": "2026-02-18T23:13:53",
-        "balance": 105.18,
+        "balance": 205.18,
         "pnl": -0.36,
         "drawdown": 48.92,
-        "drawdown_pct": 31.75
+        "drawdown_pct": 19.25
       },
       {
         "time": 1771429090,
         "time_str": "2026-02-18T23:38:10",
-        "balance": 108.08,
+        "balance": 208.08,
         "pnl": 2.9,
         "drawdown": 46.02,
-        "drawdown_pct": 29.86
+        "drawdown_pct": 18.11
       },
       {
         "time": 1771441426,
         "time_str": "2026-02-19T03:03:46",
-        "balance": 99.51,
+        "balance": 199.51,
         "pnl": -8.57,
         "drawdown": 54.59,
-        "drawdown_pct": 35.43
+        "drawdown_pct": 21.48
       },
       {
         "time": 1771447368,
         "time_str": "2026-02-19T04:42:48",
-        "balance": 85.29,
+        "balance": 185.29,
         "pnl": -14.22,
         "drawdown": 68.81,
-        "drawdown_pct": 44.65
+        "drawdown_pct": 27.08
       },
       {
         "time": 1771500964,
         "time_str": "2026-02-19T19:36:04",
-        "balance": 77.43,
+        "balance": 177.43,
         "pnl": -7.86,
         "drawdown": 76.67,
-        "drawdown_pct": 49.75
+        "drawdown_pct": 30.17
       },
       {
         "time": 1771515839,
         "time_str": "2026-02-19T23:43:59",
-        "balance": 79.59,
+        "balance": 179.59,
         "pnl": 2.16,
         "drawdown": 74.51,
-        "drawdown_pct": 48.35
+        "drawdown_pct": 29.32
       },
       {
         "time": 1771520537,
         "time_str": "2026-02-20T01:02:17",
-        "balance": 81.84,
+        "balance": 181.84,
         "pnl": 2.25,
         "drawdown": 72.26,
-        "drawdown_pct": 46.89
+        "drawdown_pct": 28.44
       },
       {
         "time": 1771579736,
         "time_str": "2026-02-20T17:28:56",
-        "balance": 83.87,
+        "balance": 183.87,
         "pnl": 2.03,
         "drawdown": 70.23,
-        "drawdown_pct": 45.57
+        "drawdown_pct": 27.64
       },
       {
         "time": 1771584063,
         "time_str": "2026-02-20T18:41:03",
-        "balance": 85.22,
+        "balance": 185.22,
         "pnl": 1.35,
         "drawdown": 68.88,
-        "drawdown_pct": 44.7
+        "drawdown_pct": 27.11
       },
       {
         "time": 1771587184,
         "time_str": "2026-02-20T19:33:04",
-        "balance": 87.34,
+        "balance": 187.34,
         "pnl": 2.12,
         "drawdown": 66.76,
-        "drawdown_pct": 43.32
+        "drawdown_pct": 26.27
       },
       {
         "time": 1771589532,
         "time_str": "2026-02-20T20:12:12",
-        "balance": 87.69,
+        "balance": 187.69,
         "pnl": 0.35,
         "drawdown": 66.41,
-        "drawdown_pct": 43.1
+        "drawdown_pct": 26.14
       },
       {
         "time": 1771589617,
         "time_str": "2026-02-20T20:13:37",
-        "balance": 89.22,
+        "balance": 189.22,
         "pnl": 1.53,
         "drawdown": 64.88,
-        "drawdown_pct": 42.1
+        "drawdown_pct": 25.53
       },
       {
         "time": 1771603356,
         "time_str": "2026-02-21T00:02:36",
-        "balance": 90.8,
+        "balance": 190.8,
         "pnl": 1.58,
         "drawdown": 63.3,
-        "drawdown_pct": 41.08
+        "drawdown_pct": 24.91
       },
       {
         "time": 1771852026,
         "time_str": "2026-02-23T21:07:06",
-        "balance": 93.25,
+        "balance": 193.25,
         "pnl": 2.45,
         "drawdown": 60.85,
-        "drawdown_pct": 39.49
+        "drawdown_pct": 23.95
       },
       {
         "time": 1771860645,
         "time_str": "2026-02-23T23:30:45",
-        "balance": 95.45,
+        "balance": 195.45,
         "pnl": 2.2,
         "drawdown": 58.65,
-        "drawdown_pct": 38.06
+        "drawdown_pct": 23.08
       },
       {
         "time": 1771864803,
         "time_str": "2026-02-24T00:40:03",
-        "balance": 88.39,
+        "balance": 188.39,
         "pnl": -7.06,
         "drawdown": 65.71,
-        "drawdown_pct": 42.64
+        "drawdown_pct": 25.86
+      },
+      {
+        "time": 1771869982,
+        "time_str": "2026-02-24T02:06:22",
+        "balance": 189.67,
+        "pnl": 1.28,
+        "drawdown": 64.43,
+        "drawdown_pct": 25.36
+      },
+      {
+        "time": 1771932800,
+        "time_str": "2026-02-24T19:33:20",
+        "balance": 192.21,
+        "pnl": 2.54,
+        "drawdown": 61.89,
+        "drawdown_pct": 24.36
+      },
+      {
+        "time": 1771932912,
+        "time_str": "2026-02-24T19:35:12",
+        "balance": 185.38,
+        "pnl": -6.83,
+        "drawdown": 68.72,
+        "drawdown_pct": 27.04
+      },
+      {
+        "time": 1771947641,
+        "time_str": "2026-02-24T23:40:41",
+        "balance": 187.74,
+        "pnl": 2.36,
+        "drawdown": 66.36,
+        "drawdown_pct": 26.12
+      },
+      {
+        "time": 1771954049,
+        "time_str": "2026-02-25T01:27:29",
+        "balance": 189.91,
+        "pnl": 2.17,
+        "drawdown": 64.19,
+        "drawdown_pct": 25.26
+      },
+      {
+        "time": 1772017457,
+        "time_str": "2026-02-25T19:04:17",
+        "balance": 192.45,
+        "pnl": 2.54,
+        "drawdown": 61.65,
+        "drawdown_pct": 24.26
+      },
+      {
+        "time": 1772022298,
+        "time_str": "2026-02-25T20:24:58",
+        "balance": 185.73,
+        "pnl": -6.72,
+        "drawdown": 68.37,
+        "drawdown_pct": 26.91
+      },
+      {
+        "time": 1772025082,
+        "time_str": "2026-02-25T21:11:22",
+        "balance": 186.72,
+        "pnl": 0.99,
+        "drawdown": 67.38,
+        "drawdown_pct": 26.52
+      },
+      {
+        "time": 1772040495,
+        "time_str": "2026-02-26T01:28:15",
+        "balance": 178.92,
+        "pnl": -7.8,
+        "drawdown": 75.18,
+        "drawdown_pct": 29.59
+      },
+      {
+        "time": 1772082936,
+        "time_str": "2026-02-26T13:15:36",
+        "balance": 178.52,
+        "pnl": -0.4,
+        "drawdown": 75.58,
+        "drawdown_pct": 29.74
+      },
+      {
+        "time": 1772086336,
+        "time_str": "2026-02-26T14:12:16",
+        "balance": 166.84,
+        "pnl": -11.68,
+        "drawdown": 87.26,
+        "drawdown_pct": 34.34
+      },
+      {
+        "time": 1772097972,
+        "time_str": "2026-02-26T17:26:12",
+        "balance": 157.3,
+        "pnl": -9.54,
+        "drawdown": 96.8,
+        "drawdown_pct": 38.1
+      },
+      {
+        "time": 1772106945,
+        "time_str": "2026-02-26T19:55:45",
+        "balance": 165.55,
+        "pnl": 8.25,
+        "drawdown": 88.55,
+        "drawdown_pct": 34.85
+      },
+      {
+        "time": 1772108344,
+        "time_str": "2026-02-26T20:19:04",
+        "balance": 167.93,
+        "pnl": 2.38,
+        "drawdown": 86.17,
+        "drawdown_pct": 33.91
+      },
+      {
+        "time": 1772109438,
+        "time_str": "2026-02-26T20:37:18",
+        "balance": 170.35,
+        "pnl": 2.42,
+        "drawdown": 83.75,
+        "drawdown_pct": 32.96
+      },
+      {
+        "time": 1772116458,
+        "time_str": "2026-02-26T22:34:18",
+        "balance": 156.27,
+        "pnl": -14.08,
+        "drawdown": 97.83,
+        "drawdown_pct": 38.5
+      },
+      {
+        "time": 1772123649,
+        "time_str": "2026-02-27T00:34:09",
+        "balance": 158.82,
+        "pnl": 2.55,
+        "drawdown": 95.28,
+        "drawdown_pct": 37.5
+      },
+      {
+        "time": 1772126381,
+        "time_str": "2026-02-27T01:19:41",
+        "balance": 161.37,
+        "pnl": 2.55,
+        "drawdown": 92.73,
+        "drawdown_pct": 36.49
+      },
+      {
+        "time": 1772135939,
+        "time_str": "2026-02-27T03:58:59",
+        "balance": 162.44,
+        "pnl": 1.07,
+        "drawdown": 91.66,
+        "drawdown_pct": 36.07
+      },
+      {
+        "time": 1772135969,
+        "time_str": "2026-02-27T03:59:29",
+        "balance": 164.93,
+        "pnl": 2.49,
+        "drawdown": 89.17,
+        "drawdown_pct": 35.09
+      },
+      {
+        "time": 1772159478,
+        "time_str": "2026-02-27T10:31:18",
+        "balance": 154.17,
+        "pnl": -10.96,
+        "drawdown": 99.93,
+        "drawdown_pct": 39.33
+      },
+      {
+        "time": 1772167799,
+        "time_str": "2026-02-27T12:49:59",
+        "balance": 154.46,
+        "pnl": 0.17,
+        "drawdown": 99.64,
+        "drawdown_pct": 39.21
+      },
+      {
+        "time": 1772184763,
+        "time_str": "2026-02-27T17:32:43",
+        "balance": 156.85,
+        "pnl": 2.39,
+        "drawdown": 97.25,
+        "drawdown_pct": 38.27
+      },
+      {
+        "time": 1772186519,
+        "time_str": "2026-02-27T18:01:59",
+        "balance": 189.35,
+        "pnl": 32.5,
+        "drawdown": 64.75,
+        "drawdown_pct": 25.48
+      },
+      {
+        "time": 1772191231,
+        "time_str": "2026-02-27T19:20:31",
+        "balance": 200.03,
+        "pnl": 10.68,
+        "drawdown": 54.07,
+        "drawdown_pct": 21.28
+      },
+      {
+        "time": 1772204859,
+        "time_str": "2026-02-27T23:07:39",
+        "balance": 237.26,
+        "pnl": 37.23,
+        "drawdown": 16.84,
+        "drawdown_pct": 6.63
+      },
+      {
+        "time": 1772204860,
+        "time_str": "2026-02-27T23:07:40",
+        "balance": 223.14,
+        "pnl": -14.12,
+        "drawdown": 30.96,
+        "drawdown_pct": 12.18
+      },
+      {
+        "time": 1772205357,
+        "time_str": "2026-02-27T23:15:57",
+        "balance": 224.77,
+        "pnl": 1.63,
+        "drawdown": 29.33,
+        "drawdown_pct": 11.54
+      },
+      {
+        "time": 1772205419,
+        "time_str": "2026-02-27T23:16:59",
+        "balance": 231.77,
+        "pnl": 7.0,
+        "drawdown": 22.33,
+        "drawdown_pct": 8.79
+      },
+      {
+        "time": 1772205419,
+        "time_str": "2026-02-27T23:16:59",
+        "balance": 235.72,
+        "pnl": 3.95,
+        "drawdown": 18.38,
+        "drawdown_pct": 7.23
+      },
+      {
+        "time": 1772210547,
+        "time_str": "2026-02-28T00:42:27",
+        "balance": 237.99,
+        "pnl": 2.27,
+        "drawdown": 16.11,
+        "drawdown_pct": 6.34
+      },
+      {
+        "time": 1772215349,
+        "time_str": "2026-02-28T02:02:29",
+        "balance": 220.92,
+        "pnl": -17.07,
+        "drawdown": 33.18,
+        "drawdown_pct": 13.06
+      },
+      {
+        "time": 1772216118,
+        "time_str": "2026-02-28T02:15:18",
+        "balance": 206.4,
+        "pnl": -14.52,
+        "drawdown": 47.7,
+        "drawdown_pct": 18.77
+      },
+      {
+        "time": 1772216138,
+        "time_str": "2026-02-28T02:15:38",
+        "balance": 199.5,
+        "pnl": -6.9,
+        "drawdown": 54.6,
+        "drawdown_pct": 21.49
+      },
+      {
+        "time": 1772216138,
+        "time_str": "2026-02-28T02:15:38",
+        "balance": 197.13,
+        "pnl": -2.37,
+        "drawdown": 56.97,
+        "drawdown_pct": 22.42
+      },
+      {
+        "time": 1772216403,
+        "time_str": "2026-02-28T02:20:03",
+        "balance": 202.61,
+        "pnl": 5.48,
+        "drawdown": 51.49,
+        "drawdown_pct": 20.26
+      },
+      {
+        "time": 1772216405,
+        "time_str": "2026-02-28T02:20:05",
+        "balance": 207.62,
+        "pnl": 5.01,
+        "drawdown": 46.48,
+        "drawdown_pct": 18.29
+      },
+      {
+        "time": 1772449623,
+        "time_str": "2026-03-02T19:07:03",
+        "balance": 210.11,
+        "pnl": 2.49,
+        "drawdown": 43.99,
+        "drawdown_pct": 17.31
+      },
+      {
+        "time": 1772453302,
+        "time_str": "2026-03-02T20:08:22",
+        "balance": 211.2,
+        "pnl": 1.09,
+        "drawdown": 42.9,
+        "drawdown_pct": 16.88
+      },
+      {
+        "time": 1772464327,
+        "time_str": "2026-03-02T23:12:07",
+        "balance": 197.52,
+        "pnl": -13.68,
+        "drawdown": 56.58,
+        "drawdown_pct": 22.27
+      },
+      {
+        "time": 1772464413,
+        "time_str": "2026-03-02T23:13:33",
+        "balance": 196.73,
+        "pnl": -0.79,
+        "drawdown": 57.37,
+        "drawdown_pct": 22.58
+      },
+      {
+        "time": 1772466331,
+        "time_str": "2026-03-02T23:45:31",
+        "balance": 202.03,
+        "pnl": 5.3,
+        "drawdown": 52.07,
+        "drawdown_pct": 20.49
+      },
+      {
+        "time": 1772473015,
+        "time_str": "2026-03-03T01:36:55",
+        "balance": 191.15,
+        "pnl": -10.88,
+        "drawdown": 62.95,
+        "drawdown_pct": 24.77
+      },
+      {
+        "time": 1772474518,
+        "time_str": "2026-03-03T02:01:58",
+        "balance": 170.58,
+        "pnl": -20.57,
+        "drawdown": 83.52,
+        "drawdown_pct": 32.87
+      },
+      {
+        "time": 1772475636,
+        "time_str": "2026-03-03T02:20:36",
+        "balance": 175.58,
+        "pnl": 5.0,
+        "drawdown": 78.52,
+        "drawdown_pct": 30.9
+      },
+      {
+        "time": 1772510399,
+        "time_str": "2026-03-03T11:59:59",
+        "balance": 162.63,
+        "pnl": -12.95,
+        "drawdown": 91.47,
+        "drawdown_pct": 36.0
+      },
+      {
+        "time": 1772512186,
+        "time_str": "2026-03-03T12:29:46",
+        "balance": 169.9,
+        "pnl": 7.27,
+        "drawdown": 84.2,
+        "drawdown_pct": 33.14
+      },
+      {
+        "time": 1772516735,
+        "time_str": "2026-03-03T13:45:35",
+        "balance": 170.87,
+        "pnl": 0.97,
+        "drawdown": 83.23,
+        "drawdown_pct": 32.75
+      },
+      {
+        "time": 1772516966,
+        "time_str": "2026-03-03T13:49:26",
+        "balance": 169.59,
+        "pnl": -1.28,
+        "drawdown": 84.51,
+        "drawdown_pct": 33.26
+      },
+      {
+        "time": 1772516969,
+        "time_str": "2026-03-03T13:49:29",
+        "balance": 168.24,
+        "pnl": -1.35,
+        "drawdown": 85.86,
+        "drawdown_pct": 33.79
+      },
+      {
+        "time": 1772516980,
+        "time_str": "2026-03-03T13:49:40",
+        "balance": 167.41,
+        "pnl": -0.83,
+        "drawdown": 86.69,
+        "drawdown_pct": 34.12
+      },
+      {
+        "time": 1772517001,
+        "time_str": "2026-03-03T13:50:01",
+        "balance": 167.1,
+        "pnl": -0.31,
+        "drawdown": 87.0,
+        "drawdown_pct": 34.24
+      },
+      {
+        "time": 1772519257,
+        "time_str": "2026-03-03T14:27:37",
+        "balance": 158.53,
+        "pnl": -8.57,
+        "drawdown": 95.57,
+        "drawdown_pct": 37.61
+      },
+      {
+        "time": 1772519942,
+        "time_str": "2026-03-03T14:39:02",
+        "balance": 158.99,
+        "pnl": 0.46,
+        "drawdown": 95.11,
+        "drawdown_pct": 37.43
+      },
+      {
+        "time": 1772523452,
+        "time_str": "2026-03-03T15:37:32",
+        "balance": 184.69,
+        "pnl": 25.7,
+        "drawdown": 69.41,
+        "drawdown_pct": 27.32
+      },
+      {
+        "time": 1772525543,
+        "time_str": "2026-03-03T16:12:23",
+        "balance": 171.26,
+        "pnl": -13.43,
+        "drawdown": 82.84,
+        "drawdown_pct": 32.6
+      },
+      {
+        "time": 1772526947,
+        "time_str": "2026-03-03T16:35:47",
+        "balance": 165.82,
+        "pnl": -5.44,
+        "drawdown": 88.28,
+        "drawdown_pct": 34.74
+      },
+      {
+        "time": 1772532868,
+        "time_str": "2026-03-03T18:14:28",
+        "balance": 158.75,
+        "pnl": -7.07,
+        "drawdown": 95.35,
+        "drawdown_pct": 37.52
+      },
+      {
+        "time": 1772534130,
+        "time_str": "2026-03-03T18:35:30",
+        "balance": 160.07,
+        "pnl": 1.32,
+        "drawdown": 94.03,
+        "drawdown_pct": 37.01
+      },
+      {
+        "time": 1772537398,
+        "time_str": "2026-03-03T19:29:58",
+        "balance": 162.56,
+        "pnl": 2.49,
+        "drawdown": 91.54,
+        "drawdown_pct": 36.03
+      },
+      {
+        "time": 1772541610,
+        "time_str": "2026-03-03T20:40:10",
+        "balance": 162.99,
+        "pnl": 0.43,
+        "drawdown": 91.11,
+        "drawdown_pct": 35.86
+      },
+      {
+        "time": 1772543723,
+        "time_str": "2026-03-03T21:15:23",
+        "balance": 165.62,
+        "pnl": 2.63,
+        "drawdown": 88.48,
+        "drawdown_pct": 34.82
+      },
+      {
+        "time": 1772611318,
+        "time_str": "2026-03-04T16:01:58",
+        "balance": 192.56,
+        "pnl": 26.94,
+        "drawdown": 61.54,
+        "drawdown_pct": 24.22
+      },
+      {
+        "time": 1772620861,
+        "time_str": "2026-03-04T18:41:01",
+        "balance": 180.48,
+        "pnl": -12.08,
+        "drawdown": 73.62,
+        "drawdown_pct": 28.97
+      },
+      {
+        "time": 1772626103,
+        "time_str": "2026-03-04T20:08:23",
+        "balance": 167.27,
+        "pnl": -13.21,
+        "drawdown": 86.83,
+        "drawdown_pct": 34.17
+      },
+      {
+        "time": 1772640144,
+        "time_str": "2026-03-05T00:02:24",
+        "balance": 164.33,
+        "pnl": -2.93,
+        "drawdown": 89.77,
+        "drawdown_pct": 35.33
+      },
+      {
+        "time": 1772680235,
+        "time_str": "2026-03-05T11:10:35",
+        "balance": 155.66,
+        "pnl": -8.67,
+        "drawdown": 98.44,
+        "drawdown_pct": 38.74
+      },
+      {
+        "time": 1772685025,
+        "time_str": "2026-03-05T12:30:25",
+        "balance": 151.07,
+        "pnl": -4.59,
+        "drawdown": 103.03,
+        "drawdown_pct": 40.55
+      },
+      {
+        "time": 1772685025,
+        "time_str": "2026-03-05T12:30:25",
+        "balance": 146.71,
+        "pnl": -4.36,
+        "drawdown": 107.39,
+        "drawdown_pct": 42.26
+      },
+      {
+        "time": 1772693247,
+        "time_str": "2026-03-05T14:47:27",
+        "balance": 142.38,
+        "pnl": -4.33,
+        "drawdown": 111.72,
+        "drawdown_pct": 43.97
+      },
+      {
+        "time": 1772693247,
+        "time_str": "2026-03-05T14:47:27",
+        "balance": 137.21,
+        "pnl": -5.17,
+        "drawdown": 116.89,
+        "drawdown_pct": 46.0
+      },
+      {
+        "time": 1772694033,
+        "time_str": "2026-03-05T15:00:33",
+        "balance": 137.18,
+        "pnl": -0.03,
+        "drawdown": 116.92,
+        "drawdown_pct": 46.01
+      },
+      {
+        "time": 1772695158,
+        "time_str": "2026-03-05T15:19:18",
+        "balance": 137.18,
+        "pnl": 0.0,
+        "drawdown": 116.92,
+        "drawdown_pct": 46.01
+      },
+      {
+        "time": 1772697484,
+        "time_str": "2026-03-05T15:58:04",
+        "balance": 131.95,
+        "pnl": -5.23,
+        "drawdown": 122.15,
+        "drawdown_pct": 48.07
+      },
+      {
+        "time": 1772698156,
+        "time_str": "2026-03-05T16:09:16",
+        "balance": 122.89,
+        "pnl": -9.06,
+        "drawdown": 131.21,
+        "drawdown_pct": 51.64
+      },
+      {
+        "time": 1772701095,
+        "time_str": "2026-03-05T16:58:15",
+        "balance": 156.12,
+        "pnl": 33.23,
+        "drawdown": 97.98,
+        "drawdown_pct": 38.56
+      },
+      {
+        "time": 1772701630,
+        "time_str": "2026-03-05T17:07:10",
+        "balance": 157.48,
+        "pnl": 1.36,
+        "drawdown": 96.62,
+        "drawdown_pct": 38.02
+      },
+      {
+        "time": 1772706127,
+        "time_str": "2026-03-05T18:22:07",
+        "balance": 148.12,
+        "pnl": -9.36,
+        "drawdown": 105.98,
+        "drawdown_pct": 41.71
+      },
+      {
+        "time": 1772706131,
+        "time_str": "2026-03-05T18:22:11",
+        "balance": 139.11,
+        "pnl": -9.01,
+        "drawdown": 114.99,
+        "drawdown_pct": 45.25
+      },
+      {
+        "time": 1772708779,
+        "time_str": "2026-03-05T19:06:19",
+        "balance": 139.08,
+        "pnl": -0.03,
+        "drawdown": 115.02,
+        "drawdown_pct": 45.27
+      },
+      {
+        "time": 1772716007,
+        "time_str": "2026-03-05T21:06:47",
+        "balance": 145.54,
+        "pnl": 6.46,
+        "drawdown": 108.56,
+        "drawdown_pct": 42.72
+      },
+      {
+        "time": 1772727652,
+        "time_str": "2026-03-06T00:20:52",
+        "balance": 148.0,
+        "pnl": 2.46,
+        "drawdown": 106.1,
+        "drawdown_pct": 41.76
+      },
+      {
+        "time": 1772729900,
+        "time_str": "2026-03-06T00:58:20",
+        "balance": 150.59,
+        "pnl": 2.59,
+        "drawdown": 103.51,
+        "drawdown_pct": 40.74
+      },
+      {
+        "time": 1772731568,
+        "time_str": "2026-03-06T01:26:08",
+        "balance": 141.01,
+        "pnl": -9.58,
+        "drawdown": 113.09,
+        "drawdown_pct": 44.51
+      },
+      {
+        "time": 1772733959,
+        "time_str": "2026-03-06T02:05:59",
+        "balance": 133.96,
+        "pnl": -7.05,
+        "drawdown": 120.14,
+        "drawdown_pct": 47.28
+      },
+      {
+        "time": 1772767984,
+        "time_str": "2026-03-06T11:33:04",
+        "balance": 126.01,
+        "pnl": -7.95,
+        "drawdown": 128.09,
+        "drawdown_pct": 50.41
+      },
+      {
+        "time": 1772771301,
+        "time_str": "2026-03-06T12:28:21",
+        "balance": 123.89,
+        "pnl": -2.12,
+        "drawdown": 130.21,
+        "drawdown_pct": 51.24
+      },
+      {
+        "time": 1772772065,
+        "time_str": "2026-03-06T12:41:05",
+        "balance": 119.35,
+        "pnl": -4.54,
+        "drawdown": 134.75,
+        "drawdown_pct": 53.03
+      },
+      {
+        "time": 1772775066,
+        "time_str": "2026-03-06T13:31:06",
+        "balance": 119.07,
+        "pnl": -0.28,
+        "drawdown": 135.03,
+        "drawdown_pct": 53.14
+      },
+      {
+        "time": 1772775103,
+        "time_str": "2026-03-06T13:31:43",
+        "balance": 119.22,
+        "pnl": 0.15,
+        "drawdown": 134.88,
+        "drawdown_pct": 53.08
+      },
+      {
+        "time": 1772788409,
+        "time_str": "2026-03-06T17:13:29",
+        "balance": 120.94,
+        "pnl": 1.72,
+        "drawdown": 133.16,
+        "drawdown_pct": 52.4
+      },
+      {
+        "time": 1772793157,
+        "time_str": "2026-03-06T18:32:37",
+        "balance": 123.63,
+        "pnl": 2.69,
+        "drawdown": 130.47,
+        "drawdown_pct": 51.35
+      },
+      {
+        "time": 1772795532,
+        "time_str": "2026-03-06T19:12:12",
+        "balance": 129.0,
+        "pnl": 5.37,
+        "drawdown": 125.1,
+        "drawdown_pct": 49.23
+      },
+      {
+        "time": 1772811000,
+        "time_str": "2026-03-06T23:30:00",
+        "balance": 119.73,
+        "pnl": -9.27,
+        "drawdown": 134.37,
+        "drawdown_pct": 52.88
+      },
+      {
+        "time": 1772817903,
+        "time_str": "2026-03-07T01:25:03",
+        "balance": 122.23,
+        "pnl": 2.5,
+        "drawdown": 131.87,
+        "drawdown_pct": 51.9
+      },
+      {
+        "time": 1773022821,
+        "time_str": "2026-03-09T10:20:21",
+        "balance": 140.61,
+        "pnl": 18.28,
+        "drawdown": 113.49,
+        "drawdown_pct": 44.66
+      },
+      {
+        "time": 1773050647,
+        "time_str": "2026-03-09T18:04:07",
+        "balance": 143.05,
+        "pnl": 2.44,
+        "drawdown": 111.05,
+        "drawdown_pct": 43.7
+      },
+      {
+        "time": 1773058579,
+        "time_str": "2026-03-09T20:16:19",
+        "balance": 128.88,
+        "pnl": -14.17,
+        "drawdown": 125.22,
+        "drawdown_pct": 49.28
+      },
+      {
+        "time": 1773060165,
+        "time_str": "2026-03-09T20:42:45",
+        "balance": 142.58,
+        "pnl": 13.7,
+        "drawdown": 111.52,
+        "drawdown_pct": 43.89
+      },
+      {
+        "time": 1773060298,
+        "time_str": "2026-03-09T20:44:58",
+        "balance": 128.23,
+        "pnl": -14.35,
+        "drawdown": 125.87,
+        "drawdown_pct": 49.54
+      },
+      {
+        "time": 1773070956,
+        "time_str": "2026-03-09T23:42:36",
+        "balance": 133.42,
+        "pnl": 5.19,
+        "drawdown": 120.68,
+        "drawdown_pct": 47.49
       }
     ],
     "daily_pnl": [
@@ -2682,21 +3523,98 @@
       },
       {
         "date": "2026-02-24",
-        "pnl": -7.06,
-        "trades": 1,
-        "wins": 0,
+        "pnl": -7.71,
+        "trades": 5,
+        "wins": 3,
+        "losses": 2
+      },
+      {
+        "date": "2026-02-25",
+        "pnl": -1.02,
+        "trades": 4,
+        "wins": 3,
         "losses": 1
+      },
+      {
+        "date": "2026-02-26",
+        "pnl": -30.45,
+        "trades": 8,
+        "wins": 3,
+        "losses": 5
+      },
+      {
+        "date": "2026-02-27",
+        "pnl": 79.13,
+        "trades": 14,
+        "wins": 12,
+        "losses": 2
+      },
+      {
+        "date": "2026-02-28",
+        "pnl": -28.1,
+        "trades": 7,
+        "wins": 3,
+        "losses": 4
+      },
+      {
+        "date": "2026-03-02",
+        "pnl": -5.59,
+        "trades": 5,
+        "wins": 3,
+        "losses": 2
+      },
+      {
+        "date": "2026-03-03",
+        "pnl": -36.41,
+        "trades": 20,
+        "wins": 9,
+        "losses": 11
+      },
+      {
+        "date": "2026-03-04",
+        "pnl": 1.65,
+        "trades": 3,
+        "wins": 1,
+        "losses": 2
+      },
+      {
+        "date": "2026-03-05",
+        "pnl": -21.72,
+        "trades": 16,
+        "wins": 3,
+        "losses": 12
+      },
+      {
+        "date": "2026-03-06",
+        "pnl": -25.81,
+        "trades": 13,
+        "wins": 6,
+        "losses": 7
+      },
+      {
+        "date": "2026-03-07",
+        "pnl": 2.5,
+        "trades": 1,
+        "wins": 1,
+        "losses": 0
+      },
+      {
+        "date": "2026-03-09",
+        "pnl": 11.09,
+        "trades": 6,
+        "wins": 4,
+        "losses": 2
       }
     ],
     "symbol_breakdown": [
       {
         "symbol": "BTCUSD",
-        "trades": 29,
-        "pnl": 79.52,
-        "volume": 1.16,
-        "wins": 21,
-        "losses": 8,
-        "win_rate": 72.4
+        "trades": 35,
+        "pnl": 83.29,
+        "volume": 1.37,
+        "wins": 24,
+        "losses": 11,
+        "win_rate": 68.6
       },
       {
         "symbol": "GBPJPY",
@@ -2709,21 +3627,12 @@
       },
       {
         "symbol": "USDJPY",
-        "trades": 2,
-        "pnl": 12.7,
-        "volume": 0.11,
-        "wins": 1,
-        "losses": 1,
-        "win_rate": 50.0
-      },
-      {
-        "symbol": "GBPUSD",
-        "trades": 8,
-        "pnl": 10.84,
-        "volume": 0.75,
-        "wins": 4,
-        "losses": 4,
-        "win_rate": 50.0
+        "trades": 5,
+        "pnl": 8.17,
+        "volume": 0.27,
+        "wins": 2,
+        "losses": 3,
+        "win_rate": 40.0
       },
       {
         "symbol": "SP500.r",
@@ -2753,6 +3662,15 @@
         "win_rate": 100.0
       },
       {
+        "symbol": "GBPUSD",
+        "trades": 15,
+        "pnl": -2.8,
+        "volume": 1.44,
+        "wins": 5,
+        "losses": 10,
+        "win_rate": 33.3
+      },
+      {
         "symbol": "GBPAUD",
         "trades": 1,
         "pnl": -10.45,
@@ -2762,22 +3680,22 @@
         "win_rate": 0.0
       },
       {
-        "symbol": "EURUSD",
-        "trades": 12,
-        "pnl": -20.63,
-        "volume": 1.01,
-        "wins": 3,
-        "losses": 9,
-        "win_rate": 25.0
+        "symbol": "XAUUSD",
+        "trades": 310,
+        "pnl": -44.68,
+        "volume": 5.0,
+        "wins": 178,
+        "losses": 125,
+        "win_rate": 57.4
       },
       {
-        "symbol": "XAUUSD",
-        "trades": 233,
-        "pnl": -37.2,
-        "volume": 4.03,
-        "wins": 134,
-        "losses": 93,
-        "win_rate": 57.5
+        "symbol": "EURUSD",
+        "trades": 20,
+        "pnl": -54.13,
+        "volume": 1.51,
+        "wins": 5,
+        "losses": 15,
+        "win_rate": 25.0
       }
     ],
     "monthly_breakdown": [
@@ -2790,10 +3708,17 @@
       },
       {
         "month": "2026-02",
-        "pnl": 63.0,
-        "trades": 160,
-        "wins": 89,
-        "losses": 68
+        "pnl": 81.91,
+        "trades": 197,
+        "wins": 113,
+        "losses": 81
+      },
+      {
+        "month": "2026-03",
+        "pnl": -74.29,
+        "trades": 64,
+        "wins": 27,
+        "losses": 36
       }
     ]
   },
@@ -8677,6 +9602,2026 @@
       "fee": 0.0,
       "symbol": "XAUUSD",
       "comment": "[sl 5184.50]"
+    },
+    {
+      "ticket": 31884656,
+      "order": 33614878,
+      "position_id": 33600988,
+      "time": 1771869982,
+      "time_str": "2026-02-24T02:06:22",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5184.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.28,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5184.00]"
+    },
+    {
+      "ticket": 32521385,
+      "order": 34255677,
+      "position_id": 34243889,
+      "time": 1771932800,
+      "time_str": "2026-02-24T19:33:20",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5173.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.54,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5173.00]"
+    },
+    {
+      "ticket": 32524630,
+      "order": 34258744,
+      "position_id": 34231399,
+      "time": 1771932912,
+      "time_str": "2026-02-24T19:35:12",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 63005.69,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -6.83,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[sl 63000.00]"
+    },
+    {
+      "ticket": 32757128,
+      "order": 34493485,
+      "position_id": 34488400,
+      "time": 1771947641,
+      "time_str": "2026-02-24T23:40:41",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5143.12,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.36,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5143.12]"
+    },
+    {
+      "ticket": 32956928,
+      "order": 34693592,
+      "position_id": 34680810,
+      "time": 1771954049,
+      "time_str": "2026-02-25T01:27:29",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5141.17,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.17,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5141.00]"
+    },
+    {
+      "ticket": 33540416,
+      "order": 35279342,
+      "position_id": 35274889,
+      "time": 1772017457,
+      "time_str": "2026-02-25T19:04:17",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5181.99,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.54,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5181.99]"
+    },
+    {
+      "ticket": 33629781,
+      "order": 35368948,
+      "position_id": 35343145,
+      "time": 1772022298,
+      "time_str": "2026-02-25T20:24:58",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5174.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -6.72,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5174.00]"
+    },
+    {
+      "ticket": 33679660,
+      "order": 35418632,
+      "position_id": 35413358,
+      "time": 1772025082,
+      "time_str": "2026-02-25T21:11:22",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5167.5,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.99,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5167.50]"
+    },
+    {
+      "ticket": 34018412,
+      "order": 35761655,
+      "position_id": 35748186,
+      "time": 1772040495,
+      "time_str": "2026-02-26T01:28:15",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5174.07,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -7.8,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5174.50]"
+    },
+    {
+      "ticket": 34437739,
+      "order": 36189366,
+      "position_id": 36157667,
+      "time": 1772082936,
+      "time_str": "2026-02-26T13:15:36",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5191.35,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.4,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5190.88]"
+    },
+    {
+      "ticket": 34445596,
+      "order": 36197376,
+      "position_id": 36193867,
+      "time": 1772086336,
+      "time_str": "2026-02-26T14:12:16",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5199.03,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -11.68,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5198.35]"
+    },
+    {
+      "ticket": 34506179,
+      "order": 36259534,
+      "position_id": 36256960,
+      "time": 1772097972,
+      "time_str": "2026-02-26T17:26:12",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.23,
+      "price": 1.35468,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.54,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": "[sl 1.35468]"
+    },
+    {
+      "ticket": 34644373,
+      "order": 36401316,
+      "position_id": 36219066,
+      "time": 1772106945,
+      "time_str": "2026-02-26T19:55:45",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5188.23,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 8.25,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5188.00]"
+    },
+    {
+      "ticket": 34671653,
+      "order": 36428646,
+      "position_id": 36390546,
+      "time": 1772108344,
+      "time_str": "2026-02-26T20:19:04",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5183.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.38,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5183.00]"
+    },
+    {
+      "ticket": 34705450,
+      "order": 36462614,
+      "position_id": 36459322,
+      "time": 1772109438,
+      "time_str": "2026-02-26T20:37:18",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5175.8,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.42,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5175.80]"
+    },
+    {
+      "ticket": 34834522,
+      "order": 36592444,
+      "position_id": 36572594,
+      "time": 1772116458,
+      "time_str": "2026-02-26T22:34:18",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5184.08,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -14.08,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5184.00]"
+    },
+    {
+      "ticket": 34986863,
+      "order": 36746051,
+      "position_id": 36740159,
+      "time": 1772123649,
+      "time_str": "2026-02-27T00:34:09",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5155.69,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.55,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5155.69]"
+    },
+    {
+      "ticket": 35076866,
+      "order": 36847011,
+      "position_id": 36838388,
+      "time": 1772126381,
+      "time_str": "2026-02-27T01:19:41",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5155.6,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.55,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5155.60]"
+    },
+    {
+      "ticket": 35309665,
+      "order": 37099549,
+      "position_id": 37094911,
+      "time": 1772135939,
+      "time_str": "2026-02-27T03:58:59",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5166.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.07,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5166.00]"
+    },
+    {
+      "ticket": 35312266,
+      "order": 37102291,
+      "position_id": 37092588,
+      "time": 1772135969,
+      "time_str": "2026-02-27T03:59:29",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5167.58,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.49,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5167.63]"
+    },
+    {
+      "ticket": 35492414,
+      "order": 37301142,
+      "position_id": 36419229,
+      "time": 1772159478,
+      "time_str": "2026-02-27T10:31:18",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.05,
+      "price": 155.691,
+      "commission": 0.0,
+      "swap": 0.2,
+      "profit": -10.96,
+      "fee": 0.0,
+      "symbol": "USDJPY",
+      "comment": "[sl 155.700]"
+    },
+    {
+      "ticket": 35540844,
+      "order": 37349688,
+      "position_id": 36513312,
+      "time": 1772167799,
+      "time_str": "2026-02-27T12:49:59",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.04,
+      "price": 1.18002,
+      "commission": 0.0,
+      "swap": 0.12,
+      "profit": 0.17,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.18000]"
+    },
+    {
+      "ticket": 35650855,
+      "order": 37461465,
+      "position_id": 37458783,
+      "time": 1772184763,
+      "time_str": "2026-02-27T17:32:43",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5179.24,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.39,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5179.24]"
+    },
+    {
+      "ticket": 35669819,
+      "order": 37480977,
+      "position_id": 37460412,
+      "time": 1772186519,
+      "time_str": "2026-02-27T18:01:59",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 1,
+      "volume": 0.23,
+      "price": 1.34916,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 32.5,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 35714984,
+      "order": 37527050,
+      "position_id": 37485313,
+      "time": 1772191231,
+      "time_str": "2026-02-27T19:20:31",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.04,
+      "price": 68089.49,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 10.68,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[tp 68089.00]"
+    },
+    {
+      "ticket": 35913059,
+      "order": 37727672,
+      "position_id": 37687440,
+      "time": 1772204859,
+      "time_str": "2026-02-27T23:07:39",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.03,
+      "price": 5203.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 37.23,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5203.00]"
+    },
+    {
+      "ticket": 35913580,
+      "order": 37728341,
+      "position_id": 37719444,
+      "time": 1772204860,
+      "time_str": "2026-02-27T23:07:40",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5205.13,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -14.12,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5204.84]"
+    },
+    {
+      "ticket": 35942588,
+      "order": 37757167,
+      "position_id": 37754210,
+      "time": 1772205357,
+      "time_str": "2026-02-27T23:15:57",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.02,
+      "price": 5219.09,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.63,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 35947035,
+      "order": 37761667,
+      "position_id": 37758094,
+      "time": 1772205419,
+      "time_str": "2026-02-27T23:16:59",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5216.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 7.0,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5216.00]"
+    },
+    {
+      "ticket": 35947208,
+      "order": 37761849,
+      "position_id": 37753533,
+      "time": 1772205419,
+      "time_str": "2026-02-27T23:16:59",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5216.5,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 3.95,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5215.88]"
+    },
+    {
+      "ticket": 36099755,
+      "order": 37913645,
+      "position_id": 37907746,
+      "time": 1772210547,
+      "time_str": "2026-02-28T00:42:27",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5218.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.27,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5218.00]"
+    },
+    {
+      "ticket": 36216418,
+      "order": 38031743,
+      "position_id": 37874334,
+      "time": 1772215349,
+      "time_str": "2026-02-28T02:02:29",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.13,
+      "price": 1.34395,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -17.07,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": "[sl 1.34395]"
+    },
+    {
+      "ticket": 36245930,
+      "order": 38060985,
+      "position_id": 38042300,
+      "time": 1772216118,
+      "time_str": "2026-02-28T02:15:18",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5257.11,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -14.52,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5257.00]"
+    },
+    {
+      "ticket": 36248221,
+      "order": 38063303,
+      "position_id": 37494415,
+      "time": 1772216138,
+      "time_str": "2026-02-28T02:15:38",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.12,
+      "price": 1.18219,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -6.9,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.18216]"
+    },
+    {
+      "ticket": 36248222,
+      "order": 38063302,
+      "position_id": 37494086,
+      "time": 1772216138,
+      "time_str": "2026-02-28T02:15:38",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.04,
+      "price": 1.18219,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -2.37,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.18216]"
+    },
+    {
+      "ticket": 36255462,
+      "order": 38070646,
+      "position_id": 38056301,
+      "time": 1772216403,
+      "time_str": "2026-02-28T02:20:03",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5250.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.48,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5250.00]"
+    },
+    {
+      "ticket": 36256172,
+      "order": 38071300,
+      "position_id": 38052914,
+      "time": 1772216405,
+      "time_str": "2026-02-28T02:20:05",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5248.99,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.01,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5248.99]"
+    },
+    {
+      "ticket": 37450771,
+      "order": 39252948,
+      "position_id": 39226497,
+      "time": 1772449623,
+      "time_str": "2026-03-02T19:07:03",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5397.79,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.49,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5398.00]"
+    },
+    {
+      "ticket": 37533092,
+      "order": 39335282,
+      "position_id": 39310314,
+      "time": 1772453302,
+      "time_str": "2026-03-02T20:08:22",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5387.5,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.09,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5387.50]"
+    },
+    {
+      "ticket": 37756689,
+      "order": 39563183,
+      "position_id": 39552943,
+      "time": 1772464327,
+      "time_str": "2026-03-02T23:12:07",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5387.9,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -13.68,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5388.00]"
+    },
+    {
+      "ticket": 37764595,
+      "order": 39571138,
+      "position_id": 39469651,
+      "time": 1772464413,
+      "time_str": "2026-03-02T23:13:33",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5383.21,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.79,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5384.13]"
+    },
+    {
+      "ticket": 37838390,
+      "order": 39646827,
+      "position_id": 39641992,
+      "time": 1772466331,
+      "time_str": "2026-03-02T23:45:31",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5396.21,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.3,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5396.21]"
+    },
+    {
+      "ticket": 38070647,
+      "order": 39879658,
+      "position_id": 39785551,
+      "time": 1772473015,
+      "time_str": "2026-03-03T01:36:55",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.08,
+      "price": 1.1695,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -10.88,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.16950]"
+    },
+    {
+      "ticket": 38122988,
+      "order": 39931172,
+      "position_id": 39925855,
+      "time": 1772474518,
+      "time_str": "2026-03-03T02:01:58",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5271.7,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -20.57,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5273.48]"
+    },
+    {
+      "ticket": 38170800,
+      "order": 39979919,
+      "position_id": 39976010,
+      "time": 1772475636,
+      "time_str": "2026-03-03T02:20:36",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5287.18,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.0,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5287.18]"
+    },
+    {
+      "ticket": 38542306,
+      "order": 40347470,
+      "position_id": 40345331,
+      "time": 1772510399,
+      "time_str": "2026-03-03T11:59:59",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5337.53,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -12.95,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5338.00]"
+    },
+    {
+      "ticket": 38553575,
+      "order": 40358831,
+      "position_id": 40353456,
+      "time": 1772512186,
+      "time_str": "2026-03-03T12:29:46",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5358.5,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 7.27,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5358.50]"
+    },
+    {
+      "ticket": 38569276,
+      "order": 40374817,
+      "position_id": 40373812,
+      "time": 1772516735,
+      "time_str": "2026-03-03T13:45:35",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5365.7,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.97,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5365.70]"
+    },
+    {
+      "ticket": 38569915,
+      "order": 40375461,
+      "position_id": 40373816,
+      "time": 1772516966,
+      "time_str": "2026-03-03T13:49:26",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 5365.65,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -1.28,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "closePosition"
+    },
+    {
+      "ticket": 38569918,
+      "order": 40375464,
+      "position_id": 40373814,
+      "time": 1772516969,
+      "time_str": "2026-03-03T13:49:29",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 5365.63,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -1.35,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "closePosition"
+    },
+    {
+      "ticket": 38569934,
+      "order": 40375480,
+      "position_id": 40373813,
+      "time": 1772516980,
+      "time_str": "2026-03-03T13:49:40",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 5366.25,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.83,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "closePosition"
+    },
+    {
+      "ticket": 38569988,
+      "order": 40375536,
+      "position_id": 40373811,
+      "time": 1772517001,
+      "time_str": "2026-03-03T13:50:01",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 5366.8,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.31,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "closePosition"
+    },
+    {
+      "ticket": 38577354,
+      "order": 40383070,
+      "position_id": 40375433,
+      "time": 1772519257,
+      "time_str": "2026-03-03T14:27:37",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5375.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -8.57,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5375.00]"
+    },
+    {
+      "ticket": 38579818,
+      "order": 40385543,
+      "position_id": 40385525,
+      "time": 1772519942,
+      "time_str": "2026-03-03T14:39:02",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 5367.89,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.46,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "closePosition"
+    },
+    {
+      "ticket": 38601680,
+      "order": 40407780,
+      "position_id": 40385606,
+      "time": 1772523452,
+      "time_str": "2026-03-03T15:37:32",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5340.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 25.7,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5340.00]"
+    },
+    {
+      "ticket": 38626135,
+      "order": 40431929,
+      "position_id": 40426786,
+      "time": 1772525543,
+      "time_str": "2026-03-03T16:12:23",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5297.84,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -13.43,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5298.00]"
+    },
+    {
+      "ticket": 38639857,
+      "order": 40445551,
+      "position_id": 40444869,
+      "time": 1772526947,
+      "time_str": "2026-03-03T16:35:47",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5308.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -5.44,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5308.00]"
+    },
+    {
+      "ticket": 38709774,
+      "order": 40516249,
+      "position_id": 40514824,
+      "time": 1772532868,
+      "time_str": "2026-03-03T18:14:28",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.06,
+      "price": 68073.33,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -7.07,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[sl 68085.01]"
+    },
+    {
+      "ticket": 38741204,
+      "order": 40547848,
+      "position_id": 40543769,
+      "time": 1772534130,
+      "time_str": "2026-03-03T18:35:30",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5305.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.32,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5305.00]"
+    },
+    {
+      "ticket": 38831977,
+      "order": 40638496,
+      "position_id": 40638350,
+      "time": 1772537398,
+      "time_str": "2026-03-03T19:29:58",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5241.25,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.49,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5241.25]"
+    },
+    {
+      "ticket": 38914720,
+      "order": 40719924,
+      "position_id": 40710910,
+      "time": 1772541610,
+      "time_str": "2026-03-03T20:40:10",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5256.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.43,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5256.00]"
+    },
+    {
+      "ticket": 38979225,
+      "order": 40782962,
+      "position_id": 40778785,
+      "time": 1772543723,
+      "time_str": "2026-03-03T21:15:23",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5199.89,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.63,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5199.89]"
+    },
+    {
+      "ticket": 39854348,
+      "order": 41705735,
+      "position_id": 41669381,
+      "time": 1772611318,
+      "time_str": "2026-03-04T16:01:58",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5145.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 26.94,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5145.00]"
+    },
+    {
+      "ticket": 39957672,
+      "order": 41821018,
+      "position_id": 41798828,
+      "time": 1772620861,
+      "time_str": "2026-03-04T18:41:01",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.04,
+      "price": 69712.45,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -12.08,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[sl 69717.00]"
+    },
+    {
+      "ticket": 40028385,
+      "order": 41897433,
+      "position_id": 41783849,
+      "time": 1772626103,
+      "time_str": "2026-03-04T20:08:23",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.08,
+      "price": 1.16281,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -13.21,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.16280]"
+    },
+    {
+      "ticket": 40328432,
+      "order": 42212859,
+      "position_id": 40511665,
+      "time": 1772640144,
+      "time_str": "2026-03-05T00:02:24",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 1.33644,
+      "commission": 0.0,
+      "swap": -0.01,
+      "profit": -2.93,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 40779498,
+      "order": 42678251,
+      "position_id": 42670017,
+      "time": 1772680235,
+      "time_str": "2026-03-05T11:10:35",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5185.04,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -8.67,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5185.00]"
+    },
+    {
+      "ticket": 40804909,
+      "order": 42703722,
+      "position_id": 42703005,
+      "time": 1772685025,
+      "time_str": "2026-03-05T12:30:25",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5187.07,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.59,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5187.00]"
+    },
+    {
+      "ticket": 40804911,
+      "order": 42703719,
+      "position_id": 42702888,
+      "time": 1772685025,
+      "time_str": "2026-03-05T12:30:25",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5187.07,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.36,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5187.00]"
+    },
+    {
+      "ticket": 40829699,
+      "order": 42728577,
+      "position_id": 42727039,
+      "time": 1772693247,
+      "time_str": "2026-03-05T14:47:27",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5173.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.33,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5173.00]"
+    },
+    {
+      "ticket": 40829702,
+      "order": 42728572,
+      "position_id": 42726936,
+      "time": 1772693247,
+      "time_str": "2026-03-05T14:47:27",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5173.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -5.17,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5173.00]"
+    },
+    {
+      "ticket": 40832825,
+      "order": 42731741,
+      "position_id": 42730307,
+      "time": 1772694033,
+      "time_str": "2026-03-05T15:00:33",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 1,
+      "volume": 0.01,
+      "price": 5170.72,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.03,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 40835824,
+      "order": 42734756,
+      "position_id": 42731403,
+      "time": 1772695158,
+      "time_str": "2026-03-05T15:19:18",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5170.85,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.0,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5170.85]"
+    },
+    {
+      "ticket": 40847544,
+      "order": 42746325,
+      "position_id": 42744517,
+      "time": 1772697484,
+      "time_str": "2026-03-05T15:58:04",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5153.93,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -5.23,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5154.00]"
+    },
+    {
+      "ticket": 40854648,
+      "order": 42753332,
+      "position_id": 42751471,
+      "time": 1772698156,
+      "time_str": "2026-03-05T16:09:16",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5138.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.06,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5138.00]"
+    },
+    {
+      "ticket": 40879080,
+      "order": 42777662,
+      "position_id": 42759034,
+      "time": 1772701095,
+      "time_str": "2026-03-05T16:58:15",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5165.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 33.23,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5165.00]"
+    },
+    {
+      "ticket": 40894170,
+      "order": 42792678,
+      "position_id": 42779722,
+      "time": 1772701630,
+      "time_str": "2026-03-05T17:07:10",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5165.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.3599999999999999,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5165.00]"
+    },
+    {
+      "ticket": 40951020,
+      "order": 42849883,
+      "position_id": 42830606,
+      "time": 1772706127,
+      "time_str": "2026-03-05T18:22:07",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5137.89,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.36,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5139.00]"
+    },
+    {
+      "ticket": 40954770,
+      "order": 42853492,
+      "position_id": 42776228,
+      "time": 1772706131,
+      "time_str": "2026-03-05T18:22:11",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.06,
+      "price": 1.15876,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.01,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.15876]"
+    },
+    {
+      "ticket": 40998568,
+      "order": 42897225,
+      "position_id": 42795991,
+      "time": 1772708779,
+      "time_str": "2026-03-05T19:06:19",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.06,
+      "price": 156.998,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.03,
+      "fee": 0.0,
+      "symbol": "USDJPY",
+      "comment": "[sl 156.999]"
+    },
+    {
+      "ticket": 41104246,
+      "order": 43003192,
+      "position_id": 42914733,
+      "time": 1772716007,
+      "time_str": "2026-03-05T21:06:47",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 1,
+      "volume": 0.05,
+      "price": 157.239,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 6.46,
+      "fee": 0.0,
+      "symbol": "USDJPY",
+      "comment": ""
+    },
+    {
+      "ticket": 41293758,
+      "order": 43194817,
+      "position_id": 43191869,
+      "time": 1772727652,
+      "time_str": "2026-03-06T00:20:52",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5108.82,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.46,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5108.98]"
+    },
+    {
+      "ticket": 41356228,
+      "order": 43258101,
+      "position_id": 43246453,
+      "time": 1772729900,
+      "time_str": "2026-03-06T00:58:20",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5106.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.59,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5106.00]"
+    },
+    {
+      "ticket": 41397825,
+      "order": 43299994,
+      "position_id": 42893428,
+      "time": 1772731568,
+      "time_str": "2026-03-06T01:26:08",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.06,
+      "price": 1.15815,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.58,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[sl 1.15815]"
+    },
+    {
+      "ticket": 41443099,
+      "order": 43345994,
+      "position_id": 42896520,
+      "time": 1772733959,
+      "time_str": "2026-03-06T02:05:59",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.03,
+      "price": 1.3305799999999999,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -7.05,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": "[sl 1.33058]"
+    },
+    {
+      "ticket": 41818187,
+      "order": 43749555,
+      "position_id": 43739031,
+      "time": 1772767984,
+      "time_str": "2026-03-06T11:33:04",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5092.23,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -7.95,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5092.00]"
+    },
+    {
+      "ticket": 41843986,
+      "order": 43779337,
+      "position_id": 43778394,
+      "time": 1772771301,
+      "time_str": "2026-03-06T12:28:21",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 1,
+      "volume": 0.01,
+      "price": 5129.04,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -2.12,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 41847384,
+      "order": 43782869,
+      "position_id": 43781118,
+      "time": 1772772065,
+      "time_str": "2026-03-06T12:41:05",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.01,
+      "price": 5123.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -4.54,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5123.00]"
+    },
+    {
+      "ticket": 41858578,
+      "order": 43797546,
+      "position_id": 43797415,
+      "time": 1772775066,
+      "time_str": "2026-03-06T13:31:06",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 1,
+      "volume": 0.01,
+      "price": 1.33712,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -0.28,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 41858629,
+      "order": 43797598,
+      "position_id": 43797557,
+      "time": 1772775103,
+      "time_str": "2026-03-06T13:31:43",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.01,
+      "price": 5136.74,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 0.15,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "closePosition"
+    },
+    {
+      "ticket": 41916060,
+      "order": 43857383,
+      "position_id": 43853921,
+      "time": 1772788409,
+      "time_str": "2026-03-06T17:13:29",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5110.5,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 1.72,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5110.50]"
+    },
+    {
+      "ticket": 41977036,
+      "order": 43919813,
+      "position_id": 43911016,
+      "time": 1772793157,
+      "time_str": "2026-03-06T18:32:37",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5102.95,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.69,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5103.00]"
+    },
+    {
+      "ticket": 42008596,
+      "order": 43952041,
+      "position_id": 43886697,
+      "time": 1772795532,
+      "time_str": "2026-03-06T19:12:12",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 70557.23,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.37,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[tp 70557.00]"
+    },
+    {
+      "ticket": 42247807,
+      "order": 44197014,
+      "position_id": 43945328,
+      "time": 1772811000,
+      "time_str": "2026-03-06T23:30:00",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.05,
+      "price": 1.33904,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.27,
+      "fee": 0.0,
+      "symbol": "GBPUSD",
+      "comment": "[sl 1.33793]"
+    },
+    {
+      "ticket": 42453606,
+      "order": 44401196,
+      "position_id": 44397839,
+      "time": 1772817903,
+      "time_str": "2026-03-07T01:25:03",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5163.1,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.5,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5163.00]"
+    },
+    {
+      "ticket": 42950725,
+      "order": 44895235,
+      "position_id": 42899010,
+      "time": 1773022821,
+      "time_str": "2026-03-09T10:20:21",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 1.15298,
+      "commission": 0.0,
+      "swap": 0.1,
+      "profit": 18.28,
+      "fee": 0.0,
+      "symbol": "EURUSD",
+      "comment": "[tp 1.15300]"
+    },
+    {
+      "ticket": 43195556,
+      "order": 45162959,
+      "position_id": 45160755,
+      "time": 1773050647,
+      "time_str": "2026-03-09T18:04:07",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.01,
+      "price": 5092.52,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 2.44,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5092.52]"
+    },
+    {
+      "ticket": 43298384,
+      "order": 45266514,
+      "position_id": 45262304,
+      "time": 1773058579,
+      "time_str": "2026-03-09T20:16:19",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 0,
+      "volume": 0.02,
+      "price": 5118.86,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -14.17,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": ""
+    },
+    {
+      "ticket": 43333001,
+      "order": 45300497,
+      "position_id": 45204668,
+      "time": 1773060165,
+      "time_str": "2026-03-09T20:42:45",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 68404.75,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 13.7,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[tp 68400.00]"
+    },
+    {
+      "ticket": 43344775,
+      "order": 45312248,
+      "position_id": 45304885,
+      "time": 1773060298,
+      "time_str": "2026-03-09T20:44:58",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 4,
+      "volume": 0.02,
+      "price": 5102.71,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -14.35,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[sl 5103.00]"
+    },
+    {
+      "ticket": 43516346,
+      "order": 45483194,
+      "position_id": 45466192,
+      "time": 1773070956,
+      "time_str": "2026-03-09T23:42:36",
+      "type": "BUY",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 777,
+      "reason": 5,
+      "volume": 0.02,
+      "price": 5107.0,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": 5.19,
+      "fee": 0.0,
+      "symbol": "XAUUSD",
+      "comment": "[tp 5107.00]"
     }
   ]
 }
