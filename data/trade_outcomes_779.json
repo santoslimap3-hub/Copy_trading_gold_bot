@@ -1,7 +1,7 @@
 {
   "magic": 779,
-  "total_tracked": 3,
-  "last_updated": "2026-03-09 19:20:23",
+  "total_tracked": 4,
+  "last_updated": "2026-03-09 20:55:08",
   "outcomes": [
     {
       "ticket": -3935,
@@ -111,6 +111,70 @@
       "shadow_duration_seconds": 15376.482873439789,
       "virtual": false,
       "position_close_price": 0.0
+    },
+    {
+      "ticket": -3947,
+      "side": "SELL",
+      "entry_price": 5109.41,
+      "sl_price": 5118.0,
+      "tp_levels": {
+        "1": 5107.0,
+        "2": 5105.0,
+        "3": 5103.0,
+        "4": 5101.0,
+        "5": 5095.0
+      },
+      "sequence": [
+        {
+          "level": "TP1",
+          "time": "2026-03-09 20:42:39",
+          "timestamp": 1773060159.5986748,
+          "price": 5104.92
+        },
+        {
+          "level": "TP2",
+          "time": "2026-03-09 20:42:39",
+          "timestamp": 1773060159.5986888,
+          "price": 5104.92
+        },
+        {
+          "level": "TP3",
+          "time": "2026-03-09 20:48:11",
+          "timestamp": 1773060491.0344498,
+          "price": 5102.87
+        },
+        {
+          "level": "TP4",
+          "time": "2026-03-09 20:49:47",
+          "timestamp": 1773060587.432421,
+          "price": 5101.0
+        },
+        {
+          "level": "TP5",
+          "time": "2026-03-09 20:55:08",
+          "timestamp": 1773060908.974025,
+          "price": 5094.97
+        }
+      ],
+      "sequence_str": "TP1 \u2192 TP2 \u2192 TP3 \u2192 TP4 \u2192 TP5",
+      "levels_hit": [
+        "TP1",
+        "TP2",
+        "TP3",
+        "TP4",
+        "TP5"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 20:42:37",
+      "closed_at": "2026-03-09 20:55:08",
+      "duration_seconds": 751.2264358997345,
+      "position_closed_at": 1773060157.7624044,
+      "position_close_reason": "not_entered:order_disappeared",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 751.2229270935059,
+      "virtual": true,
+      "position_close_price": null
     }
   ]
 }
