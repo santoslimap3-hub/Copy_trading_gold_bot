@@ -1,0 +1,79 @@
+{
+  "magic": 777,
+  "total_tracked": 2,
+  "last_updated": "2026-03-09 17:45:23",
+  "outcomes": [
+    {
+      "ticket": -3935,
+      "side": "SELL",
+      "entry_price": 5110.04,
+      "sl_price": 5118.0,
+      "tp_levels": {
+        "1": 5107.5,
+        "2": 5105.5,
+        "3": 5103.5,
+        "4": 5101.5,
+        "5": 5093.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 17:16:05",
+          "timestamp": 1773047765.5373304,
+          "price": 5118.17
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 17:11:53",
+      "closed_at": "2026-03-09 17:16:05",
+      "duration_seconds": 252.52733206748962,
+      "position_closed_at": 1773047513.0116613,
+      "position_close_reason": "not_entered:zone_wait_timeout",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 252.52730989456177,
+      "virtual": true,
+      "position_close_price": null
+    },
+    {
+      "ticket": -3942,
+      "side": "BUY",
+      "entry_price": 5111.67,
+      "sl_price": 5103.0,
+      "tp_levels": {
+        "1": 5114.0,
+        "2": 5116.0,
+        "3": 5118.0,
+        "4": 5120.0,
+        "5": 5128.0
+      },
+      "sequence": [
+        {
+          "level": "SL",
+          "time": "2026-03-09 17:45:23",
+          "timestamp": 1773049523.6296706,
+          "price": 5102.54
+        }
+      ],
+      "sequence_str": "SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:timeout",
+      "registered_at": "2026-03-09 17:45:03",
+      "closed_at": "2026-03-09 17:45:23",
+      "duration_seconds": 20.41085147857666,
+      "position_closed_at": 1773049503.2191603,
+      "position_close_reason": "not_entered:order_disappeared",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 20.410847902297974,
+      "virtual": true,
+      "position_close_price": null
+    }
+  ]
+}
