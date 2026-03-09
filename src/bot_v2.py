@@ -2391,39 +2391,47 @@ async def main():
                                     completed_orders.append(mid)
                                     continue
                     if pos_ticket:
-                        fill_price = await run_mt5(lambda: get_fill_price_from_order(order_ticket))
-                        slippage = abs(fill_price - limit_price) if fill_price else 0
-                        log(_LOG_SEP, "INFO")
-                        log(f"LIMIT ORDER FILLED!", "INFO")
-                        log(f"   Order: {order_ticket} → Position: {pos_ticket}", "INFO")
-                        log(f"   Fill: ${fill_price:.2f} | Limit: ${limit_price:.2f} | Slippage: ${slippage:.2f}", "INFO")
-                        log(f"   Time to fill: {elapsed:.1f}s", "INFO")
-                        log(_LOG_SEP, "INFO")
+                        try:
+                            fill_price = await run_mt5(lambda: get_fill_price_from_order(order_ticket))
+                            slippage = abs(fill_price - limit_price) if fill_price else 0
+                            log(_LOG_SEP, "INFO")
+                            log(f"LIMIT ORDER FILLED!", "INFO")
+                            log(f"   Order: {order_ticket} → Position: {pos_ticket}", "INFO")
+                            if fill_price is not None:
+                                log(f"   Fill: ${fill_price:.2f} | Limit: ${limit_price:.2f} | Slippage: ${slippage:.2f}", "INFO")
+                            else:
+                                log(f"   Fill: N/A | Limit: ${limit_price:.2f} | Slippage: N/A (fill price unavailable)", "WARN")
+                            log(f"   Time to fill: {elapsed:.1f}s", "INFO")
+                            log(_LOG_SEP, "INFO")
 
-                        # Map position for SL/TP edits
-                        position_map[mid] = pos_ticket
-                        if fill_price:
-                            entry_prices[pos_ticket] = fill_price
+                            # Map position for SL/TP edits
+                            position_map[mid] = pos_ticket
+                            if fill_price:
+                                entry_prices[pos_ticket] = fill_price
 
-                        record_entry_stat("limit_fill", side=side, limit_price=limit_price,
-                                          fill_price=fill_price, slippage=slippage, fill_time=elapsed,
-                                          best_reached=True, worst_reached=True,
-                                          zone_low=info["zone_low"], zone_high=info["zone_high"],
-                                          price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
+                            record_entry_stat("limit_fill", side=side, limit_price=limit_price,
+                                              fill_price=fill_price, slippage=slippage, fill_time=elapsed,
+                                              best_reached=True, worst_reached=True,
+                                              zone_low=info["zone_low"], zone_high=info["zone_high"],
+                                              price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
-                        # Apply SL/TP if we have them
-                        # Register with outcome tracker using ALL TP levels from signal
-                        actual_entry = fill_price or limit_price
-                        all_tps_from_signal = info.get("all_tps", {})
-                        if not all_tps_from_signal and info.get("tp1"):
-                            all_tps_from_signal = {1: info["tp1"]}
-                        if outcome_tracker:
-                            outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), all_tps_from_signal)
+                            # Apply SL/TP if we have them
+                            # Register with outcome tracker using ALL TP levels from signal
+                            actual_entry = fill_price or limit_price
+                            all_tps_from_signal = info.get("all_tps", {})
+                            if not all_tps_from_signal and info.get("tp1"):
+                                all_tps_from_signal = {1: info["tp1"]}
+                            if outcome_tracker:
+                                outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), all_tps_from_signal)
 
-                        sl_val = info.get("sl")
-                        tp_val = info.get("tp1")
-                        if sl_val or tp_val:
-                            await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)", all_tp_levels=all_tps_from_signal)
+                            sl_val = info.get("sl")
+                            tp_val = info.get("tp1")
+                            if sl_val or tp_val:
+                                await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)", all_tp_levels=all_tps_from_signal)
+                        except Exception as fill_err:
+                            log(f"Error processing filled order {order_ticket} → position {pos_ticket}: {fill_err}", "ERROR")
+                            # Still map the position so SL/TP edits can work
+                            position_map[mid] = pos_ticket
 
                         completed_orders.append(mid)
                         continue
@@ -2680,7 +2688,7 @@ async def main():
     log("  Limit order & buffer monitor task created (1s interval)", "INFO")
 
     asyncio.create_task(trade_outcome_monitor())
-    log("  Trade outcome monitor task created (2s interval)", "INFO")
+    log("  Trade outcome monitor task created (0.5s interval)", "INFO")
 
     # ══════════════════════════════════════════════════════════════════════
     # Connect to Telegram

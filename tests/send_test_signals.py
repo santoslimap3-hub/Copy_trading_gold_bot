@@ -26,20 +26,39 @@ import os
 import time
 import argparse
 
+# Fix Windows console encoding for emoji/unicode characters
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 # Add parent dir so we can import shared config
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from telethon import TelegramClient
+import MetaTrader5 as mt5
 
 # ─── Config (must match bot_v2.py) ───
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
 TEST_CHANNEL_ID = -1003817819872
 SESSION_FILE = os.path.join(os.path.dirname(__file__), "test_sender_session")
+SYMBOL = "XAUUSD"
+MT5_PATH = r"C:\Program Files\MetaTrader 5\terminal64.exe"
 
 # ─── Price configuration ───
-# Set this close to current XAUUSD price. Tests will build zones around it.
-PRICE_BASE = 5170  # Adjust if gold has moved significantly
+# Fallback only — the script fetches the live price from MT5 at startup.
+PRICE_BASE_FALLBACK = 5170
+
+
+def get_live_price() -> float:
+    """Fetch the current XAUUSD bid price from MT5."""
+    if not mt5.initialize(path=MT5_PATH):
+        return 0.0
+    tick = mt5.symbol_info_tick(SYMBOL)
+    mt5.shutdown()
+    if tick is None:
+        return 0.0
+    return round(float(tick.bid), 2)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -291,7 +310,7 @@ def build_tests(p: int):
             ("wait", 3, None),
             ("send", 2, "Remember to set your buy zones"),
             ("wait", 3, None),
-            ("send", 2, "Gold is at 5170 right now"),
+            ("send", 2, f"Gold is at {p} right now"),
             ("wait", 3, "All 3 messages should be ignored — no BUY/SELL NOW"),
         ],
     })
@@ -449,27 +468,42 @@ async def main():
     parser.add_argument("--test", type=int, help="Run only a specific test number")
     parser.add_argument("--dry-run", action="store_true", help="Print messages instead of sending")
     parser.add_argument("--list", action="store_true", help="List all tests and exit")
-    parser.add_argument("--price", type=int, default=PRICE_BASE, help=f"Base price for zones (default: {PRICE_BASE})")
+    parser.add_argument("--price", type=float, default=0, help="Override base price (default: fetch live from MT5)")
     parser.add_argument("--pause", type=int, default=5, help="Seconds to pause between tests (default: 5)")
     args = parser.parse_args()
 
-    tests = build_tests(args.price)
+    # Determine base price: CLI override -> live MT5 -> fallback
+    if args.price > 0:
+        base_price = args.price
+        print(f"  Using manual price override: ${base_price}")
+    else:
+        print("  Fetching live XAUUSD price from MT5...")
+        base_price = get_live_price()
+        if base_price > 0:
+            print(f"  Live price: ${base_price}")
+        else:
+            base_price = PRICE_BASE_FALLBACK
+            print(f"  Could not get live price, using fallback: ${base_price}")
+
+    # Round to nearest integer for clean zone numbers
+    base_price = int(round(base_price))
+    tests = build_tests(base_price)
 
     if args.list:
         print(f"\n{'='*70}")
-        print(f"  AVAILABLE TESTS ({len(tests)} total)")
+        print(f"  AVAILABLE TESTS ({len(tests)} total)  [base price: ${base_price}]")
         print(f"{'='*70}")
         for i, t in enumerate(tests, 1):
-            note = " ⚠️ SLOW (130s)" if "130s" in str(t) else ""
-            print(f"  {i:2d}. {t['name']}{note}")
+            note = " SLOW (130s)" if "130s" in str(t) else ""
+            print(f"  {i:2d}. {t['name'].replace(chr(8594), '->')}{note}")
         print()
         return
 
     print(f"\n{'='*70}")
-    print(f"  GOLD BOT — COMPREHENSIVE TEST SIGNAL SENDER")
+    print(f"  GOLD BOT -- COMPREHENSIVE TEST SIGNAL SENDER")
     print(f"{'='*70}")
     print(f"  Test channel: {TEST_CHANNEL_ID}")
-    print(f"  Base price:   ${args.price}")
+    print(f"  Base price:   ${base_price} (live from MT5)")
     print(f"  Dry run:      {args.dry_run}")
     print(f"  Tests:        {'#' + str(args.test) if args.test else f'ALL ({len(tests)})'}")
     print(f"{'='*70}\n")
