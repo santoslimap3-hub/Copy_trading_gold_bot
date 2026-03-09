@@ -1438,26 +1438,21 @@ async def monitor_stale_failsafe():
         try:
             await asyncio.sleep(120)
 
-            # Check for positions where tp_sl_updated is False
-            stale_tickets = [t for t, updated in tp_sl_updated.items() if not updated]
-
-            if not stale_tickets:
-                continue
-
-            # Verify they're still open
-            for ticket in stale_tickets:
+            # Clean up ALL closed positions from tracking dicts (not just failsafe ones)
+            all_tracked_tickets = list(tp_sl_updated.keys())
+            for ticket in all_tracked_tickets:
                 pos = await run_mt5(lambda t=ticket: mt5.positions_get(ticket=t))
                 if not pos:
-                    # Position was closed by broker (SL or TP hit) - clean up
-                    log(f"Position {ticket} closed by broker (failsafe SL/TP hit). Cleaning up.", "INFO")
+                    was_stale = not tp_sl_updated.get(ticket, True)
+                    label = "failsafe SL/TP" if was_stale else "real SL/TP"
+                    log(f"Position {ticket} closed by broker ({label}). Cleaning up.", "INFO")
                     tp_sl_updated.pop(ticket, None)
                     entry_prices.pop(ticket, None)
-                    # Remove from position_map
                     for mid, tid in list(position_map.items()):
                         if tid == ticket:
                             position_map.pop(mid, None)
                             break
-                else:
+                elif not tp_sl_updated.get(ticket, True):
                     log(f"WARNING: Ticket {ticket} still has FAILSAFE SL/TP (no edit received yet)", "WARN")
 
         except Exception as e:
@@ -1824,6 +1819,13 @@ async def main():
             log(f"SIGNAL DETECTED{source}: {side} {symbol}", "INFO")
             log_signal_attempt(side, "RECEIVED", f"msg_id={msg_id}{source}")
 
+            # Capture market price at signal reception for virtual trade tracking
+            signal_market_price = await run_mt5(lambda: get_market_price(side))
+            if signal_market_price:
+                log(f"Signal market price at reception: ${signal_market_price:.2f}", "DEBUG")
+            else:
+                log(f"WARNING: Could not capture market price at signal reception", "WARN")
+
             # ── LIMIT_ZONE strategy: check for zone, buffer if missing ──
             if ENTRY_STRATEGY == "LIMIT_ZONE":
                 zone = parse_entry_zone(text)
@@ -1853,6 +1855,7 @@ async def main():
                             _, order_ticket, lp, fsl, lot = result
                             sl = parse_stop_loss(text)
                             tp1 = parse_tp1(text)
+                            all_tps = parse_tp_levels(text)
                             _pending_limit_orders[msg_id] = {
                                 "order_ticket": order_ticket,
                                 "side": side,
@@ -1865,6 +1868,8 @@ async def main():
                                 "placed_at": time.time(),
                                 "sl": sl,
                                 "tp1": tp1,
+                                "all_tps": all_tps,
+                                "signal_market_price": signal_market_price,
                                 "price_min_seen": float('inf'),
                                 "price_max_seen": float('-inf'),
                             }
@@ -1879,6 +1884,7 @@ async def main():
                         "msg_id": msg_id,
                         "channel_name": channel_name,
                         "buffered_at": time.time(),
+                        "signal_market_price": signal_market_price,
                     }
                     record_entry_stat("signal_buffered", side=side)
                     log(f"SIGNAL BUFFERED - waiting for zone via edit (msg_id={msg_id}, timeout={ZONE_WAIT_TIMEOUT}s)", "INFO")
@@ -1924,7 +1930,9 @@ async def main():
             cleared_count = 0
 
             is_sl_hit = "SL" in closure.upper()
-            has_open_positions = bool(position_map)
+            # Check ACTUAL live positions instead of stale position_map
+            live_positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
+            has_open_positions = bool(live_positions and [p for p in live_positions if p.magic == MAGIC])
 
             # Pending limit orders:
             #   SL HIT → always cancel (trade thesis invalidated, direction wrong)
@@ -1936,9 +1944,19 @@ async def main():
                 for mid, info in list(_pending_limit_orders.items()):
                     ot = info["order_ticket"]
                     log(f"TRADE CLOSURE '{closure}' → cancelling pending limit order {ot} (msg_id={mid})", "INFO")
-                    await run_mt5(lambda: cancel_limit_order(ot))
+                    await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
                     record_entry_stat("limit_invalidated", side=info["side"], limit_price=info["limit_price"],
                                       reason=f"channel_closure: {closure}")
+                    # Register virtual trade for tracking what would have happened
+                    if outcome_tracker and info.get("all_tps"):
+                        vt_id = -abs(mid)
+                        sl_val = info.get("sl") or info.get("failsafe_sl") or 0
+                        vt_entry = info.get("signal_market_price") or info["limit_price"]
+                        outcome_tracker.register_virtual_trade(
+                            vt_id, info["side"], vt_entry,
+                            sl_val, info["all_tps"],
+                            cancel_reason=f"channel_closure:{closure}")
+                        log(f"VIRTUAL TRADE registered: id={vt_id} side={info['side']} entry=${vt_entry:.2f}", "INFO")
                     cancelled_count += 1
                 _pending_limit_orders.clear()
             elif _pending_limit_orders:
@@ -1948,6 +1966,18 @@ async def main():
             for mid, buf in list(_buffered_signals.items()):
                 log(f"TRADE CLOSURE '{closure}' → clearing buffered signal (msg_id={mid})", "INFO")
                 record_entry_stat("zone_wait_timeout", side=buf["side"])
+                # Register virtual trade if signal text had TP levels
+                if outcome_tracker:
+                    buf_tps = parse_tp_levels(buf.get("text", ""))
+                    buf_sl = parse_stop_loss(buf.get("text", ""))
+                    if buf_tps:
+                        vt_id = -abs(mid)
+                        vt_entry = buf.get("signal_market_price") or 0
+                        if vt_entry:
+                            outcome_tracker.register_virtual_trade(
+                                vt_id, buf["side"], vt_entry, buf_sl or 0, buf_tps,
+                                cancel_reason=f"channel_closure:{closure}")
+                            log(f"VIRTUAL TRADE registered: id={vt_id} side={buf['side']} entry=${vt_entry:.2f}", "INFO")
                 cleared_count += 1
             _buffered_signals.clear()
 
@@ -2005,7 +2035,9 @@ async def main():
                 return
             _processed_msg_ids.add(event.message.id)
             if len(_processed_msg_ids) > _MAX_PROCESSED_IDS:
-                _processed_msg_ids.clear()
+                # Keep only the most recent half to avoid reprocessing
+                sorted_ids = sorted(_processed_msg_ids)
+                _processed_msg_ids.difference_update(sorted_ids[:len(sorted_ids) // 2])
 
             messages_received += 1
 
@@ -2128,6 +2160,7 @@ async def main():
                             _, order_ticket, lp, fsl, lot = result
                             sl = parse_stop_loss(text)
                             tp1 = parse_tp1(text)
+                            all_tps = parse_tp_levels(text)
                             _pending_limit_orders[msg_id] = {
                                 "order_ticket": order_ticket,
                                 "side": side,
@@ -2140,6 +2173,8 @@ async def main():
                                 "placed_at": time.time(),
                                 "sl": sl,
                                 "tp1": tp1,
+                                "all_tps": all_tps,
+                                "signal_market_price": buf.get("signal_market_price"),
                                 "price_min_seen": float('inf'),
                                 "price_max_seen": float('-inf'),
                             }
@@ -2152,11 +2187,14 @@ async def main():
                     # Edit doesn't have zone yet, but may have SL/TP - update buffer
                     sl = parse_stop_loss(text)
                     tp1 = parse_tp1(text)
+                    tp_levels_buf = parse_tp_levels(text)
                     if sl:
                         buf["sl"] = sl
                     if tp1:
                         buf["tp1"] = tp1
-                    log(f"Edit for buffered signal has no zone yet (SL={'yes' if sl else 'no'}, TP1={'yes' if tp1 else 'no'})", "INFO")
+                    if tp_levels_buf:
+                        buf["text"] = text  # Update text so TPs are available for virtual trade
+                    log(f"Edit for buffered signal has no zone yet (SL={'yes' if sl else 'no'}, TP1={'yes' if tp1 else 'no'}, TPs={len(tp_levels_buf)})", "INFO")
                     return
 
             # ── 2. Check if this edit updates a PENDING LIMIT ORDER ──
@@ -2170,6 +2208,12 @@ async def main():
                 tp_levels_parsed = parse_tp_levels(text)
                 if not tp1 and tp_levels_parsed and 1 in tp_levels_parsed:
                     tp1 = tp_levels_parsed[1]
+
+                # Always update all_tps when edit has TP levels (for virtual trade accuracy)
+                if tp_levels_parsed:
+                    existing_tps = pending.get("all_tps", {})
+                    existing_tps.update(tp_levels_parsed)
+                    pending["all_tps"] = existing_tps
 
                 if sl or tp1:
                     new_sl = sl if sl else pending.get("sl")
@@ -2261,6 +2305,18 @@ async def main():
                     side = buf["side"]
                     log(f"ZONE WAIT TIMEOUT: msg_id={mid} waited {ZONE_WAIT_TIMEOUT}s - no zone received, cancelling signal", "WARN")
                     record_entry_stat("zone_wait_timeout", side=side)
+                    # Register virtual trade if signal text had TP levels
+                    if outcome_tracker:
+                        buf_tps = parse_tp_levels(buf.get("text", ""))
+                        buf_sl = parse_stop_loss(buf.get("text", ""))
+                        if buf_tps:
+                            vt_id = -abs(mid)
+                            vt_entry = buf.get("signal_market_price") or 0
+                            if vt_entry:
+                                outcome_tracker.register_virtual_trade(
+                                    vt_id, side, vt_entry, buf_sl or 0, buf_tps,
+                                    cancel_reason="zone_wait_timeout")
+                                log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
 
                 # ── Check PENDING LIMIT ORDERS ──
                 completed_orders = []
@@ -2312,6 +2368,15 @@ async def main():
                                     _worst = (_pmin <= _zh) if side == "BUY" else (_pmax >= _zl)
                                     record_entry_stat("limit_invalidated", side=side, limit_price=limit_price, reason="order_disappeared",
                                                       best_reached=_best, worst_reached=_worst, zone_low=_zl, zone_high=_zh, price_min=_pmin, price_max=_pmax)
+                                    # Register virtual trade for tracking what would have happened
+                                    if outcome_tracker and info.get("all_tps"):
+                                        vt_id = -abs(mid)
+                                        vt_sl = info.get("sl") or info.get("failsafe_sl") or 0
+                                        vt_entry = info.get("signal_market_price") or limit_price
+                                        outcome_tracker.register_virtual_trade(
+                                            vt_id, side, vt_entry, vt_sl, info["all_tps"],
+                                            cancel_reason="order_disappeared")
+                                        log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
                                     completed_orders.append(mid)
                                     continue
                     if pos_ticket:
@@ -2336,18 +2401,18 @@ async def main():
                                           price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
                         # Apply SL/TP if we have them
-                        # Register with outcome tracker
+                        # Register with outcome tracker using ALL TP levels from signal
                         actual_entry = fill_price or limit_price
+                        all_tps_from_signal = info.get("all_tps", {})
+                        if not all_tps_from_signal and info.get("tp1"):
+                            all_tps_from_signal = {1: info["tp1"]}
                         if outcome_tracker:
-                            tp_levels_info = {}
-                            if info.get("tp1"):
-                                tp_levels_info[1] = info["tp1"]
-                            outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), tp_levels_info)
+                            outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), all_tps_from_signal)
 
                         sl_val = info.get("sl")
                         tp_val = info.get("tp1")
                         if sl_val or tp_val:
-                            await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)")
+                            await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)", all_tp_levels=all_tps_from_signal)
 
                         completed_orders.append(mid)
                         continue
@@ -2362,6 +2427,15 @@ async def main():
                         _worst = (_pmin <= _zh) if side == "BUY" else (_pmax >= _zl)
                         record_entry_stat("limit_timeout", side=side, limit_price=limit_price, elapsed=elapsed,
                                           best_reached=_best, worst_reached=_worst, zone_low=_zl, zone_high=_zh, price_min=_pmin, price_max=_pmax)
+                        # Register virtual trade for tracking what would have happened
+                        if outcome_tracker and info.get("all_tps"):
+                            vt_id = -abs(mid)
+                            vt_sl = info.get("sl") or info.get("failsafe_sl") or 0
+                            vt_entry = info.get("signal_market_price") or limit_price
+                            outcome_tracker.register_virtual_trade(
+                                vt_id, side, vt_entry, vt_sl, info["all_tps"],
+                                cancel_reason=f"limit_timeout:{elapsed:.0f}s")
+                            log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
                         completed_orders.append(mid)
                         continue
 
@@ -2408,6 +2482,15 @@ async def main():
                             _worst = (_pmin <= _zh) if side == "BUY" else (_pmax >= _zl)
                             record_entry_stat("limit_invalidated", side=side, limit_price=limit_price, reason=reason,
                                               best_reached=_best, worst_reached=_worst, zone_low=_zl, zone_high=_zh, price_min=_pmin, price_max=_pmax)
+                            # Register virtual trade for tracking what would have happened
+                            if outcome_tracker and info.get("all_tps"):
+                                vt_id = -abs(mid)
+                                vt_sl = info.get("sl") or info.get("failsafe_sl") or 0
+                                vt_entry = info.get("signal_market_price") or limit_price
+                                outcome_tracker.register_virtual_trade(
+                                    vt_id, side, vt_entry, vt_sl, info["all_tps"],
+                                    cancel_reason=f"price_invalidated:{reason}")
+                                log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
                             completed_orders.append(mid)
                             continue
 
@@ -2449,11 +2532,17 @@ async def main():
 
     async def trade_outcome_monitor():
         """
-        Every 2 seconds, check current price against TP1-TP4, BE, and SL
+        Every 2 seconds, check current price against TP1-TP5, BE, and SL
         for all trades being tracked by the outcome tracker.
-        Also detect when tracked positions have been closed by the broker.
+
+        Shadow tracking: when the real position closes (e.g. at TP1), the
+        tracker keeps monitoring price to record which remaining levels
+        (TP2-TP5, SL) would have been hit.  This allows evaluating
+        alternative hold strategies from the recorded data.
+
+        Tracking finalizes when the highest TP or SL is hit, or after 24h.
         """
-        log("Trade outcome monitor started (2s interval)", "INFO")
+        log("Trade outcome monitor started (2s interval, shadow tracking enabled)", "INFO")
         while True:
             try:
                 await asyncio.sleep(2)
@@ -2482,14 +2571,42 @@ async def main():
 
                     newly_hit = outcome_tracker.check_levels(ticket, current_price)
                     for level in newly_hit:
-                        log(f"OUTCOME TRACKER: Ticket {ticket} hit {level} at ${current_price:.2f}", "INFO")
+                        if info.get("virtual"):
+                            tag = " [VIRTUAL]"
+                        elif info.get("position_closed"):
+                            tag = " [SHADOW]"
+                        else:
+                            tag = ""
+                        log(f"OUTCOME TRACKER: Ticket {ticket} hit {level} at ${current_price:.2f}{tag}", "INFO")
 
-                    # Check if position is still open
+                    # If position is already shadow-tracked, check if we should finalize
+                    if outcome_tracker.is_shadow_tracking(ticket):
+                        if outcome_tracker.should_finalize(ticket):
+                            seq = info.get("sequence_so_far", [])
+                            seq_str = " → ".join(seq) if seq else "NONE"
+                            profit = info.get("position_profit", 0.0) or 0.0
+                            # Determine why shadow tracking ended
+                            levels_hit = set(info.get("levels_hit", []))
+                            tp_nums = [k for k in info["tp_levels"].keys() if isinstance(k, int)]
+                            highest_tp = f"TP{max(tp_nums)}" if tp_nums else None
+                            if highest_tp and highest_tp in levels_hit:
+                                reason = f"shadow:{highest_tp}_hit"
+                            elif "SL" in levels_hit:
+                                reason = "shadow:SL_hit"
+                            else:
+                                reason = "shadow:timeout"
+                            virt_tag = "VIRTUAL" if info.get("virtual") else "SHADOW"
+                            log(f"OUTCOME TRACKER: Ticket {ticket} {virt_tag} tracking FINALIZED | "
+                                f"P&L=${profit:.2f} | Sequence: {seq_str} | Reason: {reason}", "INFO")
+                            outcome_tracker.close_trade(ticket, profit, reason)
+                        continue
+
+                    # Position still open — check if broker closed it
                     pos = await run_mt5(lambda t=ticket: mt5.positions_get(ticket=t))
                     if not pos:
-                        # Position closed — finalize tracking
-                        # Try to get final profit from deal history
+                        # Position closed by broker → start shadow tracking
                         final_profit = 0.0
+                        close_price = 0.0
                         close_reason = "unknown"
                         now_dt = datetime.now()
                         deals = await run_mt5(lambda: mt5.history_deals_get(
@@ -2498,14 +2615,26 @@ async def main():
                             for d in deals:
                                 if d.position_id == ticket and d.entry == 1:  # DEAL_ENTRY_OUT
                                     final_profit = float(d.profit)
+                                    close_price = float(d.price)
                                     close_reason = d.comment if d.comment else "broker"
                                     break
 
                         seq = info.get("sequence_so_far", [])
-                        seq_str = " \u2192 ".join(seq) if seq else "NONE"
-                        log(f"OUTCOME TRACKER: Ticket {ticket} CLOSED | P&L=${final_profit:.2f} | "
-                            f"Sequence: {seq_str} | Reason: {close_reason}", "INFO")
-                        outcome_tracker.close_trade(ticket, final_profit, close_reason)
+                        seq_str = " → ".join(seq) if seq else "NONE"
+                        log(f"OUTCOME TRACKER: Ticket {ticket} position CLOSED | P&L=${final_profit:.2f} | "
+                            f"Close price=${close_price:.2f} | Sequence so far: {seq_str} | Reason: {close_reason}", "INFO")
+                        log(f"OUTCOME TRACKER: Starting SHADOW TRACKING for ticket {ticket} "
+                            f"(will monitor until highest TP or SL is hit, max 24h)", "INFO")
+                        outcome_tracker.mark_position_closed(ticket, final_profit, close_reason, close_price)
+
+                        # Clean up position tracking dicts so trade closure handler
+                        # correctly sees no open positions for this ticket
+                        tp_sl_updated.pop(ticket, None)
+                        entry_prices.pop(ticket, None)
+                        for mid_key, tid in list(position_map.items()):
+                            if tid == ticket:
+                                position_map.pop(mid_key, None)
+                                break
 
             except Exception as e:
                 log(f"Trade outcome monitor error: {str(e)}", "ERROR")
@@ -2638,7 +2767,8 @@ async def main():
 
                             _processed_msg_ids.add(msg.id)
                             if len(_processed_msg_ids) > _MAX_PROCESSED_IDS:
-                                _processed_msg_ids.clear()
+                                sorted_ids = sorted(_processed_msg_ids)
+                                _processed_msg_ids.difference_update(sorted_ids[:len(sorted_ids) // 2])
 
                             last_seen_ids[chat_id] = max(last_seen_ids.get(chat_id, 0), msg.id)
 

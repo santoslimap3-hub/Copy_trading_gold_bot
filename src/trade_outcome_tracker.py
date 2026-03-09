@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """
 Trade Outcome Tracker
-Tracks the full sequence of price level events (TP1-TP4, breakeven, SL)
+Tracks the full sequence of price level events (TP1-TP5, breakeven, SL)
 after trade entry to build statistical data on trade outcome patterns.
+
+Shadow tracking: when the real position closes (e.g. at TP1), the tracker
+continues monitoring price against all remaining levels (TP2-TP5, SL) so
+you can evaluate alternative hold strategies later.  Shadow tracking ends
+when either the highest TP or SL is hit, or after a timeout (24h default).
 
 Usage:
     tracker = TradeOutcomeTracker(magic=779)
-    tracker.register_trade(ticket, side, entry_price, sl, {1: tp1, 2: tp2, 3: tp3, 4: tp4})
-    # ... background monitor calls tracker.check_levels(current_price) periodically ...
-    tracker.close_trade(ticket, final_profit)
+    tracker.register_trade(ticket, side, entry_price, sl, {1: tp1, 2: tp2, 3: tp3, 4: tp4, 5: tp5})
+    # ... position closes at TP1 ...
+    tracker.mark_position_closed(ticket, profit, "TP1")
+    # ... monitor keeps calling tracker.check_levels(ticket, price) ...
+    # ... tracker auto-finalizes when highest TP or SL is hit ...
 """
 
 import json
@@ -23,12 +30,19 @@ class TradeOutcomeTracker:
     outcome sequences to a JSON file for later statistical analysis.
 
     For each registered trade, monitors whether price crosses:
-      - TP1, TP2, TP3, TP4 (take profit levels)
+      - TP1, TP2, TP3, TP4, TP5 (take profit levels)
       - BE (breakeven = entry price)
       - SL (stop loss)
 
     Records the order in which these levels are hit with timestamps.
+
+    Shadow tracking: after the real position closes (e.g. at TP1), the
+    tracker continues monitoring price to see which remaining levels
+    would have been hit.  Tracking finalizes when the highest registered
+    TP or SL is reached, or after SHADOW_TIMEOUT seconds (default 24h).
     """
+
+    SHADOW_TIMEOUT = 86400  # 24 hours — max time to shadow-track after position close
 
     def __init__(self, magic: int, data_dir: str = None):
         self.magic = magic
@@ -55,7 +69,7 @@ class TradeOutcomeTracker:
         return []
 
     def _save_outcomes(self):
-        """Persist outcomes to disk."""
+        """Persist outcomes to disk atomically (write to temp file, then rename)."""
         os.makedirs(self.data_dir, exist_ok=True)
         data = {
             "magic": self.magic,
@@ -63,11 +77,21 @@ class TradeOutcomeTracker:
             "last_updated": time.strftime("%Y-%m-%d %H:%M:%S"),
             "outcomes": self._outcomes,
         }
+        tmp_file = self.outcomes_file + ".tmp"
         try:
-            with open(self.outcomes_file, "w") as f:
+            with open(tmp_file, "w") as f:
                 json.dump(data, f, indent=2)
+            # Atomic rename (on Windows this replaces the target)
+            if os.path.exists(self.outcomes_file):
+                os.replace(tmp_file, self.outcomes_file)
+            else:
+                os.rename(tmp_file, self.outcomes_file)
         except IOError:
-            pass
+            # Clean up temp file on failure
+            try:
+                os.remove(tmp_file)
+            except OSError:
+                pass
 
     def register_trade(self, ticket: int, side: str, entry_price: float,
                        sl_price: float, tp_levels: Dict[int, float]):
@@ -100,7 +124,35 @@ class TradeOutcomeTracker:
             "levels_hit": set(),      # Set of level names already recorded
             "registered_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "registered_ts": time.time(),
+            "position_closed": False,      # True once the real MT5 position is closed
+            "position_closed_at": None,    # Timestamp when position closed
+            "position_profit": None,       # Actual P&L from the closed position
+            "position_close_reason": None, # Why the real position closed (e.g. "TP1")
+            "position_close_price": None,  # Actual MT5 execution price when position closed
         }
+
+    def register_virtual_trade(self, trade_id: int, side: str, entry_price: float,
+                               sl_price: float, tp_levels: Dict[int, float],
+                               cancel_reason: str = ""):
+        """
+        Register a trade that was never entered (limit not filled, zone not hit)
+        for tracking what would have happened.  Starts immediately in shadow mode.
+
+        Args:
+            trade_id: Unique ID for this virtual trade (use negative msg_id to avoid collision)
+            side: "BUY" or "SELL"
+            entry_price: The limit price where entry would have occurred
+            sl_price: Stop loss price
+            tp_levels: Dict of TP level number -> price
+            cancel_reason: Why the trade was never entered
+        """
+        self.register_trade(trade_id, side, entry_price, sl_price, tp_levels)
+        trade = self._active_trades[trade_id]
+        trade["virtual"] = True
+        trade["position_closed"] = True
+        trade["position_closed_at"] = time.time()
+        trade["position_profit"] = 0.0
+        trade["position_close_reason"] = f"not_entered:{cancel_reason}"
 
     def update_levels(self, ticket: int, sl_price: float = None,
                       tp_levels: Dict[int, float] = None):
@@ -121,6 +173,73 @@ class TradeOutcomeTracker:
             trade["tp_levels"].update(tp_levels)
             for tp_num, tp_price in tp_levels.items():
                 trade["monitored_levels"][f"TP{tp_num}"] = tp_price
+
+    def mark_position_closed(self, ticket: int, final_profit: float = 0.0,
+                             close_reason: str = "", close_price: float = 0.0):
+        """
+        Record that the real MT5 position has been closed, but keep tracking
+        price levels (shadow tracking) for strategy evaluation.
+
+        The tracker will continue monitoring until the highest TP or SL is hit,
+        or until SHADOW_TIMEOUT elapses.
+        """
+        if ticket not in self._active_trades:
+            return
+
+        trade = self._active_trades[ticket]
+        trade["position_closed"] = True
+        trade["position_closed_at"] = time.time()
+        trade["position_profit"] = final_profit
+        trade["position_close_reason"] = close_reason
+        trade["position_close_price"] = close_price
+
+        # Record position closure as a sequence event
+        trade["sequence"].append({
+            "level": f"POS_CLOSED({close_reason})",
+            "time": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": time.time(),
+            "price": close_price,
+            "profit": final_profit,
+        })
+
+    def is_shadow_tracking(self, ticket: int) -> bool:
+        """Check if a ticket is being shadow-tracked (position closed, still monitoring)."""
+        if ticket not in self._active_trades:
+            return False
+        return self._active_trades[ticket]["position_closed"]
+
+    def should_finalize(self, ticket: int) -> bool:
+        """
+        Check whether shadow tracking should end for this ticket.
+        Returns True if:
+          - The highest registered TP level has been hit, OR
+          - SL has been hit (after position close), OR
+          - Shadow timeout has elapsed
+        """
+        if ticket not in self._active_trades:
+            return False
+
+        trade = self._active_trades[ticket]
+        if not trade["position_closed"]:
+            return False
+
+        # Check shadow timeout
+        elapsed = time.time() - (trade["position_closed_at"] or trade["registered_ts"])
+        if elapsed >= self.SHADOW_TIMEOUT:
+            return True
+
+        # Find the highest registered TP level
+        tp_nums = [k for k in trade["tp_levels"].keys() if isinstance(k, int)]
+        if tp_nums:
+            highest_tp = f"TP{max(tp_nums)}"
+            if highest_tp in trade["levels_hit"]:
+                return True
+
+        # SL hit after position closed → finalize
+        if "SL" in trade["levels_hit"] and trade["position_closed"]:
+            return True
+
+        return False
 
     def check_levels(self, ticket: int, current_price: float) -> List[str]:
         """
@@ -181,21 +300,29 @@ class TradeOutcomeTracker:
     def close_trade(self, ticket: int, final_profit: float = 0.0,
                     close_reason: str = ""):
         """
-        Finalize tracking for a closed trade and persist the outcome.
+        Finalize tracking for a trade and persist the outcome.
+
+        For shadow-tracked trades, final_profit is the actual position P&L
+        (recorded earlier via mark_position_closed), and close_reason reflects
+        why shadow tracking ended (e.g. "shadow:TP5_hit", "shadow:SL_hit",
+        "shadow:timeout").
 
         Args:
             ticket: Position ticket
-            final_profit: The final P&L of the trade
-            close_reason: How the trade was closed (e.g. "SL", "TP1", "manual")
+            final_profit: The final P&L of the actual trade (0 if not known)
+            close_reason: How/why tracking ended
         """
         if ticket not in self._active_trades:
             return
 
         trade = self._active_trades.pop(ticket)
 
-        # Build the sequence string (e.g. "TP1 → BE → TP2")
+        # Build the sequence string (e.g. "TP1 → POS_CLOSED(TP1) → TP2 → TP3 → SL")
         sequence_labels = [evt["level"] for evt in trade["sequence"]]
         sequence_str = " → ".join(sequence_labels) if sequence_labels else "NONE"
+
+        # Use actual position profit if available (from shadow tracking)
+        actual_profit = trade.get("position_profit") if trade.get("position_profit") is not None else final_profit
 
         outcome = {
             "ticket": trade["ticket"],
@@ -206,11 +333,21 @@ class TradeOutcomeTracker:
             "sequence": trade["sequence"],
             "sequence_str": sequence_str,
             "levels_hit": sorted(list(trade["levels_hit"])),
-            "final_profit": final_profit,
+            "final_profit": actual_profit,
             "close_reason": close_reason,
             "registered_at": trade["registered_at"],
             "closed_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "duration_seconds": time.time() - trade["registered_ts"],
+            # Shadow tracking metadata
+            "position_closed_at": trade.get("position_closed_at"),
+            "position_close_reason": trade.get("position_close_reason"),
+            "shadow_tracked": trade.get("position_closed", False),
+            "shadow_duration_seconds": (
+                time.time() - trade["position_closed_at"]
+                if trade.get("position_closed_at") else 0
+            ),
+            "virtual": trade.get("virtual", False),
+            "position_close_price": trade.get("position_close_price"),
         }
 
         self._outcomes.append(outcome)
@@ -237,6 +374,10 @@ class TradeOutcomeTracker:
             "tp_levels": trade["tp_levels"].copy(),
             "sequence_so_far": [evt["level"] for evt in trade["sequence"]],
             "levels_hit": sorted(list(trade["levels_hit"])),
+            "position_closed": trade.get("position_closed", False),
+            "position_profit": trade.get("position_profit"),
+            "position_close_price": trade.get("position_close_price"),
+            "virtual": trade.get("virtual", False),
         }
 
     def get_stats_summary(self) -> Dict:
