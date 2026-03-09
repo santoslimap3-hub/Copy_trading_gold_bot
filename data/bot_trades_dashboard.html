@@ -471,6 +471,18 @@
                     <div class="metric-value" id="avgPnL">-</div>
                     <div class="metric-label">Avg P&L per Trade</div>
                 </div>
+                <div class="metric-card positive">
+                    <div class="metric-value" id="avgWin">-</div>
+                    <div class="metric-label">Avg Win per Win</div>
+                </div>
+                <div class="metric-card negative">
+                    <div class="metric-value" id="avgLoss">-</div>
+                    <div class="metric-label">Avg Loss per Loss</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-value" id="avgRR">-</div>
+                    <div class="metric-label">Avg R:R</div>
+                </div>
             </div>
         </div>
 
@@ -721,15 +733,9 @@
                 document.getElementById('netPnL').textContent = '$0.00';
                 document.getElementById('profitFactor').textContent = '0.00';
                 document.getElementById('avgPnL').textContent = '$0.00';
-                return;
-            }
-            
-            if (trades.length === 0) {
-                document.getElementById('totalTrades').textContent = '0';
-                document.getElementById('winRate').textContent = '0%';
-                document.getElementById('netPnL').textContent = '$0.00';
-                document.getElementById('profitFactor').textContent = '0.00';
-                document.getElementById('avgPnL').textContent = '$0.00';
+                document.getElementById('avgWin').textContent = '$0.00';
+                document.getElementById('avgLoss').textContent = '$0.00';
+                document.getElementById('avgRR').textContent = '0.00';
                 return;
             }
             
@@ -743,6 +749,10 @@
             const netPnL = trades.reduce((sum, t) => sum + t.profit, 0);
             const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss).toFixed(2) : 0;
             const avgPnL = (netPnL / totalTrades).toFixed(2);
+            const avgWin = winningTrades > 0 ? (totalProfit / winningTrades).toFixed(2) : '0.00';
+            const avgLoss = losingTrades > 0 ? (totalLoss / losingTrades).toFixed(2) : '0.00';
+            const rawRR = (winningTrades > 0 && losingTrades > 0) ? (totalProfit / winningTrades) / (totalLoss / losingTrades) : 0;
+            const rrWinSide = (rawRR * 8).toFixed(2);
             
             // Update display
             document.getElementById('totalTrades').textContent = totalTrades;
@@ -750,6 +760,20 @@
             document.getElementById('netPnL').textContent = '$' + netPnL.toFixed(2);
             document.getElementById('profitFactor').textContent = profitFactor;
             document.getElementById('avgPnL').textContent = '$' + avgPnL;
+            document.getElementById('avgWin').textContent = '$' + avgWin;
+            document.getElementById('avgLoss').textContent = '-$' + avgLoss;
+            document.getElementById('avgRR').textContent = rrWinSide + ':8';
+            
+            // Update R:R card color
+            const rrCard = document.getElementById('avgRR').parentElement;
+            rrCard.className = 'metric-card';
+            if (rawRR >= 1) {
+                rrCard.classList.add('positive');
+            } else if (rawRR > 0) {
+                rrCard.classList.add('negative');
+            } else {
+                rrCard.classList.add('neutral');
+            }
             
             // Update P&L card color
             const pnlCard = document.getElementById('pnlCard');

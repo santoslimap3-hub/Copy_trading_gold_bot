@@ -13,7 +13,7 @@ from typing import List, Dict, Optional
 
 # ===================== CONFIGURATION =====================
 SYMBOL = "XAUUSD"
-BOT_MAGIC_NUMBERS = [777]  # All bot magic numbers
+BOT_MAGIC_NUMBERS = [777, 779]  # All bot magic numbers
 DAYS_BACK = 365  # How many days back to retrieve trades
 
 # Get the directory of the current script and go up to project root
@@ -36,6 +36,13 @@ class BotTradesExporter:
         self._closed_entries = {
             mt5.DEAL_ENTRY_OUT,
             mt5.DEAL_ENTRY_OUT_BY,
+        }
+
+        # Reasons that indicate a trade was closed manually (ignore these)
+        self._manual_close_reasons = {
+            mt5.DEAL_REASON_CLIENT,   # 0 - closed from desktop terminal
+            mt5.DEAL_REASON_MOBILE,   # 1 - closed from mobile app
+            mt5.DEAL_REASON_WEB,      # 2 - closed from web platform
         }
 
     @staticmethod
@@ -207,12 +214,27 @@ class BotTradesExporter:
         self.bot_closed_deals = [
             deal for deal in self.all_deals
             if deal.get('is_closed')
+            and deal.get('reason') not in self._manual_close_reasons
             and (
                 deal['magic'] in BOT_MAGIC_NUMBERS
                 or deal.get('position_id') in bot_position_ids
                 or deal.get('order') in bot_order_ids
             )
         ]
+        
+        # Count how many were excluded
+        all_bot_closed = [
+            deal for deal in self.all_deals
+            if deal.get('is_closed')
+            and (
+                deal['magic'] in BOT_MAGIC_NUMBERS
+                or deal.get('position_id') in bot_position_ids
+                or deal.get('order') in bot_order_ids
+            )
+        ]
+        manually_closed = len(all_bot_closed) - len(self.bot_closed_deals)
+        if manually_closed > 0:
+            print(f"⚠️ Excluded {manually_closed} manually closed trades")
         
         print(f"✅ Found {len(self.bot_trades)} bot trades")
         

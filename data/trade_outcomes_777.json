@@ -1,8 +1,47 @@
 {
   "magic": 777,
-  "total_tracked": 2,
+  "total_tracked": 3,
   "last_updated": "2026-03-09 17:45:23",
   "outcomes": [
+    {
+      "ticket": 43193379,
+      "side": "BUY",
+      "entry_price": 5089.70,
+      "sl_price": 5084.0,
+      "tp_levels": {
+        "1": 5092.52
+      },
+      "sequence": [
+        {
+          "level": "TP1",
+          "time": "2026-03-09 15:04:07",
+          "timestamp": 1773039847.0,
+          "price": 5092.52
+        },
+        {
+          "level": "POS_CLOSED(tp)",
+          "time": "2026-03-09 15:04:07",
+          "timestamp": 1773039847.0,
+          "price": 5092.52,
+          "profit": 2.44
+        }
+      ],
+      "sequence_str": "TP1 \u2192 POS_CLOSED(tp)",
+      "levels_hit": [
+        "TP1"
+      ],
+      "final_profit": 2.44,
+      "close_reason": "tp",
+      "registered_at": "2026-03-09 15:03:41",
+      "closed_at": "2026-03-09 15:04:07",
+      "duration_seconds": 26.0,
+      "position_closed_at": 1773039847.0,
+      "position_close_reason": "tp",
+      "shadow_tracked": false,
+      "shadow_duration_seconds": 0,
+      "virtual": false,
+      "position_close_price": 5092.52
+    },
     {
       "ticket": -3935,
       "side": "SELL",

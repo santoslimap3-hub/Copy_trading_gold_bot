@@ -13,7 +13,7 @@ from typing import List, Dict, Optional
 
 # ===================== CONFIGURATION =====================
 SYMBOL = "XAUUSD"
-BOT_MAGIC_NUMBERS = [779, 777, 0]  # All bot magic numbers
+BOT_MAGIC_NUMBERS = [779]  # All bot magic numbers
 DAYS_BACK = 365  # How many days back to retrieve trades
 
 # Get the directory of the current script and go up to project root
@@ -37,6 +37,16 @@ class BotTradesExporter:
             mt5.DEAL_ENTRY_OUT,
             mt5.DEAL_ENTRY_OUT_BY,
         }
+
+        # Reasons that indicate a trade was closed manually (ignore these)
+        self._manual_close_reasons = {
+            mt5.DEAL_REASON_CLIENT,   # 0 - closed from desktop terminal
+            mt5.DEAL_REASON_MOBILE,   # 1 - closed from mobile app
+            mt5.DEAL_REASON_WEB,      # 2 - closed from web platform
+        }
+
+        # Order tickets for test trades to permanently exclude (matched by position_id)
+        self._blacklisted_positions = {40371931, 40371975, 40371949, 40371717}
 
     @staticmethod
     def _get_attr(obj, name: str, default=None):
@@ -187,17 +197,52 @@ class BotTradesExporter:
         return True
     
     def filter_bot_trades(self) -> int:
-        """Filter ALL gold (XAUUSD) trades from history"""
-        print(f"\n🤖 Filtering ALL {SYMBOL} trades...")
+        """Filter trades by bot's magic numbers"""
+        print(f"\n🤖 Filtering trades with magic numbers {BOT_MAGIC_NUMBERS}...")
         
-        # Filter deals by symbol — gets every gold trade regardless of magic number
-        self.bot_trades = [deal for deal in self.all_deals if deal['symbol'] == SYMBOL]
-
-        # Closed deals: filter by symbol + is_closed
-        self.bot_closed_deals = [
+        # Filter deals by magic number
+        self.bot_trades = [
             deal for deal in self.all_deals
-            if deal.get('is_closed') and deal['symbol'] == SYMBOL
+            if deal['magic'] in BOT_MAGIC_NUMBERS
+            and deal.get('position_id') not in self._blacklisted_positions
         ]
+
+        # Build a set of bot-linked position/order IDs (from entry deals)
+        bot_position_ids = {
+            deal['position_id'] for deal in self.bot_trades
+            if deal.get('position_id')
+        }
+        bot_order_ids = {
+            deal['order'] for deal in self.bot_trades
+            if deal.get('order')
+        }
+
+        # Closed deals: match by magic number or position/order linkage
+        # Exclude blacklisted positions
+        all_closed = [
+            deal for deal in self.all_deals
+            if deal.get('is_closed')
+            and deal.get('position_id') not in self._blacklisted_positions
+            and (
+                deal['magic'] in BOT_MAGIC_NUMBERS
+                or deal.get('position_id') in bot_position_ids
+                or deal.get('order') in bot_order_ids
+            )
+        ]
+        self.bot_closed_deals = [
+            deal for deal in all_closed
+            if deal.get('reason') not in self._manual_close_reasons
+        ]
+        manually_closed = len(all_closed) - len(self.bot_closed_deals)
+        blacklisted = sum(
+            1 for deal in self.all_deals
+            if deal.get('is_closed')
+            and deal.get('position_id') in self._blacklisted_positions
+        )
+        if blacklisted > 0:
+            print(f"⚠️ Excluded {blacklisted} blacklisted test trades")
+        if manually_closed > 0:
+            print(f"⚠️ Excluded {manually_closed} manually closed trades")
         
         print(f"✅ Found {len(self.bot_trades)} bot trades")
         
@@ -218,13 +263,13 @@ class BotTradesExporter:
         return len(self.bot_trades)
 
     def filter_bot_orders(self) -> int:
-        """Filter ALL gold (XAUUSD) closed orders from history"""
-        print(f"\n🤖 Filtering ALL {SYMBOL} closed orders...")
+        """Filter closed orders by bot's magic numbers"""
+        print(f"\n🤖 Filtering closed orders with magic numbers {BOT_MAGIC_NUMBERS}...")
 
         filled_states = {mt5.ORDER_STATE_FILLED, mt5.ORDER_STATE_PARTIAL}
         self.bot_orders = [
             order for order in self.all_orders
-            if order['symbol'] == SYMBOL
+            if order['magic'] in BOT_MAGIC_NUMBERS
             and (order.get('state') in filled_states or order.get('is_closed'))
         ]
 
