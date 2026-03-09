@@ -50,9 +50,10 @@ class TradeOutcomeTracker:
             data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
         self.data_dir = data_dir
         self.outcomes_file = os.path.join(data_dir, f"trade_outcomes_{magic}.json")
+        self._active_file = os.path.join(data_dir, f"active_trades_{magic}.json")
 
         # Active trades being tracked: ticket -> trade_info dict
-        self._active_trades: Dict[int, Dict] = {}
+        self._active_trades: Dict[int, Dict] = self._load_active_trades()
 
         # Load existing outcomes from disk
         self._outcomes: List[Dict] = self._load_outcomes()
@@ -67,6 +68,47 @@ class TradeOutcomeTracker:
             except (json.JSONDecodeError, IOError):
                 return []
         return []
+
+    def _load_active_trades(self) -> Dict[int, Dict]:
+        """Load in-progress active trades from disk (survives restarts)."""
+        if not os.path.exists(self._active_file):
+            return {}
+        try:
+            with open(self._active_file, "r") as f:
+                data = json.load(f)
+            trades = {}
+            for ticket_str, trade in data.items():
+                # Convert levels_hit back from list to set
+                trade["levels_hit"] = set(trade.get("levels_hit", []))
+                trades[int(ticket_str)] = trade
+            if trades:
+                print(f"[TradeOutcomeTracker] Restored {len(trades)} active trade(s) from disk")
+            return trades
+        except (json.JSONDecodeError, IOError):
+            return {}
+
+    def _save_active_trades(self):
+        """Persist active trades to disk so shadow tracking survives restarts."""
+        os.makedirs(self.data_dir, exist_ok=True)
+        # Convert sets to lists for JSON serialization
+        serializable = {}
+        for ticket, trade in self._active_trades.items():
+            t = trade.copy()
+            t["levels_hit"] = sorted(list(trade["levels_hit"]))
+            serializable[str(ticket)] = t
+        tmp_file = self._active_file + ".tmp"
+        try:
+            with open(tmp_file, "w") as f:
+                json.dump(serializable, f, indent=2)
+            if os.path.exists(self._active_file):
+                os.replace(tmp_file, self._active_file)
+            else:
+                os.rename(tmp_file, self._active_file)
+        except IOError:
+            try:
+                os.remove(tmp_file)
+            except OSError:
+                pass
 
     def _save_outcomes(self):
         """Persist outcomes to disk atomically (write to temp file, then rename)."""
@@ -130,6 +172,7 @@ class TradeOutcomeTracker:
             "position_close_reason": None, # Why the real position closed (e.g. "TP1")
             "position_close_price": None,  # Actual MT5 execution price when position closed
         }
+        self._save_active_trades()
 
     def register_virtual_trade(self, trade_id: int, side: str, entry_price: float,
                                sl_price: float, tp_levels: Dict[int, float],
@@ -153,6 +196,7 @@ class TradeOutcomeTracker:
         trade["position_closed_at"] = time.time()
         trade["position_profit"] = 0.0
         trade["position_close_reason"] = f"not_entered:{cancel_reason}"
+        self._save_active_trades()
 
     def update_levels(self, ticket: int, sl_price: float = None,
                       tp_levels: Dict[int, float] = None):
@@ -173,6 +217,8 @@ class TradeOutcomeTracker:
             trade["tp_levels"].update(tp_levels)
             for tp_num, tp_price in tp_levels.items():
                 trade["monitored_levels"][f"TP{tp_num}"] = tp_price
+
+        self._save_active_trades()
 
     def mark_position_closed(self, ticket: int, final_profit: float = 0.0,
                              close_reason: str = "", close_price: float = 0.0):
@@ -201,6 +247,7 @@ class TradeOutcomeTracker:
             "price": close_price,
             "profit": final_profit,
         })
+        self._save_active_trades()
 
     def is_shadow_tracking(self, ticket: int) -> bool:
         """Check if a ticket is being shadow-tracked (position closed, still monitoring)."""
@@ -295,6 +342,9 @@ class TradeOutcomeTracker:
                 trade["sequence"].append(event)
                 newly_hit.append(level_name)
 
+        if newly_hit:
+            self._save_active_trades()
+
         return newly_hit
 
     def close_trade(self, ticket: int, final_profit: float = 0.0,
@@ -352,6 +402,7 @@ class TradeOutcomeTracker:
 
         self._outcomes.append(outcome)
         self._save_outcomes()
+        self._save_active_trades()
 
     def is_tracking(self, ticket: int) -> bool:
         """Check if a ticket is currently being tracked."""

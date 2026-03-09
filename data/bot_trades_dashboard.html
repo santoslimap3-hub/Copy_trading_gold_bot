@@ -242,6 +242,197 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stats-card .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stats-card .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .stats-card.green .stat-value { color: var(--success-color); }
+        .stats-card.red .stat-value { color: var(--danger-color); }
+        .stats-card.blue .stat-value { color: var(--info-color); }
+        .stats-card.orange .stat-value { color: var(--warning-color); }
+
+        .section-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-panel h5 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .magic-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .magic-toggle-btn {
+            padding: 6px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .magic-toggle-btn:hover { border-color: #667eea; color: #667eea; }
+        .magic-toggle-btn.active { background: #3498db; color: white; border-color: #3498db; }
+        .magic-toggle-btn.active-779 { background: #9b59b6; color: white; border-color: #9b59b6; }
+
+        .entry-timeline {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .entry-event {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 15px;
+            border-left: 3px solid #ddd;
+            margin-left: 10px;
+            margin-bottom: 2px;
+            background: #fafafa;
+            border-radius: 0 5px 5px 0;
+            font-size: 13px;
+        }
+
+        .entry-event.signal_buffered { border-left-color: var(--warning-color); }
+        .entry-event.zone_from_edit { border-left-color: var(--info-color); }
+        .entry-event.market_entry_in_zone { border-left-color: var(--success-color); }
+        .entry-event.limit_placed { border-left-color: #9b59b6; }
+        .entry-event.limit_invalidated { border-left-color: var(--danger-color); }
+        .entry-event.zone_wait_timeout { border-left-color: #e67e22; }
+        .entry-event.limit_filled { border-left-color: var(--success-color); }
+        .entry-event.market_orders_fallback { border-left-color: #e67e22; }
+
+        .entry-event .event-time {
+            min-width: 140px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .entry-event .event-type {
+            font-weight: 600;
+            min-width: 170px;
+        }
+
+        .entry-event .event-details {
+            color: #555;
+        }
+
+        .outcome-card {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+
+        .outcome-card .outcome-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .outcome-card .tp-levels {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tp-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tp-badge.hit { background: #d4edda; color: #155724; }
+        .tp-badge.miss { background: #f0f0f0; color: #999; }
+        .tp-badge.sl { background: #f8d7da; color: #721c24; }
+
+        .outcome-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .outcome-meta span { display: flex; align-items: center; gap: 4px; }
     </style>
 </head>
 <body>
@@ -250,6 +441,13 @@
         <div class="header">
             <h1><i class="bi bi-graph-up"></i> Bot Trades Dashboard</h1>
             <p class="header-subtitle">Real-time trading performance analytics</p>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('trades')"><i class="bi bi-list-ul"></i> Bot Trades</button>
+                <button class="tab-btn" onclick="switchTab('entry-stats')"><i class="bi bi-signpost-2"></i> Entry Stats</button>
+                <button class="tab-btn" onclick="switchTab('trade-outcomes')"><i class="bi bi-bullseye"></i> Trade Outcomes</button>
+            </div>
             
             <!-- Metrics -->
             <div class="metrics-row" id="metricsContainer">
@@ -273,8 +471,23 @@
                     <div class="metric-value" id="avgPnL">-</div>
                     <div class="metric-label">Avg P&L per Trade</div>
                 </div>
+                <div class="metric-card positive">
+                    <div class="metric-value" id="avgWin">-</div>
+                    <div class="metric-label">Avg Win per Win</div>
+                </div>
+                <div class="metric-card negative">
+                    <div class="metric-value" id="avgLoss">-</div>
+                    <div class="metric-label">Avg Loss per Loss</div>
+                </div>
+                <div class="metric-card neutral">
+                    <div class="metric-value" id="avgRR">-</div>
+                    <div class="metric-label">Avg R:R</div>
+                </div>
             </div>
         </div>
+
+        <!-- === TAB: Bot Trades === -->
+        <div id="tab-trades" class="tab-content active">
 
         <!-- Controls -->
         <div class="controls">
@@ -328,6 +541,41 @@
             </table>
             <div class="table-info" id="tableInfo"></div>
         </div>
+
+        </div><!-- end tab-trades -->
+
+        <!-- === TAB: Entry Stats === -->
+        <div id="tab-entry-stats" class="tab-content">
+            <div class="magic-toggle">
+                <span style="font-weight: bold; color: #2c3e50; align-self: center;">Account:</span>
+                <button class="magic-toggle-btn active" onclick="switchEntryMagic(777, this)">Bot 777</button>
+                <button class="magic-toggle-btn" onclick="switchEntryMagic(779, this)">Bot 779</button>
+            </div>
+
+            <div class="stats-grid" id="entryStatsGrid"></div>
+
+            <div class="section-panel">
+                <h5><i class="bi bi-clock-history"></i> Entry Event Timeline</h5>
+                <div class="entry-timeline" id="entryTimeline"></div>
+            </div>
+        </div><!-- end tab-entry-stats -->
+
+        <!-- === TAB: Trade Outcomes === -->
+        <div id="tab-trade-outcomes" class="tab-content">
+            <div class="magic-toggle">
+                <span style="font-weight: bold; color: #2c3e50; align-self: center;">Account:</span>
+                <button class="magic-toggle-btn active" onclick="switchOutcomeMagic(777, this)">Bot 777</button>
+                <button class="magic-toggle-btn" onclick="switchOutcomeMagic(779, this)">Bot 779</button>
+            </div>
+
+            <div class="stats-grid" id="outcomeStatsGrid"></div>
+
+            <div class="section-panel">
+                <h5><i class="bi bi-bullseye"></i> Trade Outcome Details</h5>
+                <div id="outcomeCards"></div>
+            </div>
+        </div><!-- end tab-trade-outcomes -->
+
     </div>
 
     <script>
@@ -485,15 +733,9 @@
                 document.getElementById('netPnL').textContent = '$0.00';
                 document.getElementById('profitFactor').textContent = '0.00';
                 document.getElementById('avgPnL').textContent = '$0.00';
-                return;
-            }
-            
-            if (trades.length === 0) {
-                document.getElementById('totalTrades').textContent = '0';
-                document.getElementById('winRate').textContent = '0%';
-                document.getElementById('netPnL').textContent = '$0.00';
-                document.getElementById('profitFactor').textContent = '0.00';
-                document.getElementById('avgPnL').textContent = '$0.00';
+                document.getElementById('avgWin').textContent = '$0.00';
+                document.getElementById('avgLoss').textContent = '$0.00';
+                document.getElementById('avgRR').textContent = '0.00';
                 return;
             }
             
@@ -507,6 +749,10 @@
             const netPnL = trades.reduce((sum, t) => sum + t.profit, 0);
             const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss).toFixed(2) : 0;
             const avgPnL = (netPnL / totalTrades).toFixed(2);
+            const avgWin = winningTrades > 0 ? (totalProfit / winningTrades).toFixed(2) : '0.00';
+            const avgLoss = losingTrades > 0 ? (totalLoss / losingTrades).toFixed(2) : '0.00';
+            const rawRR = (winningTrades > 0 && losingTrades > 0) ? (totalProfit / winningTrades) / (totalLoss / losingTrades) : 0;
+            const rrWinSide = (rawRR * 8).toFixed(2);
             
             // Update display
             document.getElementById('totalTrades').textContent = totalTrades;
@@ -514,6 +760,20 @@
             document.getElementById('netPnL').textContent = '$' + netPnL.toFixed(2);
             document.getElementById('profitFactor').textContent = profitFactor;
             document.getElementById('avgPnL').textContent = '$' + avgPnL;
+            document.getElementById('avgWin').textContent = '$' + avgWin;
+            document.getElementById('avgLoss').textContent = '-$' + avgLoss;
+            document.getElementById('avgRR').textContent = rrWinSide + ':8';
+            
+            // Update R:R card color
+            const rrCard = document.getElementById('avgRR').parentElement;
+            rrCard.className = 'metric-card';
+            if (rawRR >= 1) {
+                rrCard.classList.add('positive');
+            } else if (rawRR > 0) {
+                rrCard.classList.add('negative');
+            } else {
+                rrCard.classList.add('neutral');
+            }
             
             // Update P&L card color
             const pnlCard = document.getElementById('pnlCard');
@@ -628,6 +888,193 @@
         function showError(message) {
             const errorContainer = document.getElementById('errorContainer');
             errorContainer.innerHTML = `<div class="error"><i class="bi bi-exclamation-circle"></i> ${message}</div>`;
+        }
+
+        // ========== Tab Switching ==========
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+
+            if (tabName === 'entry-stats' && !entryStatsLoaded) loadEntryStats(currentEntryMagic);
+            if (tabName === 'trade-outcomes' && !outcomeStatsLoaded) loadTradeOutcomes(currentOutcomeMagic);
+        }
+
+        // ========== Entry Stats ==========
+        let currentEntryMagic = 777;
+        let entryStatsLoaded = false;
+
+        function switchEntryMagic(magic, btn) {
+            currentEntryMagic = magic;
+            btn.parentElement.querySelectorAll('.magic-toggle-btn').forEach(b => {
+                b.classList.remove('active', 'active-779');
+            });
+            btn.classList.add(magic === 779 ? 'active-779' : 'active');
+            loadEntryStats(magic);
+        }
+
+        async function loadEntryStats(magic) {
+            try {
+                const resp = await fetch('entry_stats_' + magic + '.json?t=' + Date.now(), { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                entryStatsLoaded = true;
+                renderEntryStats(data, magic);
+            } catch (e) {
+                document.getElementById('entryStatsGrid').innerHTML = '<div class="error">Failed to load entry_stats_' + magic + '.json: ' + e.message + '</div>';
+            }
+        }
+
+        function renderEntryStats(data, magic) {
+            const grid = document.getElementById('entryStatsGrid');
+            grid.innerHTML = `
+                <div class="stats-card blue"><div class="stat-value">${data.signals_buffered || 0}</div><div class="stat-label">Signals Buffered</div></div>
+                <div class="stats-card"><div class="stat-value">${data.zones_received_from_edit || 0}</div><div class="stat-label">Zones Received</div></div>
+                <div class="stats-card green"><div class="stat-value">${data.limit_orders_placed || 0}</div><div class="stat-label">Limit Orders Placed</div></div>
+                <div class="stats-card green"><div class="stat-value">${data.limit_fills || 0}</div><div class="stat-label">Limit Fills</div></div>
+                <div class="stats-card red"><div class="stat-value">${data.limit_invalidated || 0}</div><div class="stat-label">Limit Invalidated</div></div>
+                <div class="stats-card orange"><div class="stat-value">${data.limit_timeouts || 0}</div><div class="stat-label">Limit Timeouts</div></div>
+                <div class="stats-card orange"><div class="stat-value">${data.zone_wait_timeouts || 0}</div><div class="stat-label">Zone Wait Timeouts</div></div>
+                <div class="stats-card green"><div class="stat-value">${data.market_orders_in_zone || 0}</div><div class="stat-label">Market Orders In Zone</div></div>
+                <div class="stats-card"><div class="stat-value">${data.market_orders_no_zone || 0}</div><div class="stat-label">Market Orders No Zone</div></div>
+                <div class="stats-card"><div class="stat-value">${data.market_orders_fallback || 0}</div><div class="stat-label">Market Orders Fallback</div></div>
+                <div class="stats-card blue"><div class="stat-value">${(data.total_limit_slippage || 0).toFixed(2)}</div><div class="stat-label">Total Limit Slippage</div></div>
+                <div class="stats-card"><div class="stat-value">${data.zone_tracking_total || 0}</div><div class="stat-label">Zone Tracking Total</div></div>
+            `;
+
+            const timeline = document.getElementById('entryTimeline');
+            const entries = data.entries || [];
+            if (entries.length === 0) {
+                timeline.innerHTML = '<p style="color:#7f8c8d; text-align:center;">No entry events recorded yet.</p>';
+                return;
+            }
+
+            let html = '';
+            entries.forEach(e => {
+                const typeLabel = (e.type || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                let details = '';
+                if (e.side) details += `<strong>${e.side}</strong> `;
+                if (e.entry_price) details += `Entry: ${e.entry_price} `;
+                if (e.limit_price) details += `Limit: ${e.limit_price} `;
+                if (e.zone_low != null && e.zone_high != null) details += `Zone: ${e.zone_low} - ${e.zone_high} `;
+                if (e.wait_time) details += `Wait: ${e.wait_time.toFixed(1)}s `;
+                if (e.reason) details += `Reason: ${e.reason} `;
+
+                html += `<div class="entry-event ${e.type || ''}">
+                    <span class="event-time">${e.time || ''}</span>
+                    <span class="event-type">${typeLabel}</span>
+                    <span class="event-details">${details}</span>
+                </div>`;
+            });
+            timeline.innerHTML = html;
+        }
+
+        // ========== Trade Outcomes ==========
+        let currentOutcomeMagic = 777;
+        let outcomeStatsLoaded = false;
+
+        function switchOutcomeMagic(magic, btn) {
+            currentOutcomeMagic = magic;
+            btn.parentElement.querySelectorAll('.magic-toggle-btn').forEach(b => {
+                b.classList.remove('active', 'active-779');
+            });
+            btn.classList.add(magic === 779 ? 'active-779' : 'active');
+            loadTradeOutcomes(magic);
+        }
+
+        async function loadTradeOutcomes(magic) {
+            try {
+                const resp = await fetch('trade_outcomes_' + magic + '.json?t=' + Date.now(), { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                outcomeStatsLoaded = true;
+                renderTradeOutcomes(data, magic);
+            } catch (e) {
+                document.getElementById('outcomeStatsGrid').innerHTML = '<div class="error">Failed to load trade_outcomes_' + magic + '.json: ' + e.message + '</div>';
+            }
+        }
+
+        function renderTradeOutcomes(data, magic) {
+            const outcomes = data.outcomes || [];
+            const total = outcomes.length;
+            const realTrades = outcomes.filter(o => !o.virtual);
+            const virtualTrades = outcomes.filter(o => o.virtual);
+            const slHits = outcomes.filter(o => o.levels_hit && o.levels_hit.includes('SL')).length;
+            const tp1Hits = outcomes.filter(o => o.levels_hit && o.levels_hit.includes('TP1')).length;
+            const tp2Hits = outcomes.filter(o => o.levels_hit && o.levels_hit.includes('TP2')).length;
+            const tp3Hits = outcomes.filter(o => o.levels_hit && o.levels_hit.includes('TP3')).length;
+            const tp5Hits = outcomes.filter(o => o.levels_hit && o.levels_hit.includes('TP5')).length;
+            const totalProfit = outcomes.reduce((s, o) => s + (o.final_profit || 0), 0);
+
+            const grid = document.getElementById('outcomeStatsGrid');
+            grid.innerHTML = `
+                <div class="stats-card blue"><div class="stat-value">${total}</div><div class="stat-label">Total Tracked</div></div>
+                <div class="stats-card green"><div class="stat-value">${realTrades.length}</div><div class="stat-label">Real Trades</div></div>
+                <div class="stats-card"><div class="stat-value">${virtualTrades.length}</div><div class="stat-label">Virtual / Shadow</div></div>
+                <div class="stats-card red"><div class="stat-value">${slHits}</div><div class="stat-label">SL Hits</div></div>
+                <div class="stats-card green"><div class="stat-value">${tp1Hits}</div><div class="stat-label">TP1 Hits</div></div>
+                <div class="stats-card green"><div class="stat-value">${tp2Hits}</div><div class="stat-label">TP2 Hits</div></div>
+                <div class="stats-card green"><div class="stat-value">${tp3Hits}</div><div class="stat-label">TP3+ Hits</div></div>
+                <div class="stats-card ${totalProfit >= 0 ? 'green' : 'red'}"><div class="stat-value">$${totalProfit.toFixed(2)}</div><div class="stat-label">Total Profit</div></div>
+            `;
+
+            const container = document.getElementById('outcomeCards');
+            if (outcomes.length === 0) {
+                container.innerHTML = '<p style="color:#7f8c8d; text-align:center;">No trade outcomes recorded yet.</p>';
+                return;
+            }
+
+            let html = '';
+            outcomes.forEach(o => {
+                const sideClass = o.side === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
+                const profitClass = o.final_profit > 0 ? 'trade-profit-positive' : (o.final_profit < 0 ? 'trade-profit-negative' : 'trade-profit-zero');
+                const virtualBadge = o.virtual ? '<span class="badge bg-secondary" style="font-size:10px;">SHADOW</span>' : '<span class="badge bg-primary" style="font-size:10px;">REAL</span>';
+
+                // TP level badges
+                let tpHtml = '';
+                if (o.tp_levels) {
+                    Object.keys(o.tp_levels).forEach(lvl => {
+                        const tpKey = 'TP' + lvl;
+                        const isHit = o.levels_hit && o.levels_hit.includes(tpKey);
+                        tpHtml += `<span class="tp-badge ${isHit ? 'hit' : 'miss'}">${tpKey}: ${o.tp_levels[lvl]}</span>`;
+                    });
+                }
+                const slHit = o.levels_hit && o.levels_hit.includes('SL');
+                tpHtml += `<span class="tp-badge ${slHit ? 'sl' : 'miss'}">SL: ${o.sl_price}</span>`;
+
+                const duration = o.duration_seconds ? formatDuration(o.duration_seconds) : '-';
+                const closeReason = o.close_reason || '-';
+                const posCloseReason = o.position_close_reason || '-';
+
+                html += `<div class="outcome-card">
+                    <div class="outcome-header">
+                        <div>
+                            <span class="${sideClass}" style="font-size:16px;">${o.side}</span>
+                            &nbsp;@ ${o.entry_price}
+                            &nbsp;${virtualBadge}
+                        </div>
+                        <div>
+                            <span class="${profitClass}" style="font-size:18px;">$${(o.final_profit || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div>Sequence: <strong>${o.sequence_str || '-'}</strong></div>
+                    <div class="tp-levels">${tpHtml}</div>
+                    <div class="outcome-meta">
+                        <span><i class="bi bi-clock"></i> Duration: ${duration}</span>
+                        <span><i class="bi bi-tag"></i> Close: ${closeReason}</span>
+                        <span><i class="bi bi-info-circle"></i> Position: ${posCloseReason}</span>
+                        <span><i class="bi bi-calendar"></i> ${o.registered_at || '-'}</span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function formatDuration(seconds) {
+            if (seconds < 60) return seconds.toFixed(0) + 's';
+            if (seconds < 3600) return (seconds / 60).toFixed(1) + 'm';
+            return (seconds / 3600).toFixed(1) + 'h';
         }
 
         // Load data on page load

@@ -1032,7 +1032,7 @@ def record_entry_stat(event_type: str, **kwargs):
         _entry_stats["zone_wait_timeouts"] += 1
     elif event_type == "market_no_zone":
         _entry_stats["market_orders_no_zone"] += 1
-    elif event_type == "market_in_zone":
+    elif event_type == "market_entry_in_zone":
         _entry_stats["market_orders_in_zone"] += 1
     elif event_type == "market_fallback":
         _entry_stats["market_orders_fallback"] += 1
@@ -2360,6 +2360,17 @@ async def main():
                                             pos_ticket = int(p.ticket)
                                             log(f"Found untracked position {pos_ticket} (MAGIC={MAGIC}) - likely filled from order {order_ticket}", "INFO")
                                             break
+                                if not pos_ticket:
+                                    # Extra fallback: check order history for filled state
+                                    ot_cap = order_ticket  # capture for lambda
+                                    now_oh = datetime.now()
+                                    hist_orders = await run_mt5(lambda: mt5.history_orders_get(now_oh - timedelta(days=7), now_oh + timedelta(minutes=1)))
+                                    if hist_orders:
+                                        for ho in hist_orders:
+                                            if ho.ticket == ot_cap and hasattr(ho, 'position_id') and ho.position_id:
+                                                pos_ticket = ho.position_id
+                                                log(f"Found filled order via order history: order {ot_cap} → position {pos_ticket}", "INFO")
+                                                break
                                 if not pos_ticket:
                                     log(f"Order {order_ticket} disappeared without a fill - broker may have removed it", "ERROR")
                                     _zl, _zh = info["zone_low"], info["zone_high"]
