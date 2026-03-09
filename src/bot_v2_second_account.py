@@ -2554,10 +2554,10 @@ async def main():
 
         Tracking finalizes when the highest TP or SL is hit, or after 24h.
         """
-        log("Trade outcome monitor started (2s interval, shadow tracking enabled)", "INFO")
+        log("Trade outcome monitor started (0.5s interval, shadow tracking enabled)", "INFO")
         while True:
             try:
-                await asyncio.sleep(2)
+                await asyncio.sleep(0.5)
 
                 if not outcome_tracker:
                     continue
