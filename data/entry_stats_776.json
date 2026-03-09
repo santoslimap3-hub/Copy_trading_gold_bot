@@ -6,7 +6,7 @@
   "limit_invalidated": 18,
   "signals_buffered": 28,
   "zones_received_from_edit": 21,
-  "zone_wait_timeouts": 6,
+  "zone_wait_timeouts": 7,
   "market_orders_no_zone": 0,
   "market_orders_in_zone": 0,
   "market_orders_fallback": 0,
@@ -747,6 +747,11 @@
     {
       "time": "2026-03-09 22:09:55",
       "type": "signal_buffered",
+      "side": "SELL"
+    },
+    {
+      "time": "2026-03-09 22:11:55",
+      "type": "zone_wait_timeout",
       "side": "SELL"
     }
   ],
