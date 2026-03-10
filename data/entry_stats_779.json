@@ -3,7 +3,7 @@
   "limit_orders_placed": 3,
   "limit_fills": 1,
   "limit_timeouts": 0,
-  "limit_invalidated": 1,
+  "limit_invalidated": 2,
   "signals_buffered": 8,
   "zones_received_from_edit": 7,
   "zone_wait_timeouts": 1,
@@ -11,7 +11,7 @@
   "market_orders_in_zone": 4,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
-  "zone_tracking_total": 2,
+  "zone_tracking_total": 3,
   "zone_best_entry_reached": 0,
   "zone_worst_entry_reached": 1,
   "entries": [
@@ -199,6 +199,19 @@
       "limit_price": 5182.0,
       "zone_low": 5182.0,
       "zone_high": 5187.0
+    },
+    {
+      "time": "2026-03-10 16:02:56",
+      "type": "limit_invalidated",
+      "side": "SELL",
+      "limit_price": 5182.0,
+      "reason": "order_disappeared",
+      "best_reached": false,
+      "worst_reached": false,
+      "zone_low": 5182.0,
+      "zone_high": 5187.0,
+      "price_min": 5181.22,
+      "price_max": 5181.81
     }
   ]
 }
