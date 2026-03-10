@@ -4,8 +4,8 @@
   "limit_fills": 0,
   "limit_timeouts": 0,
   "limit_invalidated": 18,
-  "signals_buffered": 30,
-  "zones_received_from_edit": 22,
+  "signals_buffered": 31,
+  "zones_received_from_edit": 23,
   "zone_wait_timeouts": 8,
   "market_orders_no_zone": 0,
   "market_orders_in_zone": 1,
@@ -784,6 +784,19 @@
       "entry_price": 5160.73,
       "zone_low": 5157.0,
       "zone_high": 5161.0
+    },
+    {
+      "time": "2026-03-10 16:01:15",
+      "type": "signal_buffered",
+      "side": "SELL"
+    },
+    {
+      "time": "2026-03-10 16:01:19",
+      "type": "zone_from_edit",
+      "side": "SELL",
+      "zone_low": 5182.0,
+      "zone_high": 5187.0,
+      "wait_time": 3.9718594551086426
     }
   ],
   "limit_placement_failed": 1
