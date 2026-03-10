@@ -344,14 +344,21 @@ class TradeOutcomeTracker:
                 revisit = level_name in trade["levels_hit"]
                 trade["levels_breached"].add(level_name)
                 trade["levels_hit"].add(level_name)
-                event = {
-                    "level": level_name,
-                    "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "timestamp": time.time(),
-                    "price": current_price,
-                    "revisit": revisit,
-                }
-                trade["sequence"].append(event)
+
+                # Only record a sequence event if a DIFFERENT level was last recorded.
+                # This prevents repeated entries like TP4 → TP4 → TP4 when price
+                # oscillates around a level boundary.
+                last_level = trade["sequence"][-1]["level"] if trade["sequence"] else None
+                if level_name != last_level:
+                    event = {
+                        "level": level_name,
+                        "time": time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "timestamp": time.time(),
+                        "price": current_price,
+                        "revisit": revisit,
+                    }
+                    trade["sequence"].append(event)
+
                 newly_hit.append(level_name)
             elif not breached and was_breached:
                 # Price retraced back past this level — no longer breached

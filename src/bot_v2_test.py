@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Gold Trading Bot - SECOND ACCOUNT - Set & Forget TP1 Strategy (Robust Edition)
+Gold Trading Bot - Set & Forget TP1 Strategy (Robust Edition)
 Connects to Telegram channel for gold trading signals and executes trades automatically.
-This is the second account version pointing to MTAccount2 with magic 779.
 
 STRATEGY:
   1. Signal received → Enter immediately with failsafe SL ($8) and failsafe TP ($3)
@@ -40,13 +39,14 @@ from trade_outcome_tracker import TradeOutcomeTracker
 # Telegram
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
-CHANNEL_ID = -1003349563414  # Main trading channel (EGN GOLD)
-SESSION_FILE = "trading_bot_session_account_2"
+CHANNEL_ID = -1003349563414  # Main trading channel
+TEST_CHANNEL_ID = -1003817819872  # Test channel for manual signals
+SESSION_FILE = "trading_bot_session"
 
 # Trading
 SYMBOL = "XAUUSD"
-MAGIC = 779
-RISK_PCT = 0.05  # 5% risk per trade
+MAGIC = 776
+RISK_PCT = 0.1  # 10% risk per trade
 FAILSAFE_SL_DISTANCE = 8.0  # failsafe SL: $8 away from entry
 FAILSAFE_TP_DISTANCE = 3.0  # failsafe TP: $3 away from entry (until real TP1 arrives)
 
@@ -56,7 +56,7 @@ ZONE_WAIT_TIMEOUT = 120      # seconds: wait for zone via edit before falling ba
 ENTRY_STRATEGY = "LIMIT_ZONE" # "LIMIT_ZONE" = limit at zone edge | "MARKET" = immediate market (old behavior)
 
 # Telegram filters
-ALLOWED_CHAT_IDS = {CHANNEL_ID}
+ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
 DEBUG_LOG_ALL_MESSAGES = True
 
 # Logging
@@ -328,7 +328,7 @@ def ensure_mt5_connection():
 
     log("Attempting MT5 initialization...", "DEBUG")
 
-    mt5_path = r"C:\Program Files\MTAccount2\terminal64.exe"
+    mt5_path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
     log(f"Initializing MT5 at: {mt5_path}", "INFO")
     init_ok = mt5.initialize(path=mt5_path)
 
@@ -391,7 +391,7 @@ def recover_mt5_connection() -> bool:
         mt5.shutdown()
         time.sleep(2)
 
-        mt5_path = r"C:\Program Files\MTAccount2\terminal64.exe"
+        mt5_path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
         init_ok = mt5.initialize(path=mt5_path)
         if init_ok:
             log("MT5 reconnection successful", "INFO")
@@ -1748,6 +1748,7 @@ async def main():
     log("=" * 70, "INFO")
     log(f"  Bot start time: {start_timestamp}", "INFO")
     log(f"  Main channel ID: {CHANNEL_ID}", "INFO")
+    log(f"  Test channel ID: {TEST_CHANNEL_ID}", "INFO")
     log(f"  Trading symbol: {SYMBOL}", "INFO")
     log(f"  Risk per trade: {RISK_PCT*100:.1f}%", "INFO")
     log(f"  Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.2f}", "INFO")
@@ -2070,7 +2071,7 @@ async def main():
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
-            channel_name = "[MAIN]"
+            channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
             if DEBUG_LOG_ALL_MESSAGES:
                 log(f"[RAW] chat_id={event.chat_id} | {channel_name} | {text[:80]}", "DEBUG")
@@ -2136,7 +2137,7 @@ async def main():
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
-            channel_name = "[MAIN]"
+            channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
             log("=" * 70, "INFO")
             log(f"{channel_name} MESSAGE EDITED", "INFO")
@@ -2409,39 +2410,47 @@ async def main():
                                     completed_orders.append(mid)
                                     continue
                     if pos_ticket:
-                        fill_price = await run_mt5(lambda: get_fill_price_from_order(order_ticket))
-                        slippage = abs(fill_price - limit_price) if fill_price else 0
-                        log(_LOG_SEP, "INFO")
-                        log(f"LIMIT ORDER FILLED!", "INFO")
-                        log(f"   Order: {order_ticket} → Position: {pos_ticket}", "INFO")
-                        log(f"   Fill: ${fill_price:.2f} | Limit: ${limit_price:.2f} | Slippage: ${slippage:.2f}", "INFO")
-                        log(f"   Time to fill: {elapsed:.1f}s", "INFO")
-                        log(_LOG_SEP, "INFO")
+                        try:
+                            fill_price = await run_mt5(lambda: get_fill_price_from_order(order_ticket))
+                            slippage = abs(fill_price - limit_price) if fill_price else 0
+                            log(_LOG_SEP, "INFO")
+                            log(f"LIMIT ORDER FILLED!", "INFO")
+                            log(f"   Order: {order_ticket} → Position: {pos_ticket}", "INFO")
+                            if fill_price is not None:
+                                log(f"   Fill: ${fill_price:.2f} | Limit: ${limit_price:.2f} | Slippage: ${slippage:.2f}", "INFO")
+                            else:
+                                log(f"   Fill: N/A | Limit: ${limit_price:.2f} | Slippage: N/A (fill price unavailable)", "WARN")
+                            log(f"   Time to fill: {elapsed:.1f}s", "INFO")
+                            log(_LOG_SEP, "INFO")
 
-                        # Map position for SL/TP edits
-                        position_map[mid] = pos_ticket
-                        if fill_price:
-                            entry_prices[pos_ticket] = fill_price
+                            # Map position for SL/TP edits
+                            position_map[mid] = pos_ticket
+                            if fill_price:
+                                entry_prices[pos_ticket] = fill_price
 
-                        record_entry_stat("limit_fill", side=side, limit_price=limit_price,
-                                          fill_price=fill_price, slippage=slippage, fill_time=elapsed,
-                                          best_reached=True, worst_reached=True,
-                                          zone_low=info["zone_low"], zone_high=info["zone_high"],
-                                          price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
+                            record_entry_stat("limit_fill", side=side, limit_price=limit_price,
+                                              fill_price=fill_price, slippage=slippage, fill_time=elapsed,
+                                              best_reached=True, worst_reached=True,
+                                              zone_low=info["zone_low"], zone_high=info["zone_high"],
+                                              price_min=info.get("price_min_seen"), price_max=info.get("price_max_seen"))
 
-                        # Apply SL/TP if we have them
-                        # Register with outcome tracker using ALL TP levels from signal
-                        actual_entry = fill_price or limit_price
-                        all_tps_from_signal = info.get("all_tps", {})
-                        if not all_tps_from_signal and info.get("tp1"):
-                            all_tps_from_signal = {1: info["tp1"]}
-                        if outcome_tracker:
-                            outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), all_tps_from_signal)
+                            # Apply SL/TP if we have them
+                            # Register with outcome tracker using ALL TP levels from signal
+                            actual_entry = fill_price or limit_price
+                            all_tps_from_signal = info.get("all_tps", {})
+                            if not all_tps_from_signal and info.get("tp1"):
+                                all_tps_from_signal = {1: info["tp1"]}
+                            if outcome_tracker:
+                                outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), all_tps_from_signal)
 
-                        sl_val = info.get("sl")
-                        tp_val = info.get("tp1")
-                        if sl_val or tp_val:
-                            await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)", all_tp_levels=all_tps_from_signal)
+                            sl_val = info.get("sl")
+                            tp_val = info.get("tp1")
+                            if sl_val or tp_val:
+                                await update_position_sl_tp(pos_ticket, sl_val, tp_val, " (LIMIT-FILL)", all_tp_levels=all_tps_from_signal)
+                        except Exception as fill_err:
+                            log(f"Error processing filled order {order_ticket} → position {pos_ticket}: {fill_err}", "ERROR")
+                            # Still map the position so SL/TP edits can work
+                            position_map[mid] = pos_ticket
 
                         completed_orders.append(mid)
                         continue
@@ -2710,7 +2719,7 @@ async def main():
     log("  Limit order & buffer monitor task created (1s interval)", "INFO")
 
     asyncio.create_task(trade_outcome_monitor())
-    log("  Trade outcome monitor task created (2s interval)", "INFO")
+    log("  Trade outcome monitor task created (0.5s interval)", "INFO")
 
     # ══════════════════════════════════════════════════════════════════════
     # Connect to Telegram
@@ -2821,7 +2830,7 @@ async def main():
                             last_message_time = time.time()
                             messages_received += 1
 
-                            channel_name = "[MAIN]"
+                            channel_name = "[TEST]" if chat_id == TEST_CHANNEL_ID else "[MAIN]"
                             log("=" * 70, "INFO")
                             log(f"{channel_name} NEW MESSAGE (POLLED)", "INFO")
                             log(f"   Message ID: {msg.id}", "INFO")

@@ -40,7 +40,8 @@ from trade_outcome_tracker import TradeOutcomeTracker
 # Telegram
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
-CHANNEL_ID = -1003349563414  # Main trading channel (EGN GOLD)
+CHANNEL_ID = -1003349563414  # Main trading channel
+TEST_CHANNEL_ID = -1003817819872  # Test channel for manual signals
 SESSION_FILE = "trading_bot_session_account_2"
 
 # Trading
@@ -56,7 +57,7 @@ ZONE_WAIT_TIMEOUT = 120      # seconds: wait for zone via edit before falling ba
 ENTRY_STRATEGY = "LIMIT_ZONE" # "LIMIT_ZONE" = limit at zone edge | "MARKET" = immediate market (old behavior)
 
 # Telegram filters
-ALLOWED_CHAT_IDS = {CHANNEL_ID}
+ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
 DEBUG_LOG_ALL_MESSAGES = True
 
 # Logging
@@ -1748,6 +1749,7 @@ async def main():
     log("=" * 70, "INFO")
     log(f"  Bot start time: {start_timestamp}", "INFO")
     log(f"  Main channel ID: {CHANNEL_ID}", "INFO")
+    log(f"  Test channel ID: {TEST_CHANNEL_ID}", "INFO")
     log(f"  Trading symbol: {SYMBOL}", "INFO")
     log(f"  Risk per trade: {RISK_PCT*100:.1f}%", "INFO")
     log(f"  Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.2f}", "INFO")
@@ -2070,7 +2072,7 @@ async def main():
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
-            channel_name = "[MAIN]"
+            channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
             if DEBUG_LOG_ALL_MESSAGES:
                 log(f"[RAW] chat_id={event.chat_id} | {channel_name} | {text[:80]}", "DEBUG")
@@ -2136,7 +2138,7 @@ async def main():
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
-            channel_name = "[MAIN]"
+            channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
 
             log("=" * 70, "INFO")
             log(f"{channel_name} MESSAGE EDITED", "INFO")
@@ -2821,7 +2823,7 @@ async def main():
                             last_message_time = time.time()
                             messages_received += 1
 
-                            channel_name = "[MAIN]"
+                            channel_name = "[TEST]" if chat_id == TEST_CHANNEL_ID else "[MAIN]"
                             log("=" * 70, "INFO")
                             log(f"{channel_name} NEW MESSAGE (POLLED)", "INFO")
                             log(f"   Message ID: {msg.id}", "INFO")

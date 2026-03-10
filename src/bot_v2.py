@@ -39,8 +39,7 @@ from trade_outcome_tracker import TradeOutcomeTracker
 # Telegram
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
-CHANNEL_ID = -1003349563414  # Main trading channel
-TEST_CHANNEL_ID = -1003817819872  # Test channel for manual signals
+CHANNEL_ID = -1003349563414  # Main trading channel (EGN GOLD)
 SESSION_FILE = "trading_bot_session"
 
 # Trading
@@ -56,7 +55,7 @@ ZONE_WAIT_TIMEOUT = 120      # seconds: wait for zone via edit before falling ba
 ENTRY_STRATEGY = "LIMIT_ZONE" # "LIMIT_ZONE" = limit at zone edge | "MARKET" = immediate market (old behavior)
 
 # Telegram filters
-ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
+ALLOWED_CHAT_IDS = {CHANNEL_ID}
 DEBUG_LOG_ALL_MESSAGES = True
 
 # Logging
@@ -119,6 +118,9 @@ _mt5_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name
 _RE_TP_LEVELS = re.compile(r"TP\s*(\d+)\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_STOP_LOSS = re.compile(r"SL\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_TP1 = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
+
+# Fallback: bare "TP 5164" without level number (channel sometimes sends abbreviated TP)
+_RE_TP_BARE = re.compile(r"\bTP\s+(\d{4,5}(?:\.\d{1,2})?)\b", re.IGNORECASE)
 
 # Entry zone pattern: matches "5396 - 5392" or "5396-5392" or "5396\u20135392"
 _RE_ENTRY_ZONE = re.compile(r"(\d{4,5}(?:\.\d{1,2})?)\s*[-\u2013\u2014]\s*(\d{4,5}(?:\.\d{1,2})?)")
@@ -729,6 +731,15 @@ def parse_tp_levels(text: str) -> Dict[int, float]:
             levels[tp_num] = tp_price
             log(f"   Found TP{tp_num}: ${tp_price:.5f}", "DEBUG")
 
+    # Fallback: bare "TP 5164" without level number → treat as TP1
+    if not levels:
+        bare_match = _RE_TP_BARE.search(text)
+        if bare_match:
+            tp_price = float(bare_match.group(1))
+            if tp_price >= 1000:
+                levels[1] = tp_price
+                log(f"   Found bare TP (treated as TP1): ${tp_price:.5f}", "DEBUG")
+
     if not levels:
         log("   No TP levels found", "DEBUG")
 
@@ -761,6 +772,13 @@ def parse_tp1(text: str) -> Optional[float]:
     if match:
         tp1_price = float(match.group(1))
         if tp1_price >= 100:
+            return tp1_price
+
+    # Fallback: bare "TP 5164" without level number → treat as TP1
+    bare_match = _RE_TP_BARE.search(text)
+    if bare_match:
+        tp1_price = float(bare_match.group(1))
+        if tp1_price >= 1000:
             return tp1_price
 
     return None
@@ -1729,7 +1747,6 @@ async def main():
     log("=" * 70, "INFO")
     log(f"  Bot start time: {start_timestamp}", "INFO")
     log(f"  Main channel ID: {CHANNEL_ID}", "INFO")
-    log(f"  Test channel ID: {TEST_CHANNEL_ID}", "INFO")
     log(f"  Trading symbol: {SYMBOL}", "INFO")
     log(f"  Risk per trade: {RISK_PCT*100:.1f}%", "INFO")
     log(f"  Failsafe SL distance: ${FAILSAFE_SL_DISTANCE:.2f}", "INFO")
@@ -2052,7 +2069,7 @@ async def main():
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
-            channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
+            channel_name = "[MAIN]"
 
             if DEBUG_LOG_ALL_MESSAGES:
                 log(f"[RAW] chat_id={event.chat_id} | {channel_name} | {text[:80]}", "DEBUG")
@@ -2118,7 +2135,7 @@ async def main():
 
             text = extract_message_text(event.message).strip()
             msg_id = event.message.id
-            channel_name = "[TEST]" if event.chat_id == TEST_CHANNEL_ID else "[MAIN]"
+            channel_name = "[MAIN]"
 
             log("=" * 70, "INFO")
             log(f"{channel_name} MESSAGE EDITED", "INFO")
@@ -2580,6 +2597,11 @@ async def main():
                 bid = float(tick.bid)
                 ask = float(tick.ask)
 
+                # Sanity check: skip stale/bogus ticks (bid or ask near zero, or spread > $5)
+                if bid < 100 or ask < 100 or abs(ask - bid) > 5:
+                    log(f"OUTCOME TRACKER: Skipping bogus tick (bid=${bid:.2f} ask=${ask:.2f})", "WARN")
+                    continue
+
                 for ticket in active_tickets:
                     info = outcome_tracker.get_trade_info(ticket)
                     if info is None:
@@ -2587,6 +2609,13 @@ async def main():
 
                     # Use bid for BUY exits (selling), ask for SELL exits (buying)
                     current_price = bid if info["side"] == "BUY" else ask
+
+                    # Sanity check: if price is absurdly far from entry, skip (stale MT5 tick)
+                    entry = info.get("entry_price", 0)
+                    if entry > 0 and abs(current_price - entry) > 50:
+                        log(f"OUTCOME TRACKER: Skipping stale tick for ticket {ticket} "
+                            f"(price=${current_price:.2f} vs entry=${entry:.2f}, diff=${abs(current_price - entry):.2f})", "WARN")
+                        continue
 
                     newly_hit = outcome_tracker.check_levels(ticket, current_price)
                     for level in newly_hit:
@@ -2799,7 +2828,7 @@ async def main():
                             last_message_time = time.time()
                             messages_received += 1
 
-                            channel_name = "[TEST]" if chat_id == TEST_CHANNEL_ID else "[MAIN]"
+                            channel_name = "[MAIN]"
                             log("=" * 70, "INFO")
                             log(f"{channel_name} NEW MESSAGE (POLLED)", "INFO")
                             log(f"   Message ID: {msg.id}", "INFO")
