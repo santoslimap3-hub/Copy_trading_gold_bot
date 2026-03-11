@@ -330,7 +330,7 @@ def ensure_mt5_connection():
 
     log("Attempting MT5 initialization...", "DEBUG")
 
-    mt5_path = r"C:\Program Files\MetaTrader 5\terminal64.exe"
+    mt5_path = r"C:\MT5_1\terminal64.exe"
     log(f"Initializing MT5 at: {mt5_path}", "INFO")
     init_ok = mt5.initialize(path=mt5_path)
 
