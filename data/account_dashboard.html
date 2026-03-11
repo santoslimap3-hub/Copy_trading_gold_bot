@@ -114,10 +114,18 @@
         <div class="filters" id="filterBar">
             <span style="font-weight:700;color:var(--primary);margin-right:4px">Period:</span>
             <button class="fbtn active" onclick="applyFilter('all',this)">All Time</button>
+            <button class="fbtn" onclick="applyFilter('1h',this)">1 Hour</button>
+            <button class="fbtn" onclick="applyFilter('4h',this)">4 Hours</button>
+            <button class="fbtn" onclick="applyFilter('12h',this)">12 Hours</button>
             <button class="fbtn" onclick="applyFilter('24h',this)">24 Hours</button>
+            <button class="fbtn" onclick="applyFilter('48h',this)">48 Hours</button>
             <button class="fbtn" onclick="applyFilter('7d',this)">7 Days</button>
+            <button class="fbtn" onclick="applyFilter('14d',this)">14 Days</button>
             <button class="fbtn" onclick="applyFilter('30d',this)">30 Days</button>
+            <button class="fbtn" onclick="applyFilter('60d',this)">60 Days</button>
             <button class="fbtn" onclick="applyFilter('90d',this)">90 Days</button>
+            <button class="fbtn" onclick="applyFilter('180d',this)">6 Months</button>
+            <button class="fbtn" onclick="applyFilter('365d',this)">1 Year</button>
         </div>
     </div>
 
@@ -227,7 +235,7 @@ function applyFilter(period, btn){
     document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     const now = Date.now()/1000;
-    const cutoffs = {all:0,'24h':86400,'7d':604800,'30d':2592000,'90d':7776000};
+    const cutoffs = {all:0,'1h':3600,'4h':14400,'12h':43200,'24h':86400,'48h':172800,'7d':604800,'14d':1209600,'30d':2592000,'60d':5184000,'90d':7776000,'180d':15552000,'365d':31536000};
     const cut = cutoffs[period]||0;
     filtered = cut===0 ? [...allTrades] : allTrades.filter(t=>t.time >= now-cut);
     render();
@@ -416,12 +424,21 @@ function renderDetailStats(){
 
 // ---- symbol table ----
 function renderSymbolTable(){
-    const sb=(RAW.summary||{}).symbol_breakdown||[];
     const body=document.getElementById('symbolBody');
-    if(!sb.length){body.innerHTML='<tr><td colspan="5" class="no-data">No data</td></tr>';return}
+    if(!filtered.length){body.innerHTML='<tr><td colspan="5" class="no-data">No data</td></tr>';return}
+    const map={};
+    filtered.forEach(t=>{
+        if(!map[t.symbol]) map[t.symbol]={symbol:t.symbol,trades:0,wins:0,pnl:0,volume:0};
+        const s=map[t.symbol];
+        s.trades++;
+        if(t.profit>0) s.wins++;
+        s.pnl+=t.profit;
+        s.volume+=t.volume;
+    });
+    const sb=Object.values(map).sort((a,b)=>b.trades-a.trades);
     body.innerHTML = sb.map(s=>`<tr>
         <td style="font-weight:700">${s.symbol}</td><td>${s.trades}</td>
-        <td>${s.win_rate}%</td>
+        <td>${s.trades?((s.wins/s.trades)*100).toFixed(1):'0.0'}%</td>
         <td class="${s.pnl>=0?'p-pos':'p-neg'}">$${fmtn(s.pnl)}</td>
         <td>${s.volume.toFixed(2)}</td></tr>`).join('');
 }
