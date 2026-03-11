@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-03-11T15:15:19.035992",
+    "created_at": "2026-03-11T16:53:24.399357",
     "days_back": 365,
     "exporter": "account_trades_exporter"
   },
@@ -8,11 +8,11 @@
     "login": 22840119,
     "server": "VantageInternational-Live 14",
     "currency": "EUR",
-    "balance": 77.88,
-    "equity": 87.8,
-    "margin": 26.88,
-    "free_margin": 60.92,
-    "margin_level": 326.64,
+    "balance": 68.64,
+    "equity": 78.56,
+    "margin": 36.88,
+    "free_margin": 41.68,
+    "margin_level": 213.02,
     "floating_pnl": 10.0,
     "leverage": 300,
     "open_positions": [
@@ -22,10 +22,10 @@
         "type": "SELL",
         "volume": 0.04,
         "price_open": 1.35802,
-        "price_current": 1.35652,
+        "price_current": 1.35705,
         "sl": 1.361,
         "tp": 1.347,
-        "profit": 3.8,
+        "profit": 2.46,
         "swap": -0.2,
         "magic": 0,
         "comment": "pendingOrder",
@@ -38,46 +38,62 @@
         "type": "BUY",
         "volume": 0.04,
         "price_open": 212.2,
-        "price_current": 212.485,
+        "price_current": 212.473,
         "sl": 211.85,
         "tp": 213.05,
-        "profit": 6.2,
+        "profit": 5.94,
         "swap": 0.12,
         "magic": 0,
         "comment": "pendingOrder",
         "time": 1773152770,
         "time_str": "2026-03-10T22:26:10"
+      },
+      {
+        "ticket": 46987552,
+        "symbol": "EURUSD",
+        "type": "SELL",
+        "volume": 0.03,
+        "price_open": 1.16145,
+        "price_current": 1.16083,
+        "sl": 1.1646,
+        "tp": 1.15762,
+        "profit": 1.6,
+        "swap": 0.0,
+        "magic": 0,
+        "comment": "positionOrder",
+        "time": 1773226806,
+        "time_str": "2026-03-11T19:00:06"
       }
     ],
-    "open_positions_count": 2
+    "open_positions_count": 3
   },
   "summary": {
-    "total_trades": 407,
+    "total_trades": 408,
     "buy_trades": 178,
-    "sell_trades": 229,
+    "sell_trades": 230,
     "winning_trades": 224,
-    "losing_trades": 176,
+    "losing_trades": 177,
     "breakeven_trades": 7,
-    "win_rate": 55.04,
+    "win_rate": 54.9,
     "total_profit": 1482.03,
-    "total_loss": 1504.41,
-    "net_pnl": -22.38,
+    "total_loss": 1513.65,
+    "net_pnl": -31.62,
     "total_commission": 0.0,
     "total_swap": 0.26,
     "total_fees": 0.0,
-    "net_after_costs": -22.12,
-    "profit_factor": 0.99,
-    "avg_pnl": -0.05,
+    "net_after_costs": -31.36,
+    "profit_factor": 0.98,
+    "avg_pnl": -0.08,
     "avg_win": 6.62,
     "avg_loss": 8.55,
     "largest_win": 74.26,
     "largest_loss": -129.22,
     "max_consecutive_wins": 10,
     "max_consecutive_losses": 9,
-    "max_drawdown": 176.22,
+    "max_drawdown": 185.46,
     "max_drawdown_pct": 112.31,
     "initial_balance": 100.0,
-    "final_balance": 77.88,
+    "final_balance": 68.64,
     "profitable_days": 27,
     "losing_days": 24,
     "best_day": {
@@ -94,11 +110,11 @@
       "wins": 4,
       "losses": 7
     },
-    "trades_per_day": 6.6,
-    "avg_daily_pnl": -0.36,
-    "trading_days": 61,
+    "trades_per_day": 6.53,
+    "avg_daily_pnl": -0.51,
+    "trading_days": 62,
     "first_trade": "2026-01-08T08:33:53",
-    "last_trade": "2026-03-11T00:18:58",
+    "last_trade": "2026-03-11T19:27:29",
     "balance_curve": [
       {
         "time": 1767832433,
@@ -3355,6 +3371,14 @@
         "pnl": -6.36,
         "drawdown": 176.22,
         "drawdown_pct": 69.35
+      },
+      {
+        "time": 1773228449,
+        "time_str": "2026-03-11T19:27:29",
+        "balance": 68.64,
+        "pnl": -9.24,
+        "drawdown": 185.46,
+        "drawdown_pct": 72.99
       }
     ],
     "daily_pnl": [
@@ -3710,21 +3734,21 @@
       },
       {
         "date": "2026-03-11",
-        "pnl": -15.17,
-        "trades": 2,
+        "pnl": -24.41,
+        "trades": 3,
         "wins": 0,
-        "losses": 2
+        "losses": 3
       }
     ],
     "symbol_breakdown": [
       {
         "symbol": "BTCUSD",
-        "trades": 36,
-        "pnl": 85.34,
-        "volume": 1.42,
+        "trades": 37,
+        "pnl": 76.1,
+        "volume": 1.47,
         "wins": 25,
-        "losses": 11,
-        "win_rate": 69.4
+        "losses": 12,
+        "win_rate": 67.6
       },
       {
         "symbol": "GBPJPY",
@@ -3825,10 +3849,10 @@
       },
       {
         "month": "2026-03",
-        "pnl": -129.74,
-        "trades": 76,
+        "pnl": -138.98,
+        "trades": 77,
         "wins": 31,
-        "losses": 44
+        "losses": 45
       }
     ]
   },
@@ -11972,6 +11996,26 @@
       "fee": 0.0,
       "symbol": "XAUUSD",
       "comment": "[sl 5214.00]"
+    },
+    {
+      "ticket": 45015946,
+      "order": 47007920,
+      "position_id": 46991497,
+      "time": 1773228449,
+      "time_str": "2026-03-11T19:27:29",
+      "type": "SELL",
+      "entry": 1,
+      "is_closed": true,
+      "magic": 0,
+      "reason": 4,
+      "volume": 0.05,
+      "price": 69493.04,
+      "commission": 0.0,
+      "swap": 0.0,
+      "profit": -9.24,
+      "fee": 0.0,
+      "symbol": "BTCUSD",
+      "comment": "[sl 69500.00]"
     }
   ]
 }
