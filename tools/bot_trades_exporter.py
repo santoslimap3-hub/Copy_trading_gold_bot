@@ -2,448 +2,341 @@
 """
 Bot Trades Exporter
 Retrieves all trades placed by the bot from MT5 and exports them to JSON.
-Uses closed orders as the primary trade list to match MT5 history tickets.
+Each entry in the output represents one complete trade (open → close),
+built by pairing DEAL_ENTRY_IN deals with DEAL_ENTRY_OUT deals by position_id.
 """
 
 import MetaTrader5 as mt5
 import json
 import os
 from datetime import datetime, timedelta
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
 
 # ===================== CONFIGURATION =====================
 SYMBOL = "XAUUSD"
-BOT_MAGIC_NUMBERS = [777]  # All bot magic numbers
-DAYS_BACK = 365  # How many days back to retrieve trades
+BOT_MAGIC_NUMBERS = [777]
+DAYS_BACK = 365
 
-# Get the directory of the current script and go up to project root
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 OUTPUT_FILE = os.path.join(PROJECT_ROOT, "data", "bot_trades.json")
 
+# Positions to exclude (e.g. test trades)
+BLACKLISTED_POSITIONS: Set[int] = set()
+
+# ===================== HELPERS =====================
+
+_CLOSE_REASON_MAP = {
+    0: "MANUAL",    # DEAL_REASON_CLIENT
+    1: "MANUAL",    # DEAL_REASON_MOBILE
+    2: "MANUAL",    # DEAL_REASON_WEB
+    3: "EXPERT",    # DEAL_REASON_EXPERT (EA / robot)
+    4: "SL",        # DEAL_REASON_SL
+    5: "TP",        # DEAL_REASON_TP
+    6: "STOP_OUT",  # DEAL_REASON_SO
+}
+
+def _close_reason_str(reason: int) -> str:
+    return _CLOSE_REASON_MAP.get(reason, f"OTHER({reason})")
+
+
 # ===================== MAIN CLASS =====================
 
 class BotTradesExporter:
-    def __init__(self):
+    def __init__(self, magic_numbers=BOT_MAGIC_NUMBERS, blacklisted_positions=BLACKLISTED_POSITIONS):
         self.initialized = False
-        self.bot_trades = []
-        self.bot_orders = []
-        self.bot_closed_deals = []
-        self.all_deals = []
-        self.all_orders = []
+        self.magic_numbers = set(magic_numbers)
+        self.blacklisted_positions = set(blacklisted_positions)
 
-        # MT5 deal entry types used to identify closed trades
-        self._closed_entries = {
-            mt5.DEAL_ENTRY_OUT,
-            mt5.DEAL_ENTRY_OUT_BY,
-        }
+        self._entry_in  = {mt5.DEAL_ENTRY_IN}
+        self._entry_out = {mt5.DEAL_ENTRY_OUT, mt5.DEAL_ENTRY_OUT_BY}
 
-        # Reasons that indicate a trade was closed manually (ignore these)
-        self._manual_close_reasons = {
-            mt5.DEAL_REASON_CLIENT,   # 0 - closed from desktop terminal
-            mt5.DEAL_REASON_MOBILE,   # 1 - closed from mobile app
-            mt5.DEAL_REASON_WEB,      # 2 - closed from web platform
-        }
+        # Raw deals grouped by position_id after fetching
+        self._deals_by_position: Dict[int, List[dict]] = {}
 
-    @staticmethod
-    def _get_attr(obj, name: str, default=None):
-        return getattr(obj, name, default)
-    
+        # Final output
+        self.completed_trades: List[dict] = []
+
+    # ------------------------------------------------------------------
     def connect_mt5(self) -> bool:
-        """Initialize MT5 connection"""
-        print("🔌 Connecting to MetaTrader5...")
-        
+        print("Connecting to MetaTrader5...")
         if not mt5.initialize():
-            print(f"❌ failed to initialize MetaTrader5: {mt5.last_error()}")
+            print(f"Failed to initialize MetaTrader5: {mt5.last_error()}")
             return False
-        
-        print("✅ MetaTrader5 initialized successfully")
-        
-        # Get account info
+
         account = mt5.account_info()
         if account is None:
-            print("❌ Failed to get account info")
+            print("Failed to get account info")
             return False
-        
-        print(f"📊 Account Information:")
-        print(f"   Login: {account.login}")
-        print(f"   Server: {account.server}")
-        print(f"   Currency: {account.currency}")
-        print(f"   Balance: ${account.balance:.2f}")
-        print(f"   Equity: ${account.equity:.2f}")
-        
+
+        print(f"Account: {account.login} | {account.server} | Balance: ${account.balance:.2f}")
         self.initialized = True
         return True
-    
-    def get_all_deals(self, days_back: int = DAYS_BACK) -> bool:
-        """Fetch all deals from MT5"""
+
+    # ------------------------------------------------------------------
+    def fetch_and_group_deals(self, days_back: int = DAYS_BACK) -> bool:
+        """Fetch all MT5 deals and group them by position_id."""
         if not self.initialized:
-            print("❌ MT5 not initialized")
+            print("MT5 not initialized")
             return False
-        
-        print(f"\n📥 Fetching deals from the last {days_back} days...")
-        
-        # Get deals from the past N days
+
         from_date = datetime.now() - timedelta(days=days_back)
-        # Use end-of-tomorrow to guarantee today's latest deals are captured
-        # (MT5 server timezone may differ from local time, and recently closed
-        # deals can take a moment to appear in history)
-        to_date = datetime.now() + timedelta(days=1)
-        
-        # Get all deals
+        to_date   = datetime.now() + timedelta(days=1)
+
+        print(f"Fetching deals from the last {days_back} days...")
         deals = mt5.history_deals_get(from_date, to_date)
-        
+
         if deals is None:
-            print(f"❌ Failed to get deals: {mt5.last_error()}")
+            print(f"Failed to get deals: {mt5.last_error()}")
             return False
-        
-        if len(deals) == 0:
-            print("ℹ️ No deals found for the specified period")
-            return True
-        
-        print(f"✅ Retrieved {len(deals)} total deals")
-        
-        # Convert to list of dictionaries
+
+        print(f"Retrieved {len(deals)} total deals")
+
         for deal in deals:
-            entry_value = deal.entry
-            is_closed = entry_value in self._closed_entries
+            position_id = getattr(deal, 'position_id', None)
+            if position_id is None:
+                continue
             deal_dict = {
-                'ticket': deal.ticket,
-                'order': deal.order,
-                'position_id': self._get_attr(deal, 'position_id', None),
-                'time': deal.time,
-                'time_str': datetime.fromtimestamp(deal.time).isoformat(),
-                'type': 'BUY' if deal.type == mt5.DEAL_TYPE_BUY else 'SELL',
-                'entry': entry_value,
-                'is_closed': is_closed,
-                'magic': deal.magic,
-                'reason': deal.reason,
-                'volume': deal.volume,
-                'price': deal.price,
-                'commission': deal.commission,
-                'swap': deal.swap,
-                'profit': deal.profit,
-                'fee': deal.fee,
-                'symbol': deal.symbol,
-                'comment': deal.comment,
-                'external_id': deal.external_id,
-                'source': 'deal',
+                'ticket':      deal.ticket,
+                'order':       deal.order,
+                'position_id': position_id,
+                'time':        deal.time,
+                'time_str':    datetime.fromtimestamp(deal.time).isoformat(),
+                'type':        'BUY' if deal.type == mt5.DEAL_TYPE_BUY else 'SELL',
+                'entry':       deal.entry,
+                'magic':       deal.magic,
+                'reason':      deal.reason,
+                'volume':      deal.volume,
+                'price':       deal.price,
+                'commission':  deal.commission,
+                'swap':        deal.swap,
+                'profit':      deal.profit,
+                'fee':         deal.fee,
+                'symbol':      deal.symbol,
+                'comment':     deal.comment,
             }
-            self.all_deals.append(deal_dict)
-        
-        # Sort by time
-        self.all_deals.sort(key=lambda x: x['time'])
-        
+            self._deals_by_position.setdefault(position_id, []).append(deal_dict)
+
         return True
 
-    def get_all_orders(self, days_back: int = DAYS_BACK) -> bool:
-        """Fetch all orders from MT5"""
-        if not self.initialized:
-            print("❌ MT5 not initialized")
-            return False
+    # ------------------------------------------------------------------
+    def build_completed_trades(self) -> int:
+        """
+        For each position that was opened by the bot, pair entry and exit deals
+        into a single trade record.  Only fully closed positions are included.
+        """
+        print(f"Building completed trades for magic numbers {list(self.magic_numbers)}...")
 
-        print(f"\n📥 Fetching orders from the last {days_back} days...")
+        skipped_manual = 0
+        skipped_open   = 0
+        skipped_black  = 0
 
-        from_date = datetime.now() - timedelta(days=days_back)
-        to_date = datetime.now() + timedelta(days=1)
-        orders = mt5.history_orders_get(from_date, to_date)
+        for position_id, deals in self._deals_by_position.items():
+            # Skip blacklisted positions
+            if position_id in self.blacklisted_positions:
+                skipped_black += 1
+                continue
 
-        if orders is None:
-            print(f"❌ Failed to get orders: {mt5.last_error()}")
-            return False
+            entry_deals = [d for d in deals if d['entry'] in (mt5.DEAL_ENTRY_IN,)]
+            exit_deals  = [d for d in deals if d['entry'] in (mt5.DEAL_ENTRY_OUT, mt5.DEAL_ENTRY_OUT_BY)]
 
-        if len(orders) == 0:
-            print("ℹ️ No orders found for the specified period")
-            return True
+            # The position must have been opened by the bot
+            bot_entry = any(d['magic'] in self.magic_numbers for d in entry_deals)
+            if not bot_entry:
+                continue
 
-        print(f"✅ Retrieved {len(orders)} total orders")
+            # Skip positions that are still open
+            if not exit_deals:
+                skipped_open += 1
+                continue
 
-        for order in orders:
-            time_value = self._get_attr(order, 'time_done', 0) or self._get_attr(order, 'time_setup', 0)
-            order_dict = {
-                'ticket': order.ticket,
-                'order': self._get_attr(order, 'order', order.ticket),
-                'time': time_value,
-                'time_str': datetime.fromtimestamp(time_value).isoformat() if time_value else None,
-                'type': 'BUY' if order.type == mt5.ORDER_TYPE_BUY else 'SELL' if order.type == mt5.ORDER_TYPE_SELL else str(order.type),
-                'entry': None,
-                'magic': order.magic,
-                'reason': self._get_attr(order, 'reason', None),
-                'volume': self._get_attr(order, 'volume_current', self._get_attr(order, 'volume_initial', 0.0)),
-                'price': self._get_attr(order, 'price_current', self._get_attr(order, 'price_open', 0.0)),
-                'commission': self._get_attr(order, 'commission', 0.0),
-                'swap': self._get_attr(order, 'swap', 0.0),
-                'profit': self._get_attr(order, 'profit', 0.0),
-                'fee': self._get_attr(order, 'fee', 0.0),
-                'symbol': order.symbol,
-                'comment': order.comment,
-                'external_id': self._get_attr(order, 'external_id', None),
-                'source': 'order',
-                'state': self._get_attr(order, 'state', None),
-                'time_setup': self._get_attr(order, 'time_setup', None),
-                'time_done': self._get_attr(order, 'time_done', None),
-                'price_open': self._get_attr(order, 'price_open', None),
-                'price_current': self._get_attr(order, 'price_current', None),
-                'sl': self._get_attr(order, 'sl', None),
-                'tp': self._get_attr(order, 'tp', None),
-                'is_closed': bool(self._get_attr(order, 'time_done', 0)),
+            # Skip manually closed trades
+            close_reason_raw = exit_deals[-1]['reason']
+            if close_reason_raw in (
+                mt5.DEAL_REASON_CLIENT,
+                mt5.DEAL_REASON_MOBILE,
+                mt5.DEAL_REASON_WEB,
+            ):
+                skipped_manual += 1
+                continue
+
+            # Use the earliest entry deal for open info
+            entry_deals.sort(key=lambda d: d['time'])
+            exit_deals.sort(key=lambda d: d['time'])
+            open_deal  = entry_deals[0]
+            close_deal = exit_deals[-1]
+
+            # Aggregate financials across all exit deals (handles partial closes)
+            total_profit     = sum(d['profit']     for d in exit_deals)
+            total_commission = sum(d['commission'] for d in exit_deals)
+            total_swap       = sum(d['swap']       for d in exit_deals)
+            total_volume     = sum(d['volume']     for d in exit_deals)
+
+            trade = {
+                'position_id':   position_id,
+                'magic':         open_deal['magic'],
+                'symbol':        open_deal['symbol'],
+                'direction':     open_deal['type'],        # BUY or SELL
+                'volume':        round(total_volume, 2),
+                'open_time':     open_deal['time_str'],
+                'open_price':    open_deal['price'],
+                'open_ticket':   open_deal['ticket'],
+                'open_comment':  open_deal['comment'],
+                'close_time':    close_deal['time_str'],
+                'close_price':   close_deal['price'],
+                'close_ticket':  close_deal['ticket'],
+                'close_comment': close_deal['comment'],
+                'close_reason':  _close_reason_str(close_reason_raw),
+                'profit':        round(total_profit, 2),
+                'commission':    round(total_commission, 2),
+                'swap':          round(total_swap, 2),
+                'net_profit':    round(total_profit + total_commission + total_swap, 2),
             }
-            self.all_orders.append(order_dict)
+            self.completed_trades.append(trade)
 
-        self.all_orders.sort(key=lambda x: x['time'])
-        return True
-    
-    def filter_bot_trades(self) -> int:
-        """Filter trades by bot's magic numbers"""
-        print(f"\n🤖 Filtering trades with magic numbers {BOT_MAGIC_NUMBERS}...")
-        
-        # Filter deals by magic numbers
-        self.bot_trades = [deal for deal in self.all_deals if deal['magic'] in BOT_MAGIC_NUMBERS]
+        # Sort chronologically by close time
+        self.completed_trades.sort(key=lambda t: t['close_time'])
 
-        # Build a set of bot-linked order/position IDs (from entry deals)
-        bot_position_ids = {
-            deal['position_id'] for deal in self.bot_trades
-            if deal.get('position_id')
-        }
-        bot_order_ids = {
-            deal['order'] for deal in self.bot_trades
-            if deal.get('order')
-        }
+        if skipped_black:
+            print(f"  Excluded {skipped_black} blacklisted positions")
+        if skipped_manual:
+            print(f"  Excluded {skipped_manual} manually closed trades")
+        if skipped_open:
+            print(f"  Skipped {skipped_open} positions still open")
+        print(f"Completed trades: {len(self.completed_trades)}")
+        return len(self.completed_trades)
 
-        # Closed deals can sometimes have magic 0; include by position/order linkage
-        self.bot_closed_deals = [
-            deal for deal in self.all_deals
-            if deal.get('is_closed')
-            and deal.get('reason') not in self._manual_close_reasons
-            and (
-                deal['magic'] in BOT_MAGIC_NUMBERS
-                or deal.get('position_id') in bot_position_ids
-                or deal.get('order') in bot_order_ids
-            )
-        ]
-        
-        # Count how many were excluded
-        all_bot_closed = [
-            deal for deal in self.all_deals
-            if deal.get('is_closed')
-            and (
-                deal['magic'] in BOT_MAGIC_NUMBERS
-                or deal.get('position_id') in bot_position_ids
-                or deal.get('order') in bot_order_ids
-            )
-        ]
-        manually_closed = len(all_bot_closed) - len(self.bot_closed_deals)
-        if manually_closed > 0:
-            print(f"⚠️ Excluded {manually_closed} manually closed trades")
-        
-        print(f"✅ Found {len(self.bot_trades)} bot trades")
-        
-        if self.bot_trades:
-            print(f"\n📋 Bot Trade Summary:")
-            print(f"   First trade: {self.bot_trades[0]['time_str']}")
-            print(f"   Last trade: {self.bot_trades[-1]['time_str']}")
-            
-            # Calculate some quick stats
-            total_pnl = sum(trade['profit'] for trade in self.bot_trades)
-            winning_trades = sum(1 for trade in self.bot_trades if trade['profit'] > 0)
-            losing_trades = sum(1 for trade in self.bot_trades if trade['profit'] < 0)
-            
-            print(f"   Total P&L: ${total_pnl:.2f}")
-            print(f"   Winning trades: {winning_trades}")
-            print(f"   Losing trades: {losing_trades}")
-        
-        return len(self.bot_trades)
-
-    def filter_bot_orders(self) -> int:
-        """Filter closed orders by bot's magic numbers"""
-        print(f"\n🤖 Filtering closed orders with magic numbers {BOT_MAGIC_NUMBERS}...")
-
-        filled_states = {mt5.ORDER_STATE_FILLED, mt5.ORDER_STATE_PARTIAL}
-        self.bot_orders = [
-            order for order in self.all_orders
-            if order['magic'] in BOT_MAGIC_NUMBERS
-            and (order.get('state') in filled_states or order.get('is_closed'))
-        ]
-
-        print(f"✅ Found {len(self.bot_orders)} closed bot orders")
-        return len(self.bot_orders)
-    
-    def calculate_metrics(self, trades_override=None) -> Dict:
-        """Calculate trading metrics for bot trades"""
-        trades = trades_override if trades_override is not None else self.bot_closed_deals
+    # ------------------------------------------------------------------
+    def calculate_metrics(self) -> Dict:
+        trades = self.completed_trades
         if not trades:
             return {}
-        
-        print("\n📈 Calculating Bot Trading Metrics...")
-        
-        # Basic metrics
-        total_trades = len(trades)
-        buy_trades = sum(1 for d in trades if d['type'] == 'BUY')
-        sell_trades = sum(1 for d in trades if d['type'] == 'SELL')
-        
-        # P&L metrics
-        winning_trades = sum(1 for d in trades if d['profit'] > 0)
-        losing_trades = sum(1 for d in trades if d['profit'] < 0)
-        breakeven_trades = sum(1 for d in trades if d['profit'] == 0)
 
-        total_profit = sum(d['profit'] for d in trades if d['profit'] > 0)
-        total_loss = abs(sum(d['profit'] for d in trades if d['profit'] < 0))
-        net_pnl = sum(d['profit'] for d in trades)
-        total_commission = abs(sum(d['commission'] for d in trades))
-        total_swap = sum(d['swap'] for d in trades)
-        
-        # Win rate
-        win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
-        
-        # Average P&L per trade
-        avg_pnl = net_pnl / total_trades if total_trades > 0 else 0
-        avg_profit = total_profit / winning_trades if winning_trades > 0 else 0
-        avg_loss = total_loss / losing_trades if losing_trades > 0 else 0
-        
-        # Profit factor
-        profit_factor = total_profit / total_loss if total_loss > 0 else 0
-        
-        metrics = {
-            'total_trades': total_trades,
-            'buy_trades': buy_trades,
-            'sell_trades': sell_trades,
-            'winning_trades': winning_trades,
-            'losing_trades': losing_trades,
-            'breakeven_trades': breakeven_trades,
-            'win_rate_percent': round(win_rate, 2),
-            'total_profit': round(total_profit, 2),
-            'total_loss': round(total_loss, 2),
-            'net_pnl': round(net_pnl, 2),
-            'total_commission': round(total_commission, 2),
-            'total_swap': round(total_swap, 2),
-            'avg_pnl_per_trade': round(avg_pnl, 2),
-            'avg_profit_per_win': round(avg_profit, 2),
-            'avg_loss_per_loss': round(avg_loss, 2),
-            'profit_factor': round(profit_factor, 2),
+        total  = len(trades)
+        wins   = sum(1 for t in trades if t['net_profit'] > 0)
+        losses = sum(1 for t in trades if t['net_profit'] < 0)
+        be     = total - wins - losses
+
+        gross_profit = sum(t['net_profit'] for t in trades if t['net_profit'] > 0)
+        gross_loss   = abs(sum(t['net_profit'] for t in trades if t['net_profit'] < 0))
+        net_pnl      = sum(t['net_profit'] for t in trades)
+
+        return {
+            'total_trades':       total,
+            'buy_trades':         sum(1 for t in trades if t['direction'] == 'BUY'),
+            'sell_trades':        sum(1 for t in trades if t['direction'] == 'SELL'),
+            'winning_trades':     wins,
+            'losing_trades':      losses,
+            'breakeven_trades':   be,
+            'win_rate_percent':   round(wins / total * 100, 2) if total else 0,
+            'gross_profit':       round(gross_profit, 2),
+            'gross_loss':         round(gross_loss, 2),
+            'net_pnl':            round(net_pnl, 2),
+            'total_commission':   round(sum(t['commission'] for t in trades), 2),
+            'total_swap':         round(sum(t['swap'] for t in trades), 2),
+            'avg_net_per_trade':  round(net_pnl / total, 2) if total else 0,
+            'avg_win':            round(gross_profit / wins, 2) if wins else 0,
+            'avg_loss':           round(gross_loss / losses, 2) if losses else 0,
+            'profit_factor':      round(gross_profit / gross_loss, 2) if gross_loss else 0,
+            'close_reason_breakdown': _close_reason_breakdown(trades),
         }
-        
-        return metrics
-    
-    def save_to_json(self, output_file: str = OUTPUT_FILE) -> bool:
-        """Save bot trades to JSON file."""
-        print(f"\n💾 Saving bot trades to JSON...")
 
-        trades_output = list(self.bot_closed_deals)  # copy so we don't mutate
-        trade_source = 'deals_closed'
-        
-        # Prepare the output
+    # ------------------------------------------------------------------
+    def save_to_json(self, output_file: str = OUTPUT_FILE) -> bool:
+        print(f"Saving to {output_file}...")
+
         output_data = {
             'metadata': {
-                'created_at': datetime.now().isoformat(),
-                'bot_version': 'zone',
-                'symbol': SYMBOL,
-                'magic_numbers': BOT_MAGIC_NUMBERS,
-                'days_back': DAYS_BACK,
-                'trade_source': trade_source,
-                'closed_deals_match': 'magic_or_position_or_order',
+                'created_at':    datetime.now().isoformat(),
+                'symbol':        SYMBOL,
+                'magic_numbers': list(self.magic_numbers),
+                'days_back':     DAYS_BACK,
             },
-            'summary': self.calculate_metrics(trades_override=trades_output),
-            'trades': trades_output,
-            'deals': self.bot_trades,
-            'orders': self.bot_orders,
+            'summary': self.calculate_metrics(),
+            'trades':  self.completed_trades,
         }
-        
-        # Create output directory if it doesn't exist
+
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        
-        # Save to JSON
         with open(output_file, 'w') as f:
             json.dump(output_data, f, indent=2, default=str)
-        
-        print(f"✅ Bot trades saved to: {output_file}")
+
+        print(f"Saved {len(self.completed_trades)} trades to {output_file}")
         return True
-    
+
+    # ------------------------------------------------------------------
     def print_summary(self):
-        """Print a summary of the bot trades"""
-        trades = self.bot_closed_deals
-        if not trades:
-            print("\n⚠️ No bot trades found")
+        if not self.completed_trades:
+            print("No completed bot trades found")
             return
-        
-        metrics = self.calculate_metrics()
-        
-        print("\n" + "="*60)
-        print("🤖 BOT TRADES SUMMARY")
-        print("="*60)
-        
-        print(f"\n📊 TRADE STATISTICS:")
-        print(f"   Total Trades: {metrics['total_trades']}")
-        print(f"   Buy Trades: {metrics['buy_trades']}")
-        print(f"   Sell Trades: {metrics['sell_trades']}")
-        
-        print(f"\n✅ WINNING STATISTICS:")
-        print(f"   Winning Trades: {metrics['winning_trades']}")
-        print(f"   Losing Trades: {metrics['losing_trades']}")
-        print(f"   Breakeven Trades: {metrics['breakeven_trades']}")
-        print(f"   Win Rate: {metrics['win_rate_percent']}%")
-        
-        print(f"\n💰 PROFIT & LOSS:")
-        print(f"   Total Profit: ${metrics['total_profit']:.2f}")
-        print(f"   Total Loss: ${metrics['total_loss']:.2f}")
-        print(f"   Net P&L: ${metrics['net_pnl']:.2f}")
-        print(f"   Commission Paid: ${metrics['total_commission']:.2f}")
-        print(f"   Swap: ${metrics['total_swap']:.2f}")
-        
-        print(f"\n📈 AVERAGES:")
-        print(f"   Avg P&L per Trade: ${metrics['avg_pnl_per_trade']:.2f}")
-        print(f"   Avg Profit per Win: ${metrics['avg_profit_per_win']:.2f}")
-        print(f"   Avg Loss per Loss: ${metrics['avg_loss_per_loss']:.2f}")
-        print(f"   Profit Factor: {metrics['profit_factor']:.2f}")
-        
-        print("\n" + "="*60)
-    
+
+        m = self.calculate_metrics()
+        print("\n" + "=" * 60)
+        print("BOT TRADES SUMMARY")
+        print("=" * 60)
+        print(f"  Total trades:    {m['total_trades']}  (BUY: {m['buy_trades']} | SELL: {m['sell_trades']})")
+        print(f"  Win rate:        {m['win_rate_percent']}%  ({m['winning_trades']}W / {m['losing_trades']}L / {m['breakeven_trades']}BE)")
+        print(f"  Net P&L:         ${m['net_pnl']:.2f}")
+        print(f"  Gross profit:    ${m['gross_profit']:.2f}")
+        print(f"  Gross loss:      ${m['gross_loss']:.2f}")
+        print(f"  Profit factor:   {m['profit_factor']:.2f}")
+        print(f"  Avg win:         ${m['avg_win']:.2f}")
+        print(f"  Avg loss:        ${m['avg_loss']:.2f}")
+        print(f"  Commission:      ${m['total_commission']:.2f}")
+        print(f"  Swap:            ${m['total_swap']:.2f}")
+        print(f"  Close reasons:   {m['close_reason_breakdown']}")
+        print("=" * 60)
+
+    # ------------------------------------------------------------------
     def shutdown(self):
-        """Shutdown MT5"""
         if self.initialized:
             mt5.shutdown()
-            print("\n👋 MetaTrader5 connection closed")
+            print("MetaTrader5 connection closed")
+
+
+# ===================== HELPERS =====================
+
+def _close_reason_breakdown(trades: List[dict]) -> Dict[str, int]:
+    breakdown: Dict[str, int] = {}
+    for t in trades:
+        r = t['close_reason']
+        breakdown[r] = breakdown.get(r, 0) + 1
+    return breakdown
+
 
 # ===================== MAIN =====================
 
 def main():
-    exporter = BotTradesExporter()
-    
+    exporter = BotTradesExporter(
+        magic_numbers=BOT_MAGIC_NUMBERS,
+        blacklisted_positions=BLACKLISTED_POSITIONS,
+    )
+
     try:
-        # Connect to MT5
         if not exporter.connect_mt5():
             return False
-        
-        # Get all deals
-        if not exporter.get_all_deals(days_back=DAYS_BACK):
-            print("⚠️ Error retrieving deals")
+
+        if not exporter.fetch_and_group_deals(days_back=DAYS_BACK):
+            print("Error retrieving deals")
             return False
 
-        # Get all orders
-        if not exporter.get_all_orders(days_back=DAYS_BACK):
-            print("⚠️ Error retrieving orders")
-            return False
-        
-        # Filter bot deals and orders
-        bot_trade_count = exporter.filter_bot_trades()
-        bot_order_count = exporter.filter_bot_orders()
-        
-        # Save to JSON
-        if bot_trade_count > 0 or bot_order_count > 0:
+        count = exporter.build_completed_trades()
+
+        if count > 0:
             exporter.save_to_json()
             exporter.print_summary()
         else:
-            print("\n⚠️ No bot trades found to export")
-        
+            print("No completed bot trades found to export")
+
         return True
-        
+
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         import traceback
         traceback.print_exc()
         return False
     finally:
         exporter.shutdown()
 
+
 if __name__ == "__main__":
-    success = main()
-    exit(0 if success else 1)
+    exit(0 if main() else 1)

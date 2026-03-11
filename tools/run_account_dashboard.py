@@ -28,6 +28,10 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.path = '/account_dashboard.html'
         return super().do_GET()
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        super().end_headers()
+
     def log_message(self, format, *args):
         # Quieter logging
         pass
@@ -68,6 +72,7 @@ def main():
 
     # Step 2: serve the dashboard
     handler = DashboardHandler
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), handler) as httpd:
         url = f"http://localhost:{PORT}"
         print(f"\n🚀 Account Dashboard running at {url}")
