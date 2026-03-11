@@ -1,6 +1,6 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 5,
+  "limit_orders_placed": 7,
   "limit_fills": 2,
   "limit_timeouts": 0,
   "limit_invalidated": 3,
@@ -261,6 +261,22 @@
       "zone_high": 5027.0,
       "price_min": 5221.78,
       "price_max": 5221.78
+    },
+    {
+      "time": "2026-03-11 17:21:17",
+      "type": "limit_placed",
+      "side": "BUY",
+      "limit_price": 5187.0,
+      "zone_low": 5183.0,
+      "zone_high": 5187.0
+    },
+    {
+      "time": "2026-03-11 17:21:17",
+      "type": "limit_placed",
+      "side": "BUY",
+      "limit_price": 5176.0,
+      "zone_low": 5171.0,
+      "zone_high": 5176.0
     }
   ]
 }
