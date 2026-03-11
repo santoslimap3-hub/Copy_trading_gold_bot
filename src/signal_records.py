@@ -381,6 +381,14 @@ class SignalRecordsManager:
                 if msg_id in self._mem:
                     self._mem[msg_id]["best_in_zone"] = None   # reset for next interval
 
+            # When SL is hit: also snapshot best-in-zone for the next pending TP
+            if level == LEVEL_SL and best_snap is not None:
+                last_tp = max((l for l in seq if l >= 1), default=0)
+                next_tp = last_tp + 1
+                rec.setdefault("best_prices_per_tp", []).append(
+                    [best_snap, f"tp{next_tp}"]
+                )
+
             # LEVEL_ZONE: only record once (skip if already first in sequence)
             if level == LEVEL_ZONE and LEVEL_ZONE in seq:
                 return
