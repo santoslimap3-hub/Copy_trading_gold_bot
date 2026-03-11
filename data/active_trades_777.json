@@ -20,15 +20,23 @@
       "BE": 5160.0,
       "SL": 5156.0
     },
-    "sequence": [],
+    "sequence": [
+      {
+        "level": "POS_CLOSED(unknown)",
+        "time": "2026-03-11 13:53:08",
+        "timestamp": 1773237188.301022,
+        "price": 0.0,
+        "profit": 0.0
+      }
+    ],
     "levels_hit": [],
     "levels_breached": [],
     "registered_at": "2026-03-11 13:49:50",
     "registered_ts": 1773236990.852888,
-    "position_closed": false,
-    "position_closed_at": null,
-    "position_profit": null,
-    "position_close_reason": null,
-    "position_close_price": null
+    "position_closed": true,
+    "position_closed_at": 1773237188.301022,
+    "position_profit": 0.0,
+    "position_close_reason": "unknown",
+    "position_close_price": 0.0
   }
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-03-11T13:51:19",
+  "last_updated": "2026-03-11T13:53:09",
   "records": {
     "4091": {
       "msg_id": 4091,
@@ -27,7 +27,8 @@
       "price_extreme_at_zone_arrival": null,
       "best_prices_per_tp": [],
       "outcome_sequence": [
-        0
+        0,
+        -1
       ],
       "bot_entries": {
         "777": {
@@ -72,13 +73,14 @@
           "zone_high": 5165.5
         }
       ],
-      "tracking_active": true,
-      "tracking_complete": false,
+      "tracking_active": false,
+      "tracking_complete": true,
       "tracking_started_at": "2026-03-11T13:51:19",
-      "tracking_ended_at": null,
-      "last_updated": "2026-03-11T13:51:19",
+      "tracking_ended_at": "2026-03-11T13:53:09",
+      "last_updated": "2026-03-11T13:53:09",
       "_level_times": [
-        "2026-03-11T13:50:01"
+        "2026-03-11T13:50:01",
+        "2026-03-11T13:53:09"
       ]
     }
   }
