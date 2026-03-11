@@ -1,11 +1,35 @@
+
 from flask import Flask, request, jsonify
+import os
+import json
 
 app = Flask(__name__)
 
 @app.route("/")
-
 def home():
     return "Home"
 
-if  __name__ == "__main__":
+@app.route("/trade_history")
+def trade_history():
+    # Example: return contents of data/bot_trades.json
+    json_path = os.path.join(os.path.dirname(__file__), '../data/bot_trades.json')
+    try:
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/entry_stats")
+def entry_stats():
+    # Example: return contents of data/entry_stats.json
+    json_path = os.path.join(os.path.dirname(__file__), '../data/entry_stats_779.json')
+    try:
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
     app.run(debug=True)
