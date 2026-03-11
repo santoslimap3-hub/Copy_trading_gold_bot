@@ -1,1 +1,34 @@
-{}
+{
+  "47301115": {
+    "ticket": 47301115,
+    "side": "BUY",
+    "entry_price": 5160.0,
+    "sl_price": 5156.0,
+    "tp_levels": {
+      "1": 5168.0,
+      "2": 5170.0,
+      "3": 5172.0,
+      "4": 5174.0,
+      "5": 5180.0
+    },
+    "monitored_levels": {
+      "TP1": 5168.0,
+      "TP2": 5170.0,
+      "TP3": 5172.0,
+      "TP4": 5174.0,
+      "TP5": 5180.0,
+      "BE": 5160.0,
+      "SL": 5156.0
+    },
+    "sequence": [],
+    "levels_hit": [],
+    "levels_breached": [],
+    "registered_at": "2026-03-11 13:49:50",
+    "registered_ts": 1773236990.852888,
+    "position_closed": false,
+    "position_closed_at": null,
+    "position_profit": null,
+    "position_close_reason": null,
+    "position_close_price": null
+  }
+}

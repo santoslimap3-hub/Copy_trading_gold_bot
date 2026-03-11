@@ -1,3 +1,16 @@
 {
-  "queue": []
+  "queue": [
+    {
+      "id": 4091,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5160.33,
+      "sl_price": 5152.33,
+      "lot_size": 0.05,
+      "tp_levels": {},
+      "msg_text": "XAU USD BUY NOW\n\n5165.50 - 5160\n\n\ud83e\udd47TP1 5168\n\ud83e\udd48TP2 5170\n\ud83e\udd49TP3 5172\n\ud83c\udfc5TP4 5174\n      TP5 5180\n\n\ud83d\udeabSL 5156",
+      "timestamp": "2026-03-11T13:51:19.496998",
+      "executed": true
+    }
+  ]
 }
