@@ -190,6 +190,11 @@
             background-color: #9b59b6;
         }
 
+        .badge-reason-tp   { background-color: #27ae60; }
+        .badge-reason-sl   { background-color: #e74c3c; }
+        .badge-reason-expert { background-color: #3498db; }
+        .badge-reason-other  { background-color: #95a5a6; }
+
         .no-data {
             text-align: center;
             padding: 40px;
@@ -516,7 +521,13 @@
         <!-- Cumulative P&L Chart -->
         <div class="trades-table">
             <div style="padding: 20px;">
-                <h5 style="color: var(--primary-color); margin-bottom: 20px;"><i class="bi bi-graph-up"></i> Cumulative P&L</h5>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                    <h5 style="color: var(--primary-color); margin:0;"><i class="bi bi-graph-up"></i> Cumulative P&L</h5>
+                    <div style="display:flex; gap:6px;">
+                        <button class="time-filter-btn active" id="chartModeCombined" onclick="setChartMode('combined')">Combined</button>
+                        <button class="time-filter-btn" id="chartModeSymbol" onclick="setChartMode('by-symbol')">By Symbol</button>
+                    </div>
+                </div>
                 <canvas id="pnlChart" height="80"></canvas>
             </div>
         </div>
@@ -527,18 +538,20 @@
                 <thead>
                     <tr>
                         <th style="width: 30px;">#</th>
-                        <th style="width: 80px;">Time</th>
-                        <th style="width: 60px;">Type</th>
-                        <th style="width: 80px;">Price</th>
-                        <th style="width: 70px;">Volume</th>
-                        <th style="width: 80px;">P&L</th>
+                        <th style="width: 130px;">Close Time</th>
+                        <th style="width: 60px;">Dir</th>
+                        <th style="width: 80px;">Open</th>
+                        <th style="width: 80px;">Close</th>
+                        <th style="width: 60px;">Vol</th>
+                        <th style="width: 90px;">Net P&L</th>
+                        <th style="width: 70px;">Reason</th>
                         <th style="width: 60px;">Bot</th>
-                        <th style="width: 200px;">Comment</th>
+                        <th>Comment</th>
                     </tr>
                 </thead>
                 <tbody id="tradesBody">
                     <tr>
-                        <td colspan="8" class="loading">
+                        <td colspan="10" class="loading">
                             <i class="bi bi-hourglass-split"></i> Loading trades...
                         </td>
                     </tr>
@@ -591,39 +604,62 @@
         let currentFilter = 'all';
         let tradesData = null;
         let chartInstance = null;
+        let symbolChartMode = 'combined';
 
-        function isClosedTrade(trade) {
-            if (trade.is_closed === true) {
-                return true;
-            }
-            if (trade.entry === 1) {
-                return true;
-            }
-            if (trade.entry === 0) {
-                return false;
-            }
-            return trade.profit !== 0;
+        const CHART_COLORS = [
+            '#667eea', '#27ae60', '#e74c3c', '#f39c12',
+            '#9b59b6', '#1abc9c', '#e67e22', '#3498db',
+            '#e91e63', '#00bcd4', '#8bc34a', '#ff5722'
+        ];
+
+        function setChartMode(mode) {
+            symbolChartMode = mode;
+            document.getElementById('chartModeCombined').classList.toggle('active', mode === 'combined');
+            document.getElementById('chartModeSymbol').classList.toggle('active', mode === 'by-symbol');
+            updateChart(filteredTrades);
+        }
+
+        // Parse a trade's close time to a JS Date (supports ISO string or unix timestamp)
+        function tradeCloseDate(trade) {
+            if (trade.close_time) return new Date(trade.close_time);
+            if (trade.time) return new Date(trade.time * 1000);
+            return new Date(0);
+        }
+
+        // Net P&L field — new structure uses net_profit, old used profit
+        function tradeNetProfit(trade) {
+            return (trade.net_profit !== undefined) ? trade.net_profit : trade.profit;
+        }
+
+        // Direction — new structure uses direction, old used type with entry reversal
+        function tradeDirection(trade) {
+            if (trade.direction) return trade.direction;
+            if (trade.entry === 1) return trade.type === 'BUY' ? 'SELL' : 'BUY';
+            return trade.type;
+        }
+
+        function reasonBadgeClass(reason) {
+            if (!reason) return 'badge-reason-other';
+            const r = reason.toUpperCase();
+            if (r === 'TP') return 'badge-reason-tp';
+            if (r === 'SL') return 'badge-reason-sl';
+            if (r === 'EXPERT') return 'badge-reason-expert';
+            return 'badge-reason-other';
         }
 
         // Load JSON data
         async function loadTradesData() {
             try {
                 const response = await fetch('bot_trades.json?t=' + Date.now(), { cache: 'no-store' });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 tradesData = await response.json();
 
-                const rawTrades = tradesData.trades || tradesData.orders || tradesData.deals || [];
+                allTrades = tradesData.trades || [];
 
-                // Keep only closed trades
-                const allClosedTrades = rawTrades.filter(isClosedTrade);
-                allTrades = allClosedTrades;
+                // Sort newest first
+                allTrades.sort((a, b) => tradeCloseDate(b) - tradeCloseDate(a));
                 filteredTrades = [...allTrades];
-                
-                // Sort by time descending
-                filteredTrades.sort((a, b) => b.time - a.time);
-                
+
                 renderDashboard();
                 updateMetrics(filteredTrades);
                 updateChart(filteredTrades);
@@ -635,47 +671,33 @@
 
         function filterByPeriod(period) {
             currentFilter = period;
-            
-            // Update button states
-            document.querySelectorAll('.time-filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+
+            document.querySelectorAll('.time-filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
-            const now = Date.now() / 1000; // Current time in seconds
-            let cutoffTime = 0;
-            
+
+            const now = Date.now();
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const periodMs = {
+                '24h': msPerDay,
+                '2d':  2  * msPerDay,
+                '3d':  3  * msPerDay,
+                '4d':  4  * msPerDay,
+                '5d':  5  * msPerDay,
+                '7d':  7  * msPerDay,
+                '14d': 14 * msPerDay,
+                '30d': 30 * msPerDay,
+            };
+
             if (period === 'all') {
                 filteredTrades = [...allTrades];
-            } else if (period === '24h') {
-                cutoffTime = now - (24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '2d') {
-                cutoffTime = now - (2 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '3d') {
-                cutoffTime = now - (3 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '4d') {
-                cutoffTime = now - (4 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '5d') {
-                cutoffTime = now - (5 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '7d') {
-                cutoffTime = now - (7 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '14d') {
-                cutoffTime = now - (14 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
-            } else if (period === '30d') {
-                cutoffTime = now - (30 * 24 * 60 * 60);
-                filteredTrades = allTrades.filter(trade => trade.time >= cutoffTime);
+            } else {
+                const cutoff = now - (periodMs[period] || 0);
+                filteredTrades = allTrades.filter(t => tradeCloseDate(t).getTime() >= cutoff);
             }
-            
-            // Sort by time descending
-            filteredTrades.sort((a, b) => b.time - a.time);
-            
+
+            // Keep newest first
+            filteredTrades.sort((a, b) => tradeCloseDate(b) - tradeCloseDate(a));
+
             renderDashboard();
             updateMetrics(filteredTrades);
             updateChart(filteredTrades);
@@ -683,155 +705,162 @@
 
         function renderDashboard() {
             const tbody = document.getElementById('tradesBody');
-            
+
             if (filteredTrades.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="no-data">
+                        <td colspan="10" class="no-data">
                             <i class="bi bi-inbox"></i><br>
-                            No closed trades found for this period
+                            No trades found for this period
                         </td>
                     </tr>
                 `;
                 document.getElementById('tableInfo').textContent = '';
                 return;
             }
-            
+
             let html = '';
             filteredTrades.forEach((trade, index) => {
-                const date = new Date(trade.time * 1000);
-                const timeStr = date.toLocaleString();
-                // For closing deals (entry=1), reverse type to show position direction
-                // A closing BUY deal means the position was SELL, and vice versa
-                const displayType = (trade.entry === 1)
-                    ? (trade.type === 'BUY' ? 'SELL' : 'BUY')
-                    : trade.type;
-                const typeClass = displayType === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
-                const profitClass = trade.profit > 0 ? 'trade-profit-positive' : (trade.profit < 0 ? 'trade-profit-negative' : 'trade-profit-zero');
+                const closeDate = tradeCloseDate(trade);
+                const timeStr = closeDate.toLocaleString();
+                const dir = tradeDirection(trade);
+                const netP = tradeNetProfit(trade);
+                const typeClass   = dir === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
+                const profitClass = netP > 0 ? 'trade-profit-positive' : (netP < 0 ? 'trade-profit-negative' : 'trade-profit-zero');
                 const botBadgeClass = trade.magic === 776 ? 'badge-776' : trade.magic === 777 ? 'badge-777' : 'badge-778';
-                
+                const reason = trade.close_reason || '';
+                const reasonClass = reasonBadgeClass(reason);
+
+                // Price columns — new structure has open_price + close_price, old has just price
+                const openPrice  = trade.open_price  !== undefined ? trade.open_price.toFixed(2)  : '-';
+                const closePrice = trade.close_price !== undefined ? trade.close_price.toFixed(2) : (trade.price !== undefined ? trade.price.toFixed(2) : '-');
+                const comment = trade.close_comment || trade.comment || '';
+
                 html += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${timeStr}</td>
-                        <td><span class="${typeClass}">${displayType}</span></td>
-                        <td>${trade.price.toFixed(2)}</td>
+                        <td style="font-size:12px;">${timeStr}</td>
+                        <td><span class="${typeClass}">${dir}</span></td>
+                        <td>${openPrice}</td>
+                        <td>${closePrice}</td>
                         <td>${trade.volume.toFixed(2)}</td>
-                        <td><span class="${profitClass}">$${trade.profit.toFixed(2)}</span></td>
+                        <td><span class="${profitClass}">$${netP.toFixed(2)}</span></td>
+                        <td><span class="badge badge-magic ${reasonClass}">${reason || '-'}</span></td>
                         <td><span class="badge badge-magic ${botBadgeClass}">${trade.magic}</span></td>
-                        <td style="max-width: 200px; word-wrap: break-word; font-size: 12px;">${trade.comment}</td>
+                        <td style="max-width: 180px; word-wrap: break-word; font-size: 11px;">${comment}</td>
                     </tr>
                 `;
             });
-            
+
             tbody.innerHTML = html;
-            
-            // Update table info
-            const startTime = new Date(filteredTrades[filteredTrades.length - 1].time * 1000).toLocaleString();
-            const endTime = new Date(filteredTrades[0].time * 1000).toLocaleString();
-            document.getElementById('tableInfo').textContent = 
-                `Showing ${filteredTrades.length} closed trade(s) | From: ${startTime} to ${endTime}`;
+
+            const sorted = [...filteredTrades].sort((a, b) => tradeCloseDate(a) - tradeCloseDate(b));
+            const startTime = tradeCloseDate(sorted[0]).toLocaleString();
+            const endTime   = tradeCloseDate(sorted[sorted.length - 1]).toLocaleString();
+            document.getElementById('tableInfo').textContent =
+                `Showing ${filteredTrades.length} trade(s) | From: ${startTime} to ${endTime}`;
         }
 
         function updateMetrics(trades) {
-            if (trades.length === 0) {
-                document.getElementById('totalTrades').textContent = '0';
+            const zero = () => {
+                ['totalTrades','winRate','netPnL','profitFactor','avgPnL','avgWin','avgLoss','avgRR']
+                    .forEach(id => document.getElementById(id).textContent = id.startsWith('net') || id.startsWith('avg') ? '$0.00' : '0');
                 document.getElementById('winRate').textContent = '0%';
-                document.getElementById('netPnL').textContent = '$0.00';
                 document.getElementById('profitFactor').textContent = '0.00';
-                document.getElementById('avgPnL').textContent = '$0.00';
-                document.getElementById('avgWin').textContent = '$0.00';
-                document.getElementById('avgLoss').textContent = '$0.00';
                 document.getElementById('avgRR').textContent = '0.00';
-                return;
-            }
-            
-            const totalTrades = trades.length;
-            const winningTrades = trades.filter(t => t.profit > 0).length;
-            const losingTrades = trades.filter(t => t.profit < 0).length;
-            const winRate = totalTrades > 0 ? ((winningTrades / totalTrades) * 100).toFixed(2) : 0;
-            
-            const totalProfit = trades.filter(t => t.profit > 0).reduce((sum, t) => sum + t.profit, 0);
-            const totalLoss = Math.abs(trades.filter(t => t.profit < 0).reduce((sum, t) => sum + t.profit, 0));
-            const netPnL = trades.reduce((sum, t) => sum + t.profit, 0);
-            const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss).toFixed(2) : 0;
-            const avgPnL = (netPnL / totalTrades).toFixed(2);
-            const avgWin = winningTrades > 0 ? (totalProfit / winningTrades).toFixed(2) : '0.00';
-            const avgLoss = losingTrades > 0 ? (totalLoss / losingTrades).toFixed(2) : '0.00';
-            const rawRR = (winningTrades > 0 && losingTrades > 0) ? (totalProfit / winningTrades) / (totalLoss / losingTrades) : 0;
+            };
+            if (trades.length === 0) { zero(); return; }
+
+            const netProfits = trades.map(tradeNetProfit);
+            const totalTrades   = trades.length;
+            const winningTrades = netProfits.filter(p => p > 0).length;
+            const losingTrades  = netProfits.filter(p => p < 0).length;
+            const winRate       = ((winningTrades / totalTrades) * 100).toFixed(2);
+
+            const grossProfit = netProfits.filter(p => p > 0).reduce((s, p) => s + p, 0);
+            const grossLoss   = Math.abs(netProfits.filter(p => p < 0).reduce((s, p) => s + p, 0));
+            const netPnL      = netProfits.reduce((s, p) => s + p, 0);
+            const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : '∞';
+            const avgPnL  = (netPnL / totalTrades).toFixed(2);
+            const avgWin  = winningTrades > 0 ? (grossProfit / winningTrades).toFixed(2) : '0.00';
+            const avgLoss = losingTrades  > 0 ? (grossLoss  / losingTrades).toFixed(2)  : '0.00';
+            const rawRR   = (winningTrades > 0 && losingTrades > 0)
+                ? (grossProfit / winningTrades) / (grossLoss / losingTrades) : 0;
             const rrWinSide = (rawRR * 8).toFixed(2);
-            
-            // Update display
-            document.getElementById('totalTrades').textContent = totalTrades;
-            document.getElementById('winRate').textContent = winRate + '%';
-            document.getElementById('netPnL').textContent = '$' + netPnL.toFixed(2);
+
+            document.getElementById('totalTrades').textContent  = totalTrades;
+            document.getElementById('winRate').textContent      = winRate + '%';
+            document.getElementById('netPnL').textContent       = '$' + netPnL.toFixed(2);
             document.getElementById('profitFactor').textContent = profitFactor;
-            document.getElementById('avgPnL').textContent = '$' + avgPnL;
-            document.getElementById('avgWin').textContent = '$' + avgWin;
-            document.getElementById('avgLoss').textContent = '-$' + avgLoss;
-            document.getElementById('avgRR').textContent = rrWinSide + ':8';
-            
-            // Update R:R card color
+            document.getElementById('avgPnL').textContent       = '$' + avgPnL;
+            document.getElementById('avgWin').textContent       = '$' + avgWin;
+            document.getElementById('avgLoss').textContent      = '-$' + avgLoss;
+            document.getElementById('avgRR').textContent        = rrWinSide + ':8';
+
             const rrCard = document.getElementById('avgRR').parentElement;
-            rrCard.className = 'metric-card';
-            if (rawRR >= 1) {
-                rrCard.classList.add('positive');
-            } else if (rawRR > 0) {
-                rrCard.classList.add('negative');
-            } else {
-                rrCard.classList.add('neutral');
-            }
-            
-            // Update P&L card color
+            rrCard.className = 'metric-card ' + (rawRR >= 1 ? 'positive' : rawRR > 0 ? 'negative' : 'neutral');
+
             const pnlCard = document.getElementById('pnlCard');
-            pnlCard.className = 'metric-card';
-            if (netPnL > 0) {
-                pnlCard.classList.add('positive');
-            } else if (netPnL < 0) {
-                pnlCard.classList.add('negative');
-            } else {
-                pnlCard.classList.add('neutral');
-            }
+            pnlCard.className = 'metric-card ' + (netPnL > 0 ? 'positive' : netPnL < 0 ? 'negative' : 'neutral');
+        }
+
+        function _chartOptions(borderColor) {
+            return {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: true, labels: { font: { size: 12, weight: 'bold' }, color: '#2c3e50' } },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)', padding: 12,
+                        titleFont: { size: 12, weight: 'bold' }, bodyFont: { size: 11 },
+                        borderColor: borderColor || '#667eea', borderWidth: 1,
+                        callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.parsed.y.toFixed(2) }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { color: '#7f8c8d', callback: v => '$' + v.toFixed(2) }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#7f8c8d', maxTicksLimit: 10, font: { size: 10 } }
+                    }
+                }
+            };
         }
 
         function updateChart(trades) {
-            const orderedTrades = [...trades].sort((a, b) => a.time - b.time);
+            if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+            if (trades.length === 0) return;
 
-            if (orderedTrades.length === 0) {
-                // Clear chart if no trades
-                if (chartInstance) {
-                    chartInstance.destroy();
-                    chartInstance = null;
-                }
-                return;
+            if (symbolChartMode === 'by-symbol') {
+                _renderChartBySymbol(trades);
+            } else {
+                _renderChartCombined(trades);
             }
-            
-            // Calculate cumulative P&L
-            let cumulativePnL = 0;
+        }
+
+        function _renderChartCombined(trades) {
+            const ordered = [...trades].sort((a, b) => tradeCloseDate(a) - tradeCloseDate(b));
+            let cum = 0;
             const labels = [];
-            const data = [];
-            
-            orderedTrades.forEach(trade => {
-                cumulativePnL += trade.profit;
-                const date = new Date(trade.time * 1000);
-                labels.push(date.toLocaleString());
-                data.push(parseFloat(cumulativePnL.toFixed(2)));
+            const data   = [];
+            ordered.forEach(trade => {
+                cum += tradeNetProfit(trade);
+                labels.push(tradeCloseDate(trade).toLocaleString());
+                data.push(parseFloat(cum.toFixed(2)));
             });
-            
+
             const ctx = document.getElementById('pnlChart').getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-            
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
-                        label: 'Cumulative P&L ($)',
-                        data: data,
+                        label: 'Cumulative Net P&L ($)',
+                        data,
                         borderColor: '#667eea',
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
                         borderWidth: 2,
@@ -844,51 +873,57 @@
                         pointHoverRadius: 5,
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                font: { size: 12, weight: 'bold' },
-                                color: '#2c3e50',
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            titleFont: { size: 12, weight: 'bold' },
-                            bodyFont: { size: 11 },
-                            borderColor: '#667eea',
-                            borderWidth: 1,
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)',
-                            },
-                            ticks: {
-                                color: '#7f8c8d',
-                                callback: function(value) {
-                                    return '$' + value.toFixed(2);
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                            },
-                            ticks: {
-                                color: '#7f8c8d',
-                                maxTicksLimit: 10,
-                                font: { size: 10 }
-                            }
-                        }
-                    }
-                }
+                options: _chartOptions('#667eea')
+            });
+        }
+
+        function _renderChartBySymbol(trades) {
+            // Sort all trades chronologically — this becomes the shared x-axis
+            const ordered = [...trades].sort((a, b) => tradeCloseDate(a) - tradeCloseDate(b));
+            const labels  = ordered.map(t => tradeCloseDate(t).toLocaleString());
+
+            // Unique symbols in the order they first appear
+            const symbols = [];
+            ordered.forEach(t => {
+                const sym = t.symbol || 'UNKNOWN';
+                if (!symbols.includes(sym)) symbols.push(sym);
+            });
+
+            // For each symbol: walk all trades in order, accumulate PnL only for that symbol.
+            // This produces a step-function line that stays flat between that symbol's own trades.
+            const datasets = symbols.map((sym, i) => {
+                const color = CHART_COLORS[i % CHART_COLORS.length];
+                let cum = 0;
+                const data = ordered.map(t => {
+                    if ((t.symbol || 'UNKNOWN') === sym) cum += tradeNetProfit(t);
+                    return parseFloat(cum.toFixed(2));
+                });
+                // Show dot only on the symbol's own trades; hide on others
+                const pointRadius = ordered.map(t => (t.symbol || 'UNKNOWN') === sym ? 4 : 0);
+                return {
+                    label: sym,
+                    data,
+                    borderColor: color,
+                    backgroundColor: color + '18',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius,
+                    pointBackgroundColor: color,
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                };
+            });
+
+            const opts = _chartOptions(CHART_COLORS[0]);
+            opts.plugins.legend.labels.boxWidth = 16;
+
+            const ctx = document.getElementById('pnlChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets },
+                options: opts
             });
         }
 
