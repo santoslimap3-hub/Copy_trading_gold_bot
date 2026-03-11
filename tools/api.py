@@ -30,6 +30,17 @@ def entry_stats():
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/trade_outcomes")
+def trade_outcomes():
+    # Example: return contents of data/trade_outcomes.json
+    json_path = os.path.join(os.path.dirname(__file__), '../data/trade_outcomes_779.json')
+    try:
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
