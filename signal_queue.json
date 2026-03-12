@@ -155,6 +155,18 @@
       "msg_text": "XAUUSD BUY NOW 5151.5-5155.5",
       "timestamp": "2026-03-12T12:17:35.056231",
       "executed": true
+    },
+    {
+      "id": 210,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5162.22,
+      "sl_price": 5154.22,
+      "lot_size": 10.9,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW 5159.5-5163.5",
+      "timestamp": "2026-03-12T14:33:24.569966",
+      "executed": true
     }
   ]
 }
