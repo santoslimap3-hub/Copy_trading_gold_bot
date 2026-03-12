@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-03-11T21:58:55.357690",
+    "created_at": "2026-03-12T12:47:28.037377",
     "symbol": "XAUUSD",
     "magic_numbers": [
       779
@@ -8,24 +8,24 @@
     "days_back": 365
   },
   "summary": {
-    "total_trades": 62,
-    "buy_trades": 39,
+    "total_trades": 63,
+    "buy_trades": 40,
     "sell_trades": 23,
-    "winning_trades": 47,
+    "winning_trades": 48,
     "losing_trades": 15,
     "breakeven_trades": 0,
-    "win_rate_percent": 75.81,
-    "gross_profit": 533.87,
+    "win_rate_percent": 76.19,
+    "gross_profit": 542.85,
     "gross_loss": 625.32,
-    "net_pnl": -91.45,
+    "net_pnl": -82.47,
     "total_commission": 0.0,
     "total_swap": 0.0,
-    "avg_net_per_trade": -1.48,
-    "avg_win": 11.36,
+    "avg_net_per_trade": -1.31,
+    "avg_win": 11.31,
     "avg_loss": 41.69,
-    "profit_factor": 0.85,
+    "profit_factor": 0.87,
     "close_reason_breakdown": {
-      "TP": 47,
+      "TP": 48,
       "SL": 15
     }
   },
@@ -1269,6 +1269,26 @@
       "commission": 0.0,
       "swap": 0.0,
       "net_profit": -23.96
+    },
+    {
+      "position_id": 47407096,
+      "magic": 779,
+      "symbol": "XAUUSD",
+      "direction": "BUY",
+      "volume": 0.05,
+      "open_time": "2026-03-12T02:15:04",
+      "open_price": 5170.89,
+      "open_ticket": 45401708,
+      "open_comment": "Signal BUY",
+      "close_time": "2026-03-12T02:16:44",
+      "close_price": 5172.97,
+      "close_ticket": 45408616,
+      "close_comment": "[tp 5173.00]",
+      "close_reason": "TP",
+      "profit": 8.98,
+      "commission": 0.0,
+      "swap": 0.0,
+      "net_profit": 8.98
     }
   ]
 }

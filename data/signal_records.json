@@ -1,6 +1,6 @@
 {
     "version": 1,
-    "last_updated": "2026-03-11T13:53:09",
+    "last_updated": "2026-03-12T12:17:35",
     "records": {
         "4091": {
             "msg_id": 4091,
@@ -25,7 +25,10 @@
             "price_entered_zone": true,
             "price_extreme_at_zone_arrival": null,
             "best_prices_per_tp": [
-                [5160.33, "tp1"]
+                [
+                    5160.33,
+                    "tp1"
+                ]
             ],
             "outcome_sequence": [
                 0, -1

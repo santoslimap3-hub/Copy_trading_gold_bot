@@ -21,7 +21,7 @@ Usage:
 import json
 import os
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 
 class TradeOutcomeTracker:
@@ -53,6 +53,8 @@ class TradeOutcomeTracker:
         self._active_file = os.path.join(data_dir, f"active_trades_{magic}.json")
 
         # Active trades being tracked: ticket -> trade_info dict
+        # Trades skipped from monitoring (unknown-close) but preserved in the file
+        self._preserved_trades: Dict[int, Dict] = {}
         self._active_trades: Dict[int, Dict] = self._load_active_trades()
 
         # Load existing outcomes from disk
@@ -77,7 +79,15 @@ class TradeOutcomeTracker:
             with open(self._active_file, "r") as f:
                 data = json.load(f)
             trades = {}
+            skipped = 0
             for ticket_str, trade in data.items():
+                # Skip shadow-tracked trades whose close reason is unknown — they
+                # can never be finalized meaningfully and cause noisy re-visit logs.
+                # Preserve them in _preserved_trades so they stay in the file.
+                if trade.get("position_closed") and trade.get("position_close_reason") == "unknown":
+                    self._preserved_trades[int(ticket_str)] = trade
+                    skipped += 1
+                    continue
                 # Convert levels_hit back from list to set
                 trade["levels_hit"] = set(trade.get("levels_hit", []))
                 # levels_breached tracks which levels price is CURRENTLY past
@@ -88,8 +98,9 @@ class TradeOutcomeTracker:
                     # Backward compat: assume all ever-hit levels are currently breached
                     trade["levels_breached"] = trade["levels_hit"].copy()
                 trades[int(ticket_str)] = trade
-            if trades:
-                print(f"[TradeOutcomeTracker] Restored {len(trades)} active trade(s) from disk")
+            if trades or skipped:
+                print(f"[TradeOutcomeTracker] Restored {len(trades)} active trade(s) from disk"
+                      + (f" (skipped {skipped} unknown-close shadow trades)" if skipped else ""))
             return trades
         except (json.JSONDecodeError, IOError):
             return {}
@@ -104,6 +115,9 @@ class TradeOutcomeTracker:
             t["levels_hit"] = sorted(list(trade["levels_hit"]))
             t["levels_breached"] = sorted(list(trade["levels_breached"]))
             serializable[str(ticket)] = t
+        # Preserved (unknown-close) trades stay in the file untouched
+        for ticket, trade in self._preserved_trades.items():
+            serializable[str(ticket)] = trade
         tmp_file = self._active_file + ".tmp"
         try:
             with open(tmp_file, "w") as f:

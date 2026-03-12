@@ -1,19 +1,19 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 19,
-  "limit_fills": 0,
+  "limit_orders_placed": 20,
+  "limit_fills": 1,
   "limit_timeouts": 0,
   "limit_invalidated": 18,
-  "signals_buffered": 31,
-  "zones_received_from_edit": 23,
+  "signals_buffered": 37,
+  "zones_received_from_edit": 29,
   "zone_wait_timeouts": 8,
   "market_orders_no_zone": 0,
-  "market_orders_in_zone": 1,
+  "market_orders_in_zone": 4,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
-  "zone_tracking_total": 18,
-  "zone_best_entry_reached": 14,
-  "zone_worst_entry_reached": 14,
+  "zone_tracking_total": 19,
+  "zone_best_entry_reached": 15,
+  "zone_worst_entry_reached": 15,
   "entries": [
     {
       "time": "2026-03-09 21:36:14",
@@ -797,6 +797,131 @@
       "zone_low": 5182.0,
       "zone_high": 5187.0,
       "wait_time": 3.9718594551086426
+    },
+    {
+      "time": "2026-03-12 11:12:38",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-12 11:12:44",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5151.0,
+      "zone_high": 5156.0,
+      "wait_time": 5.232961416244507
+    },
+    {
+      "time": "2026-03-12 11:12:44",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 5153.42,
+      "zone_low": 5151.0,
+      "zone_high": 5156.0
+    },
+    {
+      "time": "2026-03-12 11:20:34",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-12 11:20:39",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5151.5,
+      "zone_high": 5156.5,
+      "wait_time": 5.272287368774414
+    },
+    {
+      "time": "2026-03-12 11:20:39",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 5154.31,
+      "zone_low": 5151.5,
+      "zone_high": 5156.5
+    },
+    {
+      "time": "2026-03-12 11:34:29",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-12 11:34:34",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5149.5,
+      "zone_high": 5151.5,
+      "wait_time": 5.217512130737305
+    },
+    {
+      "time": "2026-03-12 11:35:03",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-12 11:35:08",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5148.5,
+      "zone_high": 5150.5,
+      "wait_time": 5.3793721199035645
+    },
+    {
+      "time": "2026-03-12 11:35:09",
+      "type": "limit_placed",
+      "side": "BUY",
+      "limit_price": 5150.5,
+      "zone_low": 5148.5,
+      "zone_high": 5150.5
+    },
+    {
+      "time": "2026-03-12 11:35:14",
+      "type": "limit_fill",
+      "side": "BUY",
+      "limit_price": 5150.5,
+      "fill_price": null,
+      "slippage": 0,
+      "fill_time": 5.081033706665039,
+      "best_reached": true,
+      "worst_reached": true,
+      "zone_low": 5148.5,
+      "zone_high": 5150.5,
+      "price_min": 5150.52,
+      "price_max": 5150.57
+    },
+    {
+      "time": "2026-03-12 12:16:57",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-12 12:17:02",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5151.5,
+      "zone_high": 5155.5,
+      "wait_time": 5.153399705886841
+    },
+    {
+      "time": "2026-03-12 12:17:29",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-12 12:17:34",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5151.5,
+      "zone_high": 5155.5,
+      "wait_time": 5.237775564193726
+    },
+    {
+      "time": "2026-03-12 12:17:35",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 5153.77,
+      "zone_low": 5151.5,
+      "zone_high": 5155.5
     }
   ],
   "limit_placement_failed": 1
