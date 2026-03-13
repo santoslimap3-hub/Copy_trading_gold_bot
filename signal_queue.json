@@ -1,30 +1,6 @@
 {
   "queue": [
     {
-      "id": 3761,
-      "signal_type": "TRADE",
-      "side": "BUY",
-      "entry_price": 5255.48,
-      "sl_price": 5247.48,
-      "lot_size": 0.05,
-      "tp_levels": {},
-      "msg_text": "XAU USD BUY NOW",
-      "timestamp": "2026-03-03T18:38:55.575236",
-      "executed": true
-    },
-    {
-      "id": 3771,
-      "signal_type": "TRADE",
-      "side": "BUY",
-      "entry_price": 5196.89,
-      "sl_price": 5188.89,
-      "lot_size": 0.05,
-      "tp_levels": {},
-      "msg_text": "XAU USD BUY NOW",
-      "timestamp": "2026-03-03T19:14:57.101708",
-      "executed": true
-    },
-    {
       "id": 108,
       "signal_type": "TRADE",
       "side": "BUY",
@@ -142,6 +118,54 @@
       "tp_levels": {},
       "msg_text": "XAU USD SELL NOW\n\n5206 - 5211",
       "timestamp": "2026-03-10T21:18:16.062529",
+      "executed": true
+    },
+    {
+      "id": 203,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5153.42,
+      "sl_price": 5145.42,
+      "lot_size": 12.5,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW 5151.0-5156.0",
+      "timestamp": "2026-03-12T11:12:44.316062",
+      "executed": true
+    },
+    {
+      "id": 204,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5154.31,
+      "sl_price": 5146.31,
+      "lot_size": 12.200000000000001,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW 5151.5-5156.5",
+      "timestamp": "2026-03-12T11:20:39.558407",
+      "executed": true
+    },
+    {
+      "id": 208,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5153.77,
+      "sl_price": 5145.77,
+      "lot_size": 11.66,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW 5151.5-5155.5",
+      "timestamp": "2026-03-12T12:17:35.056231",
+      "executed": true
+    },
+    {
+      "id": 210,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5162.22,
+      "sl_price": 5154.22,
+      "lot_size": 10.9,
+      "tp_levels": {},
+      "msg_text": "XAUUSD BUY NOW 5159.5-5163.5",
+      "timestamp": "2026-03-12T14:33:24.569966",
       "executed": true
     }
   ]

@@ -650,7 +650,7 @@
         // Load JSON data
         async function loadTradesData() {
             try {
-                const response = await fetch('bot_trades.json?t=' + Date.now(), { cache: 'no-store' });
+                const response = await fetch('bot_trades_moms_account.json?t=' + Date.now(), { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 tradesData = await response.json();
 

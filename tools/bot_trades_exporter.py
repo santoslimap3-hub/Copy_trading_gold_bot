@@ -92,16 +92,22 @@ class BotTradesExporter:
 
         print(f"Retrieved {len(deals)} total deals")
 
+        # Use Bali timezone (UTC+8)
+        import pytz
+        bali_tz = pytz.timezone('Asia/Makassar')
         for deal in deals:
             position_id = getattr(deal, 'position_id', None)
             if position_id is None:
                 continue
+            # Convert deal.time (seconds since epoch) to Bali time
+            dt_bali = datetime.fromtimestamp(deal.time, tz=pytz.utc).astimezone(bali_tz)
+
             deal_dict = {
                 'ticket':      deal.ticket,
                 'order':       deal.order,
                 'position_id': position_id,
                 'time':        deal.time,
-                'time_str':    datetime.fromtimestamp(deal.time).isoformat(),
+                'time_str':    dt_bali.isoformat(),
                 'type':        'BUY' if deal.type == mt5.DEAL_TYPE_BUY else 'SELL',
                 'entry':       deal.entry,
                 'magic':       deal.magic,
