@@ -1,0 +1,66 @@
+{
+  "total_signals": 0,
+  "limit_orders_placed": 0,
+  "limit_fills": 0,
+  "limit_timeouts": 0,
+  "limit_invalidated": 1,
+  "signals_buffered": 4,
+  "zones_received_from_edit": 3,
+  "zone_wait_timeouts": 0,
+  "market_orders_no_zone": 0,
+  "market_orders_in_zone": 0,
+  "market_orders_fallback": 0,
+  "total_limit_slippage": 0.0,
+  "zone_tracking_total": 0,
+  "zone_best_entry_reached": 0,
+  "zone_worst_entry_reached": 0,
+  "entries": [
+    {
+      "time": "2026-03-13 07:18:52",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-13 07:19:02",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 5075.0,
+      "zone_high": 5079.0
+    },
+    {
+      "time": "2026-03-13 09:04:57",
+      "type": "signal_buffered",
+      "side": "SELL"
+    },
+    {
+      "time": "2026-03-13 09:05:06",
+      "type": "zone_from_edit",
+      "side": "SELL",
+      "zone_low": 5093.5,
+      "zone_high": 5098.0
+    },
+    {
+      "time": "2026-03-13 12:49:58",
+      "type": "signal_buffered",
+      "side": "SELL"
+    },
+    {
+      "time": "2026-03-13 12:50:20",
+      "type": "zone_from_edit",
+      "side": "SELL",
+      "zone_low": 5121.0,
+      "zone_high": 5126.0
+    },
+    {
+      "time": "2026-03-13 13:09:35",
+      "type": "limit_invalidated",
+      "side": "SELL",
+      "reason": "Price $5113.99 <= TP $5114.00"
+    },
+    {
+      "time": "2026-03-13 13:36:34",
+      "type": "signal_buffered",
+      "side": "BUY"
+    }
+  ]
+}
