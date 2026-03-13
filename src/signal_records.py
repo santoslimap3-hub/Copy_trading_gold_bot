@@ -264,7 +264,7 @@ class SignalRecordsManager:
             side_ref[0] = rec["side"]
 
             rec["zone"] = zone
-            if tp_levels is not None:
+            if tp_levels:  # only overwrite if non-empty — empty {} from early edits must not erase real TPs
                 rec["tp_levels"] = {str(k): v for k, v in tp_levels.items()}
             if sl_price is not None:
                 rec["sl_price"] = sl_price
@@ -359,15 +359,14 @@ class SignalRecordsManager:
             seq        = rec.setdefault("outcome_sequence", [])
             level_ts   = rec.setdefault("_level_times", [])
 
-            # Cross-bot dedup: skip if same level was recorded < 2 s ago
-            if seq and seq[-1] == level and level_ts:
-                try:
-                    age = (datetime.now() -
-                           datetime.fromisoformat(level_ts[-1])).total_seconds()
-                    if age < 2.0:
-                        return
-                except Exception:
-                    pass
+            # Dedup: never record the same level twice in a row.
+            # This handles both:
+            #   - per-tick re-fire (price hovering at TP1 for many seconds)
+            #   - cross-bot simultaneous hits (bot 777 and 779 both detect TP1 at the same time)
+            # A repeat IS allowed once a different level has been recorded in between
+            # (e.g. 1→2→1→2→3 is fine; 1→1→1 is not).
+            if seq and seq[-1] == level:
+                return
 
             # Commit zone-entry flag
             if entered_zone and not rec.get("price_entered_zone"):
@@ -449,21 +448,36 @@ class SignalRecordsManager:
             rec = data["records"].get(str(msg_id))
             if rec is None:
                 return
-            event = {"time": _now(), "type": event_type, **kwargs}
             events = rec.setdefault("entry_events", [])
+            # Cross-bot dedup: skip if same event type was logged by any bot within the last 2s
+            if events and events[-1].get("type") == event_type:
+                try:
+                    age = (datetime.now() -
+                           datetime.fromisoformat(events[-1]["time"])).total_seconds()
+                    if age < 2.0:
+                        return
+                except Exception:
+                    pass
+            event = {"time": _now(), "type": event_type, **kwargs}
             events.append(event)
             rec["entry_events"] = events[-50:]   # cap at 50 per signal
             rec["last_updated"] = _now()
         self._transact(_op)
 
     def update_tp_sl(self, msg_id: int, tp_levels: Dict, sl_price: float):
-        """Update TP/SL levels on an existing record (e.g. when edit arrives after entry)."""
+        """Update TP/SL levels on an existing record (e.g. when edit arrives after entry).
+        Merges tp_levels into existing — never wipes previously stored TP keys."""
         def _op(data):
             rec = data["records"].get(str(msg_id))
             if rec is None:
                 return
-            rec["tp_levels"] = {str(k): v for k, v in tp_levels.items()}
-            rec["sl_price"]  = sl_price
+            if tp_levels:
+                existing = rec.get("tp_levels") or {}
+                merged = dict(existing)
+                merged.update({str(k): v for k, v in tp_levels.items()})
+                rec["tp_levels"] = merged
+            if sl_price:
+                rec["sl_price"] = sl_price
             rec["last_updated"] = _now()
         self._transact(_op)
 

@@ -1169,6 +1169,12 @@ async def main():
         if outcome_tracker and outcome_tracker.is_tracking(ticket):
             outcome_tracker.update_levels(ticket, sl_price=sl, tp_levels=all_tps if all_tps else None)
 
+        # Persist TP levels into signal_records so tp_levels is never left empty
+        if signal_records and all_tps:
+            mid = _ticket_to_msg_id.get(ticket)
+            if mid:
+                signal_records.update_tp_sl(mid, all_tps, sl or 0)
+
     # ── Apply SL+TP3 to ALL active positions for this msg_id ──
     async def apply_real_levels_to_split(msg_id: int, sl: Optional[float], all_tps: Dict[int, float], source: str = ""):
         """Update SL and TP3 on every live position associated with a split-entry signal."""
@@ -1258,6 +1264,7 @@ async def main():
                         state["tp1"] = all_tps[1]
                     if signal_records:
                         signal_records.set_zone(msg_id, zone_low, zone_high, all_tps, sl_parsed or state["failsafe_sl"])
+                        signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
                     record_entry_stat("limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
 
                     # If immediate positions opened, register with outcome tracker and apply real levels
@@ -1407,7 +1414,10 @@ async def main():
                         if all_tps and 1 in all_tps:
                             state["tp1"] = all_tps[1]
                         if signal_records:
+                            wait_time = time.time() - buf["buffered_at"]
                             signal_records.set_zone(msg_id, zone_low, zone_high, all_tps, sl_parsed or state["failsafe_sl"])
+                            signal_records.record_entry_event(msg_id, "zone_from_edit", side=side, zone_low=zone_low, zone_high=zone_high, wait_time=wait_time)
+                            signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
                         record_entry_stat("zone_from_edit", side=side, zone_low=zone_low, zone_high=zone_high)
 
                         if sl_parsed or tp3:
@@ -1531,8 +1541,13 @@ async def main():
                                                       limit_price=worst_entry if "worst" in key_ot else deep_entry,
                                                       fill_price=fill_px, zone_low=zone_low, zone_high=zone_high)
                                     if signal_records:
+                                        lp_used = worst_entry if "worst" in key_ot else deep_entry
                                         signal_records.record_bot_entry(mid, entered=True, entry_type="limit",
-                                                                        entry_price=fill_px or 0, ticket=filled)
+                                                                        entry_price=fill_px or lp_used, ticket=filled)
+                                        signal_records.record_entry_event(mid, "limit_fill", side=side,
+                                                                          limit_price=lp_used,
+                                                                          fill_price=fill_px or lp_used,
+                                                                          zone_low=zone_low, zone_high=zone_high)
                                         _ticket_to_msg_id[filled] = mid
                                     if outcome_tracker:
                                         outcome_tracker.register_trade(filled, side, fill_px or worst_entry,
@@ -1659,7 +1674,11 @@ async def main():
                                                                     info.get("all_tps", {}))
                                 if signal_records:
                                     signal_records.record_bot_entry(mid, entered=True, entry_type="limit",
-                                                                    entry_price=fill_px or 0, ticket=filled)
+                                                                    entry_price=fill_px or deep_entry, ticket=filled)
+                                    signal_records.record_entry_event(mid, "limit_fill", side=side,
+                                                                      limit_price=deep_entry,
+                                                                      fill_price=fill_px or deep_entry,
+                                                                      zone_low=zone_low, zone_high=zone_high)
                                     _ticket_to_msg_id[filled] = mid
                                 if info.get("sl") or info.get("all_tps"):
                                     await update_position_sl_tp(filled, info.get("sl"), info.get("all_tps") or {}, " (SPLIT-FILL)")
@@ -1754,7 +1773,11 @@ async def main():
                                                                     info.get("all_tps", {}))
                                 if signal_records:
                                     signal_records.record_bot_entry(mid, entered=True, entry_type="limit",
-                                                                    entry_price=fill_px or 0, ticket=filled)
+                                                                    entry_price=fill_px or worst_entry, ticket=filled)
+                                    signal_records.record_entry_event(mid, "limit_fill", side=side,
+                                                                      limit_price=worst_entry,
+                                                                      fill_price=fill_px or worst_entry,
+                                                                      zone_low=zone_low, zone_high=zone_high)
                                     _ticket_to_msg_id[filled] = mid
                                 if info.get("sl") or info.get("all_tps"):
                                     await update_position_sl_tp(filled, info.get("sl"), info.get("all_tps") or {}, " (WHOLE-FILL)")

@@ -1822,6 +1822,12 @@ async def main():
             outcome_tracker.update_levels(ticket, sl_price=sl, tp_levels=tp_update if tp_update else None)
             log(f"Outcome tracker updated for ticket {ticket}", "DEBUG")
 
+        # Persist TP levels into signal_records so tp_levels is never left empty
+        if signal_records and all_tp_levels:
+            mid = _ticket_to_msg_id.get(ticket)
+            if mid:
+                signal_records.update_tp_sl(mid, all_tp_levels, sl or 0)
+
     # ── Process any message text through the signal pipeline ──
     async def process_message(text: str, msg_id: int, channel_name: str, source: str = ""):
         """
@@ -2472,7 +2478,7 @@ async def main():
                                 outcome_tracker.register_trade(pos_ticket, side, actual_entry, info.get("sl") or info.get("failsafe_sl"), all_tps_from_signal)
                             if signal_records:
                                 signal_records.record_bot_entry(mid, entered=True, entry_type="limit", entry_price=actual_entry, ticket=pos_ticket)
-                                signal_records.record_entry_event(mid, "limit_fill", side=side, limit_price=limit_price, fill_price=fill_price, slippage=slippage, fill_time=elapsed, zone_low=info["zone_low"], zone_high=info["zone_high"])
+                                signal_records.record_entry_event(mid, "limit_fill", side=side, limit_price=limit_price, fill_price=fill_price or limit_price, slippage=slippage, fill_time=elapsed, zone_low=info["zone_low"], zone_high=info["zone_high"])
                                 signal_records.update_tp_sl(mid, all_tps_from_signal, info.get("sl") or info.get("failsafe_sl") or 0)
                                 _ticket_to_msg_id[pos_ticket] = mid
 
