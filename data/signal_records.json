@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-03-13T13:36:34",
+  "last_updated": "2026-03-13T15:57:47",
   "records": {
     "4091": {
       "msg_id": 4091,
@@ -1042,6 +1042,140 @@
       "tracking_ended_at": null,
       "last_updated": "2026-03-13T13:36:34",
       "_level_times": []
+    },
+    "4205": {
+      "msg_id": 4205,
+      "side": "BUY",
+      "signal_time": "2026-03-13T15:53:37",
+      "signal_price": 5041.81,
+      "zone": [
+        5138.0,
+        5142.0
+      ],
+      "signal_to_worst_edge": [
+        -100.19,
+        "outside"
+      ],
+      "tp_levels": null,
+      "sl_price": 5130.0,
+      "price_entered_zone": false,
+      "price_extreme_at_zone_arrival": 5039.91,
+      "best_prices_per_tp": [],
+      "outcome_sequence": [],
+      "bot_entries": {},
+      "entry_events": [
+        {
+          "time": "2026-03-13T15:53:38",
+          "type": "signal_buffered",
+          "side": "BUY"
+        },
+        {
+          "time": "2026-03-13T15:53:45",
+          "type": "zone_from_edit",
+          "side": "BUY",
+          "zone_low": 5138.0,
+          "zone_high": 5142.0,
+          "wait_time": 7.499862909317017
+        },
+        {
+          "time": "2026-03-13T15:53:45",
+          "type": "limit_placed",
+          "side": "BUY",
+          "limit_price": 5138.0,
+          "zone_low": 5138.0,
+          "zone_high": 5142.0
+        },
+        {
+          "time": "2026-03-13T15:53:46",
+          "type": "zone_from_edit",
+          "side": "BUY",
+          "zone_low": 5138.0,
+          "zone_high": 5142.0,
+          "wait_time": 8.062464714050293
+        },
+        {
+          "time": "2026-03-13T15:53:46",
+          "type": "limit_placed",
+          "side": "BUY",
+          "zone_low": 5138.0,
+          "zone_high": 5142.0
+        }
+      ],
+      "tracking_active": true,
+      "tracking_complete": false,
+      "tracking_started_at": "2026-03-13T15:53:46",
+      "tracking_ended_at": null,
+      "last_updated": "2026-03-13T15:53:46",
+      "_level_times": []
+    },
+    "4207": {
+      "msg_id": 4207,
+      "side": "BUY",
+      "signal_time": "2026-03-13T15:56:22",
+      "signal_price": 5041.01,
+      "zone": [
+        5035.0,
+        5040.5
+      ],
+      "signal_to_worst_edge": [
+        0.51,
+        "outside"
+      ],
+      "tp_levels": null,
+      "sl_price": 5032.5,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 5040.08,
+      "best_prices_per_tp": [],
+      "outcome_sequence": [
+        0
+      ],
+      "bot_entries": {},
+      "entry_events": [
+        {
+          "time": "2026-03-13T15:56:22",
+          "type": "signal_buffered",
+          "side": "BUY"
+        },
+        {
+          "time": "2026-03-13T15:56:46",
+          "type": "zone_from_edit",
+          "side": "BUY",
+          "zone_low": 5035.0,
+          "zone_high": 5040.5,
+          "wait_time": 23.703105449676514
+        },
+        {
+          "time": "2026-03-13T15:56:46",
+          "type": "limit_placed",
+          "side": "BUY",
+          "limit_price": 5040.5,
+          "zone_low": 5035.0,
+          "zone_high": 5040.5
+        },
+        {
+          "time": "2026-03-13T15:56:47",
+          "type": "zone_from_edit",
+          "side": "BUY",
+          "zone_low": 5035.0,
+          "zone_high": 5040.5,
+          "wait_time": 24.218789100646973
+        },
+        {
+          "time": "2026-03-13T15:56:47",
+          "type": "limit_placed",
+          "side": "BUY",
+          "zone_low": 5035.0,
+          "zone_high": 5040.5
+        }
+      ],
+      "tracking_active": true,
+      "tracking_complete": false,
+      "tracking_started_at": "2026-03-13T15:56:47",
+      "tracking_ended_at": null,
+      "last_updated": "2026-03-13T15:57:47",
+      "_level_times": [
+        "2026-03-13T15:57:47"
+      ]
     }
   }
 }
