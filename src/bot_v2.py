@@ -2532,12 +2532,23 @@ async def main():
                         reason = ""
 
                         if sl_val:
-                            if side == "BUY" and current_price <= sl_val:
-                                invalidated = True
-                                reason = f"Price ${current_price:.2f} <= SL ${sl_val:.2f}"
-                            elif side == "SELL" and current_price >= sl_val:
-                                invalidated = True
-                                reason = f"Price ${current_price:.2f} >= SL ${sl_val:.2f}"
+                            # SL invalidation only applies if price has already reached the zone.
+                            # For BUY STOP orders (price far below zone) current price is always
+                            # below SL before the order fills — that is expected, not a signal to cancel.
+                            # We only cancel on SL if price_max_seen reached zone_low (BUY)
+                            # or price_min_seen reached zone_high (SELL), meaning price entered/approached
+                            # the zone and then reversed all the way through SL.
+                            price_reached_zone = (
+                                (side == "BUY"  and info.get("price_max_seen", float('-inf')) >= info["zone_low"]) or
+                                (side == "SELL" and info.get("price_min_seen", float('inf'))  <= info["zone_high"])
+                            )
+                            if price_reached_zone:
+                                if side == "BUY" and current_price <= sl_val:
+                                    invalidated = True
+                                    reason = f"Price ${current_price:.2f} <= SL ${sl_val:.2f}"
+                                elif side == "SELL" and current_price >= sl_val:
+                                    invalidated = True
+                                    reason = f"Price ${current_price:.2f} >= SL ${sl_val:.2f}"
 
                         if not invalidated and tp_val:
                             if side == "BUY" and current_price >= tp_val:

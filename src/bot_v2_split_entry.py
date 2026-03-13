@@ -1629,10 +1629,15 @@ async def main():
                             invalidated = False
                             reason = ""
                             if sl_val:
-                                if side == "BUY" and cp <= sl_val:
-                                    invalidated, reason = True, f"Price ${cp:.2f} <= SL ${sl_val:.2f}"
-                                elif side == "SELL" and cp >= sl_val:
-                                    invalidated, reason = True, f"Price ${cp:.2f} >= SL ${sl_val:.2f}"
+                                price_reached_zone = (
+                                    (side == "BUY"  and info.get("price_max_seen", float('-inf')) >= zone_low) or
+                                    (side == "SELL" and info.get("price_min_seen", float('inf'))  <= zone_high)
+                                )
+                                if price_reached_zone:
+                                    if side == "BUY" and cp <= sl_val:
+                                        invalidated, reason = True, f"Price ${cp:.2f} <= SL ${sl_val:.2f}"
+                                    elif side == "SELL" and cp >= sl_val:
+                                        invalidated, reason = True, f"Price ${cp:.2f} >= SL ${sl_val:.2f}"
                             if not invalidated and tp_val:
                                 if side == "BUY" and cp >= tp_val:
                                     invalidated, reason = True, f"Price ${cp:.2f} >= TP ${tp_val:.2f}"
