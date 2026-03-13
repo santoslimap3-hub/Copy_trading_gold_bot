@@ -11,6 +11,42 @@
       "msg_text": "XAU USD BUY NOW\n\n5165.50 - 5160\n\n\ud83e\udd47TP1 5168\n\ud83e\udd48TP2 5170\n\ud83e\udd49TP3 5172\n\ud83c\udfc5TP4 5174\n      TP5 5180\n\n\ud83d\udeabSL 5156",
       "timestamp": "2026-03-11T13:51:19.496998",
       "executed": true
+    },
+    {
+      "id": 4102,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5170.9,
+      "sl_price": 5162.9,
+      "lot_size": 0.05,
+      "tp_levels": {},
+      "msg_text": "XAU USD BUY NOW\n\n\n5171 - 5167",
+      "timestamp": "2026-03-11T15:15:04.381815",
+      "executed": true
+    },
+    {
+      "id": 4113,
+      "signal_type": "TRADE",
+      "side": "SELL",
+      "entry_price": 5178.36,
+      "sl_price": 5186.36,
+      "lot_size": 0.05,
+      "tp_levels": {},
+      "msg_text": "XAU USD SELL NOW\n\n5178 - 5183",
+      "timestamp": "2026-03-12T07:43:05.205439",
+      "executed": true
+    },
+    {
+      "id": 4129,
+      "signal_type": "TRADE",
+      "side": "BUY",
+      "entry_price": 5176.41,
+      "sl_price": 5168.41,
+      "lot_size": 0.05,
+      "tp_levels": {},
+      "msg_text": "XAU USD BUY NOW\n\n5176.50 - 5171.50",
+      "timestamp": "2026-03-12T11:16:03.205776",
+      "executed": true
     }
   ]
 }
