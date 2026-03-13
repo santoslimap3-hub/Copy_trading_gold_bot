@@ -228,7 +228,7 @@ def check_autotrading_status():
 
 def ensure_mt5_connection():
     global mt5_connected, mt5_connection_losses
-    mt5_path = r"C:\MT5_1\terminal64.exe"
+    mt5_path = r"C:\MT5_2\terminal64.exe"
     log(f"Initializing MT5 at: {mt5_path}", "INFO")
     init_ok = mt5.initialize(path=mt5_path)
     if not init_ok:
@@ -1907,10 +1907,12 @@ async def main():
 
                     if outcome_tracker.is_shadow_tracking(ticket):
                         if outcome_tracker.should_finalize(ticket):
+                            # Re-fetch info so finalization sees levels updated by check_levels() above
+                            info = outcome_tracker.get_trade_info(ticket) or info
                             seq  = info.get("sequence_so_far", [])
                             profit = info.get("position_profit", 0.0) or 0.0
                             levels_hit = set(info.get("levels_hit", []))
-                            tp_nums = [k for k in info["tp_levels"].keys() if isinstance(k, int)]
+                            tp_nums = [int(k) for k in info["tp_levels"].keys()]
                             highest_tp = f"TP{max(tp_nums)}" if tp_nums else None
                             reason = f"shadow:{highest_tp}_hit" if (highest_tp and highest_tp in levels_hit) \
                                      else ("shadow:SL_hit" if "SL" in levels_hit else "shadow:timeout")

@@ -5,7 +5,8 @@
       "Bash(python -c \"import ast; ast.parse\\(open\\(''src/bot_v2_test.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
       "Bash(python -c \":*)",
       "Read(//tmp/**)",
-      "Bash(python tools/make_test_bot.py)"
+      "Bash(python tools/make_test_bot.py)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

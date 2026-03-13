@@ -2697,12 +2697,14 @@ async def main():
                     # If position is already shadow-tracked, check if we should finalize
                     if outcome_tracker.is_shadow_tracking(ticket):
                         if outcome_tracker.should_finalize(ticket):
+                            # Re-fetch info so finalization sees levels updated by check_levels() above
+                            info = outcome_tracker.get_trade_info(ticket) or info
                             seq = info.get("sequence_so_far", [])
                             seq_str = " → ".join(seq) if seq else "NONE"
                             profit = info.get("position_profit", 0.0) or 0.0
                             # Determine why shadow tracking ended
                             levels_hit = set(info.get("levels_hit", []))
-                            tp_nums = [k for k in info["tp_levels"].keys() if isinstance(k, int)]
+                            tp_nums = [int(k) for k in info["tp_levels"].keys()]
                             highest_tp = f"TP{max(tp_nums)}" if tp_nums else None
                             if highest_tp and highest_tp in levels_hit:
                                 reason = f"shadow:{highest_tp}_hit"

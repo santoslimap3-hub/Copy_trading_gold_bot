@@ -88,6 +88,9 @@ class TradeOutcomeTracker:
                     self._preserved_trades[int(ticket_str)] = trade
                     skipped += 1
                     continue
+                # Convert tp_levels keys back from strings to ints (JSON serializes int keys as strings)
+                if "tp_levels" in trade:
+                    trade["tp_levels"] = {int(k): v for k, v in trade["tp_levels"].items()}
                 # Convert levels_hit back from list to set
                 trade["levels_hit"] = set(trade.get("levels_hit", []))
                 # levels_breached tracks which levels price is CURRENTLY past
@@ -299,7 +302,7 @@ class TradeOutcomeTracker:
             return True
 
         # Find the highest registered TP level
-        tp_nums = [k for k in trade["tp_levels"].keys() if isinstance(k, int)]
+        tp_nums = [int(k) for k in trade["tp_levels"].keys()]
         if tp_nums:
             highest_tp = f"TP{max(tp_nums)}"
             if highest_tp in trade["levels_hit"]:
