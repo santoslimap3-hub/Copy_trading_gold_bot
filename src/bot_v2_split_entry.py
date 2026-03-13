@@ -120,7 +120,8 @@ _RE_STOP_LOSS  = re.compile(r"SL\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_TP1        = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_TP_BARE    = re.compile(r"\bTP\s+(\d{4,5}(?:\.\d{1,2})?)\b", re.IGNORECASE)
 _RE_ENTRY_ZONE = re.compile(r"(\d{4,5}(?:\.\d{1,2})?)\s*[-\u2013\u2014]\s*(\d{4,5}(?:\.\d{1,2})?)")
-_RE_TRADE_CLOSURE = re.compile(r"(?:TP\s*\d[\s,\d]*\s*HIT|SL\s+HIT)", re.IGNORECASE | re.MULTILINE)
+# Only cancel pending orders on TP3+ HIT or SL HIT (TP1/TP2 hits keep the trade running)
+_RE_TRADE_CLOSURE = re.compile(r"(?:TP\s*[3-9][\s,\d]*\s*HIT|SL\s+HIT)", re.IGNORECASE | re.MULTILINE)
 
 _LOG_SEP = "=" * 70
 _cached_filling_mode: Optional[int] = None
@@ -431,6 +432,32 @@ def set_take_profit(ticket: int, tp_price: float) -> bool:
     if not success:
         log(f"TP update FAILED - Retcode: {result.retcode}", "WARN")
     return success
+
+
+def close_position(ticket: int, side: str) -> bool:
+    """Close an open position at market. Used for BE-close of worst entry when deep fills."""
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        log(f"close_position: ticket {ticket} not found", "WARN")
+        return False
+    close_type   = mt5.ORDER_TYPE_SELL if side == "BUY" else mt5.ORDER_TYPE_BUY
+    filling_mode = get_filling_mode()
+    request = {
+        "action":       mt5.TRADE_ACTION_DEAL,
+        "symbol":       SYMBOL,
+        "volume":       float(pos[0].volume),
+        "type":         close_type,
+        "position":     ticket,
+        "type_filling": filling_mode,
+        "magic":        MAGIC,
+        "comment":      "BE close worst entry",
+    }
+    result = mt5.order_send(request)
+    if result and result.retcode == mt5.TRADE_RETCODE_DONE:
+        log(f"Worst entry position {ticket} CLOSED at market (BE)", "INFO")
+        return True
+    log(f"close_position FAILED for {ticket}: {result.comment if result else 'None'}", "WARN")
+    return False
 
 
 # ===================== PARSING =====================
@@ -1114,13 +1141,17 @@ async def main():
                 log(f"SL ${sl:.5f} invalid for {side} at ${entry:.5f} — ignoring", "WARN")
 
         if all_tps:
-            tp3 = select_tp3(all_tps)
+            # Only set TP if TP3 is explicitly present — no fallback to TP1/TP2.
+            # Interim messages like "TP1 5081.50 SL 5070" must not overwrite TP.
+            tp3 = all_tps.get(3)
             if tp3:
                 valid_tp = (side == "BUY" and tp3 > entry) or (side == "SELL" and tp3 < entry)
                 if valid_tp:
                     new_tp = tp3
                 else:
                     log(f"TP3 ${tp3:.5f} invalid for {side} at ${entry:.5f} — ignoring", "WARN")
+            else:
+                log(f"No TP3 in update — keeping current TP ${current_tp:.5f}", "DEBUG")
 
         if abs(new_sl - current_sl) < 0.001 and abs(new_tp - current_tp) < 0.001:
             log(f"No SL/TP changes needed for ticket {ticket}", "DEBUG")
@@ -1521,28 +1552,27 @@ async def main():
                                                   (side == "SELL" and cp and cp <= worst_entry)
 
                             if price_back_to_worst:
-                                # BE on worst position
+                                # CLOSE the worst position at market (it's at breakeven)
                                 if not info["worst_be_done"]:
-                                    log(f"BE TRIGGER (both filled): price ${cp:.2f} reached worst entry ${worst_entry:.2f}", "INFO")
-                                    worst_actual_entry = entry_prices.get(worst_pos, worst_entry)
-                                    ok = await run_mt5(lambda: set_stop_loss(worst_pos, worst_actual_entry))
+                                    log(f"BE TRIGGER (both filled): price ${cp:.2f} returned to worst entry ${worst_entry:.2f}", "INFO")
+                                    log(f"  Closing worst position {worst_pos} at market (breakeven)", "INFO")
+                                    ok = await run_mt5(lambda _t=worst_pos, _s=side: close_position(_t, _s))
                                     if ok:
                                         info["worst_be_done"] = True
-                                        log(f"  Worst position {worst_pos} SL → BE @ ${worst_actual_entry:.2f}", "INFO")
                                     else:
-                                        log(f"  Failed to set BE on worst position {worst_pos}", "WARN")
+                                        log(f"  Failed to close worst position {worst_pos} — retrying next tick", "WARN")
 
-                                # BE on deep position (SL = deep_entry + buffer)
-                                if not info["deep_be_done"]:
+                                # Set SL on deep position to deep_entry + buffer (true breakeven for deep)
+                                if info["worst_be_done"] and not info["deep_be_done"]:
                                     deep_actual_entry = entry_prices.get(deep_pos, deep_entry)
                                     be_sl = (deep_actual_entry + SPLIT_ENTRY_BE_BUFFER) if side == "BUY" \
                                             else (deep_actual_entry - SPLIT_ENTRY_BE_BUFFER)
                                     ok = await run_mt5(lambda: set_stop_loss(deep_pos, be_sl))
                                     if ok:
                                         info["deep_be_done"] = True
-                                        log(f"  Deep position {deep_pos} SL → ${be_sl:.2f} (BE+buffer)", "INFO")
+                                        log(f"  Deep position {deep_pos} SL → ${be_sl:.2f} (BE + ${SPLIT_ENTRY_BE_BUFFER} buffer)", "INFO")
                                     else:
-                                        log(f"  Failed to set BE on deep position {deep_pos}", "WARN")
+                                        log(f"  Failed to set SL on deep position {deep_pos}", "WARN")
 
                         # ── Only worst filled, deep still pending ──
                         elif worst_pos and not deep_pos:
@@ -1639,23 +1669,30 @@ async def main():
                         market_actual_entry = info.get("market_entry_price", worst_entry)
 
                         if market_pos and deep_pos:
-                            # Both active — watch for price return to market entry (worst)
+                            # Both active — watch for price return to market (worst) entry level
                             price_back = (side == "BUY"  and cp and cp >= market_actual_entry) or \
                                          (side == "SELL" and cp and cp <= market_actual_entry)
                             if price_back:
+                                # CLOSE the market (worst) position at breakeven
                                 if not info["worst_be_done"]:
-                                    ok = await run_mt5(lambda: set_stop_loss(market_pos, market_actual_entry))
+                                    log(f"BE TRIGGER (market+deep): price ${cp:.2f} returned to market entry ${market_actual_entry:.2f}", "INFO")
+                                    log(f"  Closing market (worst) position {market_pos} at market (breakeven)", "INFO")
+                                    ok = await run_mt5(lambda _t=market_pos, _s=side: close_position(_t, _s))
                                     if ok:
                                         info["worst_be_done"] = True
-                                        log(f"BE (both filled): market pos {market_pos} SL → ${market_actual_entry:.2f}", "INFO")
-                                if not info["deep_be_done"]:
+                                    else:
+                                        log(f"  Failed to close market position {market_pos} — retrying next tick", "WARN")
+                                # Set SL on deep position to deep_entry + buffer
+                                if info["worst_be_done"] and not info["deep_be_done"]:
                                     deep_actual = entry_prices.get(deep_pos, deep_entry)
                                     be_sl = (deep_actual + SPLIT_ENTRY_BE_BUFFER) if side == "BUY" \
                                             else (deep_actual - SPLIT_ENTRY_BE_BUFFER)
                                     ok = await run_mt5(lambda: set_stop_loss(deep_pos, be_sl))
                                     if ok:
                                         info["deep_be_done"] = True
-                                        log(f"BE (both filled): deep pos {deep_pos} SL → ${be_sl:.2f}", "INFO")
+                                        log(f"  Deep pos {deep_pos} SL → ${be_sl:.2f} (BE + ${SPLIT_ENTRY_BE_BUFFER} buffer)", "INFO")
+                                    else:
+                                        log(f"  Failed to set SL on deep position {deep_pos}", "WARN")
 
                         elif market_pos and not deep_pos:
                             # Only market position — at TP1, move to BE
