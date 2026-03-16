@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-03-16T07:28:13",
+  "last_updated": "2026-03-16T13:18:30",
   "records": {
     "4091": {
       "msg_id": 4091,
@@ -1305,6 +1305,466 @@
         "2026-03-16T07:10:32",
         "2026-03-16T07:14:20",
         "2026-03-16T07:28:13"
+      ]
+    },
+    "4221": {
+      "msg_id": 4221,
+      "side": "BUY",
+      "signal_time": "2026-03-16T08:43:54",
+      "signal_price": 4986.25,
+      "zone": [
+        4982.0,
+        4986.0
+      ],
+      "signal_to_worst_edge": [
+        0.25,
+        "outside"
+      ],
+      "tp_levels": null,
+      "sl_price": 4978.0,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 4985.37,
+      "best_prices_per_tp": [],
+      "outcome_sequence": [
+        0
+      ],
+      "bot_entries": {},
+      "entry_events": [
+        {
+          "time": "2026-03-16T08:43:54",
+          "type": "signal_buffered",
+          "side": "BUY"
+        },
+        {
+          "time": "2026-03-16T08:44:02",
+          "type": "zone_from_edit",
+          "side": "BUY",
+          "zone_low": 4982.0,
+          "zone_high": 4986.0,
+          "wait_time": 8.32811713218689
+        },
+        {
+          "time": "2026-03-16T08:44:02",
+          "type": "limit_placed",
+          "side": "BUY",
+          "limit_price": 4986.0,
+          "zone_low": 4982.0,
+          "zone_high": 4986.0
+        },
+        {
+          "time": "2026-03-16T08:44:03",
+          "type": "zone_from_edit",
+          "side": "BUY",
+          "zone_low": 4982.0,
+          "zone_high": 4986.0,
+          "wait_time": 8.438336372375488
+        },
+        {
+          "time": "2026-03-16T08:44:03",
+          "type": "limit_placed",
+          "side": "BUY",
+          "zone_low": 4982.0,
+          "zone_high": 4986.0
+        }
+      ],
+      "tracking_active": true,
+      "tracking_complete": false,
+      "tracking_started_at": "2026-03-16T08:44:02",
+      "tracking_ended_at": null,
+      "last_updated": "2026-03-16T08:46:04",
+      "_level_times": [
+        "2026-03-16T08:46:04"
+      ]
+    },
+    "4229": {
+      "msg_id": 4229,
+      "side": "SELL",
+      "signal_time": "2026-03-16T10:49:26",
+      "signal_price": 4993.88,
+      "zone": [
+        4994.0,
+        4998.0
+      ],
+      "signal_to_worst_edge": [
+        -0.12,
+        "outside"
+      ],
+      "tp_levels": null,
+      "sl_price": 5002.0,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 4993.98,
+      "best_prices_per_tp": [
+        [
+          4998.0,
+          "tp1"
+        ]
+      ],
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "bot_entries": {
+        "777": {
+          "entered": true,
+          "entry_type": "limit",
+          "entry_price": 4994.0,
+          "ticket": 985602374
+        }
+      },
+      "entry_events": [
+        {
+          "time": "2026-03-16T10:49:26",
+          "type": "signal_buffered",
+          "side": "SELL"
+        },
+        {
+          "time": "2026-03-16T10:49:33",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 4994.0,
+          "zone_high": 4998.0,
+          "wait_time": 7.85940146446228
+        },
+        {
+          "time": "2026-03-16T10:49:34",
+          "type": "limit_placed",
+          "side": "SELL",
+          "limit_price": 4994.0,
+          "zone_low": 4994.0,
+          "zone_high": 4998.0
+        },
+        {
+          "time": "2026-03-16T10:49:34",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 4994.0,
+          "zone_high": 4998.0,
+          "wait_time": 8.155524730682373
+        },
+        {
+          "time": "2026-03-16T10:49:34",
+          "type": "limit_placed",
+          "side": "SELL",
+          "zone_low": 4994.0,
+          "zone_high": 4998.0
+        },
+        {
+          "time": "2026-03-16T10:49:45",
+          "type": "limit_fill",
+          "side": "SELL",
+          "limit_price": 4994.0,
+          "fill_price": 4994.0,
+          "slippage": 0,
+          "fill_time": 11.015573501586914,
+          "zone_low": 4994.0,
+          "zone_high": 4998.0
+        }
+      ],
+      "tracking_active": false,
+      "tracking_complete": true,
+      "tracking_started_at": "2026-03-16T10:49:34",
+      "tracking_ended_at": "2026-03-16T11:10:29",
+      "last_updated": "2026-03-16T11:10:29",
+      "_level_times": [
+        "2026-03-16T10:49:43",
+        "2026-03-16T11:10:29"
+      ]
+    },
+    "4235": {
+      "msg_id": 4235,
+      "side": "SELL",
+      "signal_time": "2026-03-16T11:11:35",
+      "signal_price": 5005.25,
+      "zone": [
+        5005.0,
+        5010.0
+      ],
+      "signal_to_worst_edge": [
+        0.25,
+        "inside"
+      ],
+      "tp_levels": {
+        "1": 5002.0
+      },
+      "sl_price": 5014.0,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 5006.06,
+      "best_prices_per_tp": [
+        [
+          5009.47,
+          "tp1"
+        ]
+      ],
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "bot_entries": {
+        "777": {
+          "entered": true,
+          "entry_type": "market",
+          "entry_price": 5005.69,
+          "ticket": 985712672
+        }
+      },
+      "entry_events": [
+        {
+          "time": "2026-03-16T11:11:35",
+          "type": "signal_buffered",
+          "side": "SELL"
+        },
+        {
+          "time": "2026-03-16T11:11:50",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5005.0,
+          "zone_high": 5010.0,
+          "wait_time": 15.312497854232788
+        },
+        {
+          "time": "2026-03-16T11:11:51",
+          "type": "market_entry_in_zone",
+          "side": "SELL",
+          "entry_price": 5005.69,
+          "zone_low": 5005.0,
+          "zone_high": 5010.0
+        },
+        {
+          "time": "2026-03-16T11:11:51",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5005.0,
+          "zone_high": 5010.0,
+          "wait_time": 15.640647649765015
+        },
+        {
+          "time": "2026-03-16T11:11:51",
+          "type": "limit_placed",
+          "side": "SELL",
+          "zone_low": 5005.0,
+          "zone_high": 5010.0
+        }
+      ],
+      "tracking_active": false,
+      "tracking_complete": true,
+      "tracking_started_at": "2026-03-16T11:11:51",
+      "tracking_ended_at": "2026-03-16T11:20:05",
+      "last_updated": "2026-03-16T11:20:05",
+      "_level_times": [
+        "2026-03-16T11:11:51",
+        "2026-03-16T11:20:04"
+      ]
+    },
+    "4239": {
+      "msg_id": 4239,
+      "side": "SELL",
+      "signal_time": "2026-03-16T11:23:22",
+      "signal_price": 5018.98,
+      "zone": [
+        5019.5,
+        5023.5
+      ],
+      "signal_to_worst_edge": [
+        -0.52,
+        "outside"
+      ],
+      "tp_levels": {
+        "1": 5017.0,
+        "2": 5015.0,
+        "3": 5013.0,
+        "4": 5011.0,
+        "5": 5005.0
+      },
+      "sl_price": 5027.0,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 5019.51,
+      "best_prices_per_tp": [
+        [
+          5022.77,
+          "tp1"
+        ],
+        [
+          5019.84,
+          "tp2"
+        ]
+      ],
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "bot_entries": {
+        "777": {
+          "entered": true,
+          "entry_type": "limit",
+          "entry_price": 5019.5,
+          "ticket": 985785607
+        }
+      },
+      "entry_events": [
+        {
+          "time": "2026-03-16T11:23:22",
+          "type": "signal_buffered",
+          "side": "SELL"
+        },
+        {
+          "time": "2026-03-16T11:23:41",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5019.5,
+          "zone_high": 5023.5,
+          "wait_time": 18.59427547454834
+        },
+        {
+          "time": "2026-03-16T11:23:42",
+          "type": "limit_placed",
+          "side": "SELL",
+          "limit_price": 5019.5,
+          "zone_low": 5019.5,
+          "zone_high": 5023.5
+        },
+        {
+          "time": "2026-03-16T11:23:42",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5019.5,
+          "zone_high": 5023.5,
+          "wait_time": 19.140624046325684
+        },
+        {
+          "time": "2026-03-16T11:23:42",
+          "type": "limit_placed",
+          "side": "SELL",
+          "zone_low": 5019.5,
+          "zone_high": 5023.5
+        },
+        {
+          "time": "2026-03-16T11:24:50",
+          "type": "limit_fill",
+          "side": "SELL",
+          "limit_price": 5019.5,
+          "fill_price": 5019.5,
+          "slippage": 0,
+          "fill_time": 68.53032088279724,
+          "zone_low": 5019.5,
+          "zone_high": 5023.5
+        }
+      ],
+      "tracking_active": false,
+      "tracking_complete": true,
+      "tracking_started_at": "2026-03-16T11:23:42",
+      "tracking_ended_at": "2026-03-16T11:53:26",
+      "last_updated": "2026-03-16T11:53:26",
+      "_level_times": [
+        "2026-03-16T11:24:42",
+        "2026-03-16T11:31:01",
+        "2026-03-16T11:43:23",
+        "2026-03-16T11:45:20",
+        "2026-03-16T11:45:52",
+        "2026-03-16T11:47:21",
+        "2026-03-16T11:49:48",
+        "2026-03-16T11:53:26"
+      ]
+    },
+    "4249": {
+      "msg_id": 4249,
+      "side": "SELL",
+      "signal_time": "2026-03-16T13:16:30",
+      "signal_price": 5029.74,
+      "zone": [
+        5029.5,
+        5034.5
+      ],
+      "signal_to_worst_edge": [
+        0.24,
+        "inside"
+      ],
+      "tp_levels": {
+        "1": 5027.5
+      },
+      "sl_price": 5040.0,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 5030.05,
+      "best_prices_per_tp": [
+        [
+          5030.11,
+          "tp1"
+        ]
+      ],
+      "outcome_sequence": [
+        0,
+        1
+      ],
+      "bot_entries": {
+        "777": {
+          "entered": true,
+          "entry_type": "limit",
+          "entry_price": 5029.5,
+          "ticket": 986439613
+        }
+      },
+      "entry_events": [
+        {
+          "time": "2026-03-16T13:16:30",
+          "type": "signal_buffered",
+          "side": "SELL"
+        },
+        {
+          "time": "2026-03-16T13:16:44",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5029.5,
+          "zone_high": 5034.5,
+          "wait_time": 14.281209945678711
+        },
+        {
+          "time": "2026-03-16T13:16:44",
+          "type": "limit_placed",
+          "side": "SELL",
+          "limit_price": 5029.5,
+          "zone_low": 5029.5,
+          "zone_high": 5034.5
+        },
+        {
+          "time": "2026-03-16T13:16:44",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5029.5,
+          "zone_high": 5034.5,
+          "wait_time": 14.624959468841553
+        },
+        {
+          "time": "2026-03-16T13:16:45",
+          "type": "limit_placed",
+          "side": "SELL",
+          "zone_low": 5029.5,
+          "zone_high": 5034.5
+        },
+        {
+          "time": "2026-03-16T13:16:59",
+          "type": "limit_fill",
+          "side": "SELL",
+          "limit_price": 5029.5,
+          "fill_price": 5029.5,
+          "slippage": 0,
+          "fill_time": 14.484419107437134,
+          "zone_low": 5029.5,
+          "zone_high": 5034.5
+        }
+      ],
+      "tracking_active": false,
+      "tracking_complete": true,
+      "tracking_started_at": "2026-03-16T13:16:44",
+      "tracking_ended_at": "2026-03-16T13:18:30",
+      "last_updated": "2026-03-16T13:18:30",
+      "_level_times": [
+        "2026-03-16T13:16:53",
+        "2026-03-16T13:18:29"
       ]
     }
   }
