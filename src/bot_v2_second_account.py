@@ -82,6 +82,9 @@ _buffered_signals: Dict[int, Dict] = {}
 # Signal attempt log: list of (timestamp, signal, result, details)
 signal_log: list = []
 
+# Error/warning log: list of {time, level, message}
+_error_log: list = []
+
 # Initialize external modules
 signal_queue: Optional[SignalQueue] = None
 session_manager: Optional[SessionManager] = None
@@ -200,6 +203,28 @@ def is_market_open() -> bool:
 
 # ===================== HELPERS =====================
 
+def _bali_iso() -> str:
+    """Return current time as ISO-8601 string with Bali (+08:00) offset."""
+    from datetime import timezone, timedelta as _td
+    bali = timezone(_td(hours=8))
+    return datetime.now(tz=bali).isoformat(timespec='seconds')
+
+
+def _flush_errors_to_json():
+    """Write _error_log to data/errors_<MAGIC>.json (overwrites each time)."""
+    try:
+        os.makedirs(os.path.dirname(ERRORS_FILE), exist_ok=True)
+        output = {
+            "last_updated": _bali_iso(),
+            "magic": MAGIC,
+            "errors": _error_log,
+        }
+        with open(ERRORS_FILE, "w") as f:
+            json.dump(output, f, indent=2)
+    except Exception:
+        pass  # never let error logging crash the bot
+
+
 def log(msg: str, level: str = "INFO"):
     """Print with timestamp and level, respecting LOG_LEVEL setting"""
     levels = {"DEBUG": 0, "INFO": 1, "WARN": 2, "ERROR": 3}
@@ -213,6 +238,10 @@ def log(msg: str, level: str = "INFO"):
         except UnicodeEncodeError:
             msg_ascii = msg.encode('ascii', 'ignore').decode('ascii')
             print(f"[{ts}] [{level}] {msg_ascii}", flush=True)
+
+    if level in ("WARN", "ERROR"):
+        _error_log.append({"time": _bali_iso(), "level": level, "message": msg})
+        _flush_errors_to_json()
 
 
 def get_error_message(retcode: int) -> str:
@@ -982,7 +1011,8 @@ def get_fill_price_from_order(order_ticket: int) -> Optional[float]:
 
 # ===================== ENTRY STATS TRACKER =====================
 
-STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", f"entry_stats_{MAGIC}.json")
+STATS_FILE   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", f"entry_stats_{MAGIC}.json")
+ERRORS_FILE  = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", f"errors_{MAGIC}.json")
 
 
 def _load_entry_stats() -> Dict:
