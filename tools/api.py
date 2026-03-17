@@ -1,12 +1,34 @@
 from flask import Flask, jsonify, abort
 import json
 import os
+import subprocess
+import sys
 
 app = Flask(__name__)
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BOT_TRADES_PATH = os.path.join(BASE_DIR, "data", "bot_trades.json")
-SIGNAL_RECORDS_PATH = os.path.join(BASE_DIR, "data", "signal_records.json")
+TOOLS_DIR  = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR   = os.path.dirname(TOOLS_DIR)
+BOT_TRADES_PATH       = os.path.join(BASE_DIR, "data", "bot_trades.json")
+BOT_TRADES_MOMS_PATH  = os.path.join(BASE_DIR, "data", "bot_trades_moms_account.json")
+SIGNAL_RECORDS_PATH   = os.path.join(BASE_DIR, "data", "signal_records.json")
+
+EXPORTER_MAIN = os.path.join(TOOLS_DIR, "bot_trades_exporter.py")
+EXPORTER_MOMS = os.path.join(TOOLS_DIR, "bot_trades_exporter_moms_account.py")
+
+
+def _run_exporter(script_path: str):
+    """Run a trades exporter script and suppress its stdout/stderr."""
+    try:
+        subprocess.run(
+            [sys.executable, script_path],
+            timeout=30,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.TimeoutExpired:
+        pass  # Return stale data rather than hanging the request
+    except Exception:
+        pass
 
 
 def _load_json(path: str):
@@ -18,8 +40,17 @@ def _load_json(path: str):
 
 @app.route("/trade_history", methods=["GET"])
 def trade_history():
-    """Return the full bot_trades.json payload."""
+    """Refresh bot_trades.json from MT5, then return it."""
+    _run_exporter(EXPORTER_MAIN)
     data = _load_json(BOT_TRADES_PATH)
+    return jsonify(data)
+
+
+@app.route("/trade_history_moms", methods=["GET"])
+def trade_history_moms():
+    """Refresh bot_trades_moms_account.json from MT5, then return it."""
+    _run_exporter(EXPORTER_MOMS)
+    data = _load_json(BOT_TRADES_MOMS_PATH)
     return jsonify(data)
 
 

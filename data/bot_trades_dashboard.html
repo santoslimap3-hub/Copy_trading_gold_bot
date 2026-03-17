@@ -186,6 +186,10 @@
             background-color: #3498db;
         }
 
+        .badge-780 {
+            background-color: #27ae60;
+        }
+
         .badge-778 {
             background-color: #9b59b6;
         }
@@ -358,6 +362,7 @@
         .magic-toggle-btn.active { background: #3498db; color: white; border-color: #3498db; }
         .magic-toggle-btn.active-776 { background: #e67e22; color: white; border-color: #e67e22; }
         .magic-toggle-btn.active-779 { background: #9b59b6; color: white; border-color: #9b59b6; }
+        .magic-toggle-btn.active-780 { background: #27ae60; color: white; border-color: #27ae60; }
 
         .entry-timeline {
             max-height: 500px;
@@ -569,6 +574,7 @@
                 <button class="magic-toggle-btn" onclick="switchEntryMagic(776, this)">Bot 776</button>
                 <button class="magic-toggle-btn active" onclick="switchEntryMagic(777, this)">Bot 777</button>
                 <button class="magic-toggle-btn" onclick="switchEntryMagic(779, this)">Bot 779</button>
+                <button class="magic-toggle-btn" onclick="switchEntryMagic(780, this)">Bot 780</button>
             </div>
 
             <div class="stats-grid" id="entryStatsGrid"></div>
@@ -586,6 +592,7 @@
                 <button class="magic-toggle-btn active" onclick="switchOutcomeMagic(776, this)">Bot 776</button>
                 <button class="magic-toggle-btn" onclick="switchOutcomeMagic(777, this)">Bot 777</button>
                 <button class="magic-toggle-btn" onclick="switchOutcomeMagic(779, this)">Bot 779</button>
+                <button class="magic-toggle-btn" onclick="switchOutcomeMagic(780, this)">Bot 780</button>
             </div>
 
             <div class="stats-grid" id="outcomeStatsGrid"></div>
@@ -727,7 +734,7 @@
                 const netP = tradeNetProfit(trade);
                 const typeClass   = dir === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
                 const profitClass = netP > 0 ? 'trade-profit-positive' : (netP < 0 ? 'trade-profit-negative' : 'trade-profit-zero');
-                const botBadgeClass = trade.magic === 776 ? 'badge-776' : trade.magic === 777 ? 'badge-777' : 'badge-778';
+                const botBadgeClass = trade.magic === 776 ? 'badge-776' : trade.magic === 777 ? 'badge-777' : trade.magic === 780 ? 'badge-780' : 'badge-778';
                 const reason = trade.close_reason || '';
                 const reasonClass = reasonBadgeClass(reason);
 
@@ -950,9 +957,9 @@
         function switchEntryMagic(magic, btn) {
             currentEntryMagic = magic;
             btn.parentElement.querySelectorAll('.magic-toggle-btn').forEach(b => {
-                b.classList.remove('active', 'active-776', 'active-779');
+                b.classList.remove('active', 'active-776', 'active-779', 'active-780');
             });
-            btn.classList.add(magic === 776 ? 'active-776' : magic === 779 ? 'active-779' : 'active');
+            btn.classList.add(magic === 776 ? 'active-776' : magic === 779 ? 'active-779' : magic === 780 ? 'active-780' : 'active');
             loadEntryStats(magic);
         }
 
@@ -1019,9 +1026,9 @@
         function switchOutcomeMagic(magic, btn) {
             currentOutcomeMagic = magic;
             btn.parentElement.querySelectorAll('.magic-toggle-btn').forEach(b => {
-                b.classList.remove('active', 'active-776', 'active-779');
+                b.classList.remove('active', 'active-776', 'active-779', 'active-780');
             });
-            btn.classList.add(magic === 776 ? 'active-776' : magic === 779 ? 'active-779' : 'active');
+            btn.classList.add(magic === 776 ? 'active-776' : magic === 779 ? 'active-779' : magic === 780 ? 'active-780' : 'active');
             loadTradeOutcomes(magic);
         }
 

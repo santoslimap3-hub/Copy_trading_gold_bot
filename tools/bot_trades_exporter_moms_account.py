@@ -17,7 +17,7 @@ sys.path.insert(0, SCRIPT_DIR)
 from bot_trades_exporter import BotTradesExporter
 
 # ===================== CONFIGURATION =====================
-BOT_MAGIC_NUMBERS = [779]
+BOT_MAGIC_NUMBERS = [780]
 DAYS_BACK = 365
 OUTPUT_FILE = os.path.join(PROJECT_ROOT, "data", "bot_trades_moms_account.json")
 
