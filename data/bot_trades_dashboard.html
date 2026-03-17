@@ -722,7 +722,7 @@
             let html = '';
             filteredTrades.forEach((trade, index) => {
                 const closeDate = tradeCloseDate(trade);
-                const timeStr = closeDate.toLocaleString();
+                const timeStr = closeDate.toLocaleString('en-GB', {timeZone: 'Asia/Makassar'});
                 const dir = tradeDirection(trade);
                 const netP = tradeNetProfit(trade);
                 const typeClass   = dir === 'BUY' ? 'trade-type-buy' : 'trade-type-sell';
@@ -755,8 +755,8 @@
             tbody.innerHTML = html;
 
             const sorted = [...filteredTrades].sort((a, b) => tradeCloseDate(a) - tradeCloseDate(b));
-            const startTime = tradeCloseDate(sorted[0]).toLocaleString();
-            const endTime   = tradeCloseDate(sorted[sorted.length - 1]).toLocaleString();
+            const startTime = tradeCloseDate(sorted[0]).toLocaleString('en-GB', {timeZone: 'Asia/Makassar'});
+            const endTime   = tradeCloseDate(sorted[sorted.length - 1]).toLocaleString('en-GB', {timeZone: 'Asia/Makassar'});
             document.getElementById('tableInfo').textContent =
                 `Showing ${filteredTrades.length} trade(s) | From: ${startTime} to ${endTime}`;
         }
@@ -849,7 +849,7 @@
             const data   = [];
             ordered.forEach(trade => {
                 cum += tradeNetProfit(trade);
-                labels.push(tradeCloseDate(trade).toLocaleString());
+                labels.push(tradeCloseDate(trade).toLocaleString('en-GB', {timeZone: 'Asia/Makassar'}));
                 data.push(parseFloat(cum.toFixed(2)));
             });
 
@@ -880,7 +880,7 @@
         function _renderChartBySymbol(trades) {
             // Sort all trades chronologically — this becomes the shared x-axis
             const ordered = [...trades].sort((a, b) => tradeCloseDate(a) - tradeCloseDate(b));
-            const labels  = ordered.map(t => tradeCloseDate(t).toLocaleString());
+            const labels  = ordered.map(t => tradeCloseDate(t).toLocaleString('en-GB', {timeZone: 'Asia/Makassar'}));
 
             // Unique symbols in the order they first appear
             const symbols = [];

@@ -14,7 +14,7 @@ from typing import List, Dict, Optional, Set
 
 # ===================== CONFIGURATION =====================
 SYMBOL = "XAUUSD"
-BOT_MAGIC_NUMBERS = [777]
+BOT_MAGIC_NUMBERS = [777, 780]
 DAYS_BACK = 365
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
