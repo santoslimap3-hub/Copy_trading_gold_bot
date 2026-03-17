@@ -23,7 +23,7 @@ def trade_history():
     return jsonify(data)
 
 
-@app.route("/signal_record", methods=["GET"])
+@app.route("/signal_records", methods=["GET"])
 def signal_record():
     """Return the full signal_records.json payload."""
     data = _load_json(SIGNAL_RECORDS_PATH)
