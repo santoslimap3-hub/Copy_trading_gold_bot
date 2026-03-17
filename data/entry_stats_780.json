@@ -4,8 +4,8 @@
   "limit_fills": 0,
   "limit_timeouts": 0,
   "limit_invalidated": 9,
-  "signals_buffered": 15,
-  "zones_received_from_edit": 14,
+  "signals_buffered": 16,
+  "zones_received_from_edit": 15,
   "zone_wait_timeouts": 0,
   "market_orders_no_zone": 0,
   "market_orders_in_zone": 0,
@@ -241,6 +241,18 @@
       "side": "BUY",
       "zone_low": 4975.0,
       "zone_high": 4979.0
+    },
+    {
+      "time": "2026-03-17 07:34:57",
+      "type": "signal_buffered",
+      "side": "SELL"
+    },
+    {
+      "time": "2026-03-17 07:35:05",
+      "type": "zone_from_edit",
+      "side": "SELL",
+      "zone_low": 5024.0,
+      "zone_high": 5028.0
     }
   ]
 }
