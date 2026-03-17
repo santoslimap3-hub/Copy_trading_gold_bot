@@ -64,6 +64,7 @@ FAILSAFE_TP_DISTANCE = 8.0   # $8 away from entry (failsafe until real TP arrive
 # Split entry constants
 SPLIT_ENTRY_DEEP_OFFSET = 2.5   # $2.5 from worst entry toward zone interior
 SPLIT_ENTRY_BE_BUFFER   = 0.5   # $0.5 above deep entry for breakeven SL
+TP_EARLY_EXIT_OFFSET    = 0.5   # $0.5 early exit: BUY TP lowered, SELL TP raised
 
 LIMIT_ORDER_TIMEOUT = 14400  # 4 hours
 ZONE_WAIT_TIMEOUT   = 120    # 2 min wait for zone via edit
@@ -539,6 +540,16 @@ def select_tp3(all_tps: Dict[int, float]) -> Optional[float]:
         if level in all_tps:
             return all_tps[level]
     return None
+
+
+def adjust_tp(tp_price: float, side: str) -> float:
+    """Shift TP by TP_EARLY_EXIT_OFFSET toward entry so we exit slightly before the signal's TP.
+    BUY:  TP lowered by offset (e.g. 5010 → 5009.5)
+    SELL: TP raised  by offset (e.g. 5017 → 5017.5)
+    """
+    if side == "BUY":
+        return tp_price - TP_EARLY_EXIT_OFFSET
+    return tp_price + TP_EARLY_EXIT_OFFSET
 
 
 def parse_entry_zone(text: str) -> Optional[Tuple[float, float]]:
@@ -1175,11 +1186,12 @@ async def main():
             # Interim messages like "TP1 5081.50 SL 5070" must not overwrite TP.
             tp3 = all_tps.get(3)
             if tp3:
-                valid_tp = (side == "BUY" and tp3 > entry) or (side == "SELL" and tp3 < entry)
+                adjusted = adjust_tp(tp3, side)
+                valid_tp = (side == "BUY" and adjusted > entry) or (side == "SELL" and adjusted < entry)
                 if valid_tp:
-                    new_tp = tp3
+                    new_tp = adjusted
                 else:
-                    log(f"TP3 ${tp3:.5f} invalid for {side} at ${entry:.5f} — ignoring", "WARN")
+                    log(f"TP3 ${tp3:.5f} (adjusted ${adjusted:.5f}) invalid for {side} at ${entry:.5f} — ignoring", "WARN")
             else:
                 log(f"No TP3 in update — keeping current TP ${current_tp:.5f}", "DEBUG")
 
@@ -1232,21 +1244,23 @@ async def main():
 
         # Also update pending orders SL/TP3 if still pending
         tp3 = select_tp3(all_tps) if all_tps else None
+        side_for_tp = info["side"]
+        tp3_adjusted = adjust_tp(tp3, side_for_tp) if tp3 else None
         if strategy == "split_both_pending":
             for key in ("worst_order_ticket", "deep_order_ticket"):
                 ot = info.get(key)
                 if ot:
-                    await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3 or 0:
+                    await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3_adjusted or 0:
                                   modify_limit_order_sl_tp(_ot, _sl, _tp))
         elif strategy == "split_market_and_pending":
             ot = info.get("deep_order_ticket")
             if ot:
-                await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3 or 0:
+                await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3_adjusted or 0:
                               modify_limit_order_sl_tp(_ot, _sl, _tp))
         elif strategy == "whole_lot":
             ot = info.get("order_ticket")
             if ot:
-                await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3 or 0:
+                await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3_adjusted or 0:
                               modify_limit_order_sl_tp(_ot, _sl, _tp))
 
         for ticket in tickets_to_update:
@@ -1292,10 +1306,29 @@ async def main():
                     state["tp3"]     = tp3
                     if all_tps and 1 in all_tps:
                         state["tp1"] = all_tps[1]
+
+                    strat = state.get("strategy")
                     if signal_records:
                         signal_records.set_zone(msg_id, zone_low, zone_high, all_tps, sl_parsed or state["failsafe_sl"])
-                        signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
-                    record_entry_stat("limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+
+                    if strat in ("full_market", "split_market_and_pending"):
+                        m_ticket = state.get("pos_ticket") or state.get("market_pos_ticket")
+                        m_price  = state.get("market_entry_price") or entry_prices.get(m_ticket) or signal_market_price or zone_low
+                        if outcome_tracker and m_ticket:
+                            outcome_tracker.register_trade(m_ticket, side, m_price, sl_parsed or state["failsafe_sl"], all_tps or {})
+                        if signal_records and m_ticket:
+                            signal_records.record_bot_entry(msg_id, entered=True, entry_type="market", entry_price=m_price, ticket=m_ticket)
+                            signal_records.record_entry_event(msg_id, "market_entry_in_zone", side=side, entry_price=m_price, zone_low=zone_low, zone_high=zone_high)
+                            _ticket_to_msg_id[m_ticket] = msg_id
+                        record_entry_stat("market_entry_in_zone", side=side, entry_price=m_price, zone_low=zone_low, zone_high=zone_high)
+                        if strat == "split_market_and_pending":
+                            if signal_records:
+                                signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+                            record_entry_stat("limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+                    else:
+                        if signal_records:
+                            signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+                        record_entry_stat("limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
 
                     # If immediate positions opened, register with outcome tracker and apply real levels
                     if sl_parsed or tp3:
@@ -1329,12 +1362,31 @@ async def main():
                         if ot:
                             log(f"CLOSURE '{closure}' → cancelling order {ot}", "INFO")
                             await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
+                    # Register virtual trade for any orders that never filled
+                    no_fill = not info.get("worst_pos_ticket") and not info.get("deep_pos_ticket") and not info.get("pos_ticket")
+                    if no_fill and outcome_tracker and info.get("all_tps"):
+                        vt_id    = -abs(mid)
+                        vt_sl    = info.get("sl") or info.get("failsafe_sl") or 0
+                        vt_entry = info.get("signal_market_price") or info.get("worst_entry_price") or 0
+                        if vt_entry:
+                            outcome_tracker.register_virtual_trade(vt_id, side_c, vt_entry, vt_sl, info["all_tps"],
+                                                                   cancel_reason=f"channel_closure:{closure}")
+                            log(f"VIRTUAL TRADE registered: id={vt_id} side={side_c} entry=${vt_entry:.2f}", "INFO")
                 _split_orders.clear()
             elif _split_orders:
                 log(f"Closure '{closure}' but no open positions — keeping {len(_split_orders)} split order(s) active", "INFO")
 
             for mid, buf in list(_buffered_signals.items()):
                 log(f"CLOSURE '{closure}' → clearing buffered signal (msg_id={mid})", "INFO")
+                if outcome_tracker:
+                    buf_tps  = parse_tp_levels(buf.get("text", ""))
+                    buf_sl   = parse_stop_loss(buf.get("text", ""))
+                    vt_entry = buf.get("signal_market_price") or 0
+                    if buf_tps and vt_entry:
+                        vt_id = -abs(mid)
+                        outcome_tracker.register_virtual_trade(vt_id, buf["side"], vt_entry, buf_sl or 0, buf_tps,
+                                                               cancel_reason=f"channel_closure:{closure}")
+                        log(f"VIRTUAL TRADE registered: id={vt_id} side={buf['side']} entry=${vt_entry:.2f}", "INFO")
             _buffered_signals.clear()
             return True
 
@@ -1443,12 +1495,33 @@ async def main():
                         state["tp3"]     = tp3
                         if all_tps and 1 in all_tps:
                             state["tp1"] = all_tps[1]
+
+                        strat = state.get("strategy")
                         if signal_records:
                             wait_time = time.time() - buf["buffered_at"]
                             signal_records.set_zone(msg_id, zone_low, zone_high, all_tps, sl_parsed or state["failsafe_sl"])
                             signal_records.record_entry_event(msg_id, "zone_from_edit", side=side, zone_low=zone_low, zone_high=zone_high, wait_time=wait_time)
-                            signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
                         record_entry_stat("zone_from_edit", side=side, zone_low=zone_low, zone_high=zone_high)
+
+                        signal_market_price = buf.get("signal_market_price")
+                        if strat in ("full_market", "split_market_and_pending"):
+                            m_ticket = state.get("pos_ticket") or state.get("market_pos_ticket")
+                            m_price  = state.get("market_entry_price") or entry_prices.get(m_ticket) or signal_market_price or zone_low
+                            if outcome_tracker and m_ticket:
+                                outcome_tracker.register_trade(m_ticket, side, m_price, sl_parsed or state["failsafe_sl"], all_tps or {})
+                            if signal_records and m_ticket:
+                                signal_records.record_bot_entry(msg_id, entered=True, entry_type="market", entry_price=m_price, ticket=m_ticket)
+                                signal_records.record_entry_event(msg_id, "market_entry_in_zone", side=side, entry_price=m_price, zone_low=zone_low, zone_high=zone_high)
+                                _ticket_to_msg_id[m_ticket] = msg_id
+                            record_entry_stat("market_entry_in_zone", side=side, entry_price=m_price, zone_low=zone_low, zone_high=zone_high)
+                            if strat == "split_market_and_pending":
+                                if signal_records:
+                                    signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+                                record_entry_stat("limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+                        else:
+                            if signal_records:
+                                signal_records.record_entry_event(msg_id, "limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
+                            record_entry_stat("limit_placed", side=side, zone_low=zone_low, zone_high=zone_high)
 
                         if sl_parsed or tp3:
                             await apply_real_levels_to_split(msg_id, sl_parsed, all_tps, " (EDIT-ZONE)")
@@ -1520,8 +1593,20 @@ async def main():
                            if now - b["buffered_at"] >= ZONE_WAIT_TIMEOUT]
                 for mid in expired:
                     buf = _buffered_signals.pop(mid)
+                    side_buf = buf["side"]
                     log(f"ZONE WAIT TIMEOUT: msg_id={mid} — no zone received, cancelling", "WARN")
-                    record_entry_stat("zone_wait_timeout", side=buf["side"])
+                    record_entry_stat("zone_wait_timeout", side=side_buf)
+                    if signal_records:
+                        signal_records.record_bot_entry(mid, entered=False, entry_type="zone_wait_timeout")
+                    if outcome_tracker:
+                        buf_tps = parse_tp_levels(buf.get("text", ""))
+                        buf_sl  = parse_stop_loss(buf.get("text", ""))
+                        vt_entry = buf.get("signal_market_price") or 0
+                        if buf_tps and vt_entry:
+                            vt_id = -abs(mid)
+                            outcome_tracker.register_virtual_trade(vt_id, side_buf, vt_entry, buf_sl or 0, buf_tps,
+                                                                   cancel_reason="zone_wait_timeout")
+                            log(f"VIRTUAL TRADE registered: id={vt_id} side={side_buf} entry=${vt_entry:.2f}", "INFO")
 
                 # ── Split order monitoring ──
                 completed = []
@@ -1578,6 +1663,7 @@ async def main():
                                                                           limit_price=lp_used,
                                                                           fill_price=fill_px or lp_used,
                                                                           zone_low=zone_low, zone_high=zone_high)
+                                        signal_records.update_tp_sl(mid, info.get("all_tps") or {}, info.get("sl") or failsafe_sl or 0)
                                         _ticket_to_msg_id[filled] = mid
                                     if outcome_tracker:
                                         outcome_tracker.register_trade(filled, side, fill_px or worst_entry,
@@ -1649,6 +1735,24 @@ async def main():
                                 if ot:
                                     await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
                             if not worst_pos and not deep_pos:
+                                _pmin = info.get("price_min_seen", float('inf'))
+                                _pmax = info.get("price_max_seen", float('-inf'))
+                                _best  = (_pmin <= zone_low)  if side == "BUY" else (_pmax >= zone_high)
+                                _worst = (_pmin <= zone_high) if side == "BUY" else (_pmax >= zone_low)
+                                record_entry_stat("limit_timeout", side=side, limit_price=worst_entry, elapsed=elapsed,
+                                                  best_reached=_best, worst_reached=_worst, zone_low=zone_low, zone_high=zone_high)
+                                if signal_records:
+                                    signal_records.record_bot_entry(mid, entered=False, entry_type="limit_timeout")
+                                    signal_records.record_entry_event(mid, "limit_timeout", side=side,
+                                                                      limit_price=worst_entry, elapsed=elapsed,
+                                                                      best_reached=_best, worst_reached=_worst)
+                                if outcome_tracker and info.get("all_tps"):
+                                    vt_id    = -abs(mid)
+                                    vt_sl    = info.get("sl") or failsafe_sl or 0
+                                    vt_entry = info.get("signal_market_price") or worst_entry
+                                    outcome_tracker.register_virtual_trade(vt_id, side, vt_entry, vt_sl, info["all_tps"],
+                                                                           cancel_reason=f"limit_timeout:{elapsed:.0f}s")
+                                    log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
                                 completed.append(mid)
                             continue
 
@@ -1679,7 +1783,24 @@ async def main():
                                     ot = info.get(key_ot)
                                     if ot:
                                         await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
-                                record_entry_stat("limit_invalidated", side=side, reason=reason)
+                                record_entry_stat("limit_invalidated", side=side, reason=reason,
+                                                  zone_low=zone_low, zone_high=zone_high)
+                                if signal_records:
+                                    _pmin2 = info.get("price_min_seen", float('inf'))
+                                    _pmax2 = info.get("price_max_seen", float('-inf'))
+                                    _best2  = (_pmin2 <= zone_low)  if side == "BUY" else (_pmax2 >= zone_high)
+                                    _worst2 = (_pmin2 <= zone_high) if side == "BUY" else (_pmax2 >= zone_low)
+                                    signal_records.record_bot_entry(mid, entered=False, entry_type="limit_timeout")
+                                    signal_records.record_entry_event(mid, "limit_timeout", side=side,
+                                                                      limit_price=worst_entry, elapsed=elapsed,
+                                                                      best_reached=_best2, worst_reached=_worst2)
+                                if outcome_tracker and info.get("all_tps"):
+                                    vt_id    = -abs(mid)
+                                    vt_sl    = info.get("sl") or failsafe_sl or 0
+                                    vt_entry = info.get("signal_market_price") or worst_entry
+                                    outcome_tracker.register_virtual_trade(vt_id, side, vt_entry, vt_sl, info["all_tps"],
+                                                                           cancel_reason=f"price_invalidated:{reason}")
+                                    log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
                                 completed.append(mid)
                                 continue
 
@@ -1714,6 +1835,7 @@ async def main():
                                                                       limit_price=deep_entry,
                                                                       fill_price=fill_px or deep_entry,
                                                                       zone_low=zone_low, zone_high=zone_high)
+                                    signal_records.update_tp_sl(mid, info.get("all_tps") or {}, info.get("sl") or failsafe_sl or 0)
                                     _ticket_to_msg_id[filled] = mid
                                 if info.get("sl") or info.get("all_tps"):
                                     await update_position_sl_tp(filled, info.get("sl"), info.get("all_tps") or {}, " (SPLIT-FILL)")
@@ -1772,6 +1894,7 @@ async def main():
                             log(f"DEEP ORDER TIMEOUT: order {deep_ot} after {elapsed:.0f}s", "WARN")
                             await run_mt5(lambda _ot=deep_ot: cancel_limit_order(_ot))
                             info["deep_order_ticket"] = None
+                            record_entry_stat("limit_timeout", side=side, limit_price=deep_entry, elapsed=elapsed)
                             # Market position stays open — this becomes "only worst filled"
 
                     # ────────────────────────────────────────
@@ -1820,13 +1943,31 @@ async def main():
                                                                       limit_price=worst_entry,
                                                                       fill_price=fill_px or worst_entry,
                                                                       zone_low=zone_low, zone_high=zone_high)
+                                    signal_records.update_tp_sl(mid, info.get("all_tps") or {}, info.get("sl") or failsafe_sl or 0)
                                     _ticket_to_msg_id[filled] = mid
                                 if info.get("sl") or info.get("all_tps"):
                                     await update_position_sl_tp(filled, info.get("sl"), info.get("all_tps") or {}, " (WHOLE-FILL)")
                             elif elapsed >= LIMIT_ORDER_TIMEOUT:
                                 log(f"WHOLE LOT TIMEOUT: order {ot} after {elapsed:.0f}s", "WARN")
                                 await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
-                                record_entry_stat("limit_timeout", side=side, limit_price=worst_entry, elapsed=elapsed)
+                                _pmin = info.get("price_min_seen", float('inf'))
+                                _pmax = info.get("price_max_seen", float('-inf'))
+                                _best  = (_pmin <= zone_low)  if side == "BUY" else (_pmax >= zone_high)
+                                _worst = (_pmin <= zone_high) if side == "BUY" else (_pmax >= zone_low)
+                                record_entry_stat("limit_timeout", side=side, limit_price=worst_entry, elapsed=elapsed,
+                                                  best_reached=_best, worst_reached=_worst, zone_low=zone_low, zone_high=zone_high)
+                                if signal_records:
+                                    signal_records.record_bot_entry(mid, entered=False, entry_type="limit_timeout")
+                                    signal_records.record_entry_event(mid, "limit_timeout", side=side,
+                                                                      limit_price=worst_entry, elapsed=elapsed,
+                                                                      best_reached=_best, worst_reached=_worst)
+                                if outcome_tracker and info.get("all_tps"):
+                                    vt_id    = -abs(mid)
+                                    vt_sl    = info.get("sl") or failsafe_sl or 0
+                                    vt_entry = info.get("signal_market_price") or worst_entry
+                                    outcome_tracker.register_virtual_trade(vt_id, side, vt_entry, vt_sl, info["all_tps"],
+                                                                           cancel_reason=f"limit_timeout:{elapsed:.0f}s")
+                                    log(f"VIRTUAL TRADE registered: id={vt_id} side={side} entry=${vt_entry:.2f}", "INFO")
                                 completed.append(mid)
                                 continue
 
@@ -2012,13 +2153,16 @@ async def main():
                             # Re-fetch info so finalization sees levels updated by check_levels() above
                             info = outcome_tracker.get_trade_info(ticket) or info
                             seq  = info.get("sequence_so_far", [])
+                            seq_str = " → ".join(seq) if seq else "NONE"
                             profit = info.get("position_profit", 0.0) or 0.0
                             levels_hit = set(info.get("levels_hit", []))
                             tp_nums = [int(k) for k in info["tp_levels"].keys()]
                             highest_tp = f"TP{max(tp_nums)}" if tp_nums else None
                             reason = f"shadow:{highest_tp}_hit" if (highest_tp and highest_tp in levels_hit) \
                                      else ("shadow:SL_hit" if "SL" in levels_hit else "shadow:timeout")
-                            log(f"OUTCOME TRACKER: Ticket {ticket} shadow FINALIZED | P&L=${profit:.2f} | Reason: {reason}", "INFO")
+                            virt_tag = "VIRTUAL" if info.get("virtual") else "SHADOW"
+                            log(f"OUTCOME TRACKER: Ticket {ticket} {virt_tag} tracking FINALIZED | "
+                                f"P&L=${profit:.2f} | Sequence: {seq_str} | Reason: {reason}", "INFO")
                             outcome_tracker.close_trade(ticket, profit, reason)
                             if signal_records:
                                 _mid = _ticket_to_msg_id.pop(ticket, None)
@@ -2042,8 +2186,11 @@ async def main():
                                     close_reason = d.comment or "broker"
                                     break
                         seq = info.get("sequence_so_far", [])
-                        log(f"OUTCOME TRACKER: Ticket {ticket} CLOSED | P&L=${final_profit:.2f} | "
-                            f"Close=${close_price:.2f} | Seq: {' → '.join(seq) or 'NONE'}", "INFO")
+                        seq_str = " → ".join(seq) if seq else "NONE"
+                        log(f"OUTCOME TRACKER: Ticket {ticket} position CLOSED | P&L=${final_profit:.2f} | "
+                            f"Close price=${close_price:.2f} | Sequence so far: {seq_str} | Reason: {close_reason}", "INFO")
+                        log(f"OUTCOME TRACKER: Starting SHADOW TRACKING for ticket {ticket} "
+                            f"(will monitor until highest TP or SL is hit, max 24h)", "INFO")
                         outcome_tracker.mark_position_closed(ticket, final_profit, close_reason, close_price)
                         tp_sl_updated.pop(ticket, None)
                         entry_prices.pop(ticket, None)
