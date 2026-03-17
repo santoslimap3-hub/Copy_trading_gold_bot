@@ -17,6 +17,11 @@ SYMBOL = "XAUUSD"
 BOT_MAGIC_NUMBERS = [777, 780]
 DAYS_BACK = 365
 
+# MT5 terminal path — pins the exporter to the instance running the magic=780 bot.
+# bot_v2_split_entry.py (magic=780) runs on C:\MT5_2\terminal64.exe.
+# If that path doesn't exist (e.g. running locally), falls back to the default instance.
+MT5_PATH = r"C:\MT5_2\terminal64.exe"
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 OUTPUT_FILE = os.path.join(PROJECT_ROOT, "data", "bot_trades.json")
@@ -58,9 +63,18 @@ class BotTradesExporter:
         self.completed_trades: List[dict] = []
 
     # ------------------------------------------------------------------
-    def connect_mt5(self) -> bool:
-        print("Connecting to MetaTrader5...")
-        if not mt5.initialize():
+    def connect_mt5(self, path: str = MT5_PATH) -> bool:
+        if path and os.path.exists(path):
+            print(f"Connecting to MetaTrader5 at: {path}")
+            ok = mt5.initialize(path=path)
+        else:
+            if path:
+                print(f"MT5 path not found ({path}), falling back to default instance")
+            else:
+                print("Connecting to MetaTrader5 (default instance)...")
+            ok = mt5.initialize()
+
+        if not ok:
             print(f"Failed to initialize MetaTrader5: {mt5.last_error()}")
             return False
 
