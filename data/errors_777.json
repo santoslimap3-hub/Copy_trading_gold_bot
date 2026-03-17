@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-17T17:05:17+08:00",
+  "last_updated": "2026-03-17T17:15:17+08:00",
   "magic": 777,
   "errors": [
     {
@@ -291,6 +291,11 @@
       "time": "2026-03-17T17:05:17+08:00",
       "level": "WARN",
       "message": "No Telegram activity for 2198s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T17:15:17+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 315s - running active connectivity check..."
     }
   ]
 }
