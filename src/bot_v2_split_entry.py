@@ -1718,6 +1718,7 @@ async def main():
                                 if info.get("sl") or info.get("all_tps"):
                                     await update_position_sl_tp(filled, info.get("sl"), info.get("all_tps") or {}, " (SPLIT-FILL)")
                                 deep_pos = filled
+                                position_map[mid] = filled  # track deep pos as the active position
 
                         # Market position is always the "worst" for BE purposes
                         market_actual_entry = info.get("market_entry_price", worst_entry)
@@ -1729,13 +1730,19 @@ async def main():
                             if price_back:
                                 # CLOSE the market (worst) position at breakeven
                                 if not info["worst_be_done"]:
-                                    log(f"BE TRIGGER (market+deep): price ${cp:.2f} returned to market entry ${market_actual_entry:.2f}", "INFO")
-                                    log(f"  Closing market (worst) position {market_pos} at market (breakeven)", "INFO")
-                                    ok = await run_mt5(lambda _t=market_pos, _s=side: close_position(_t, _s))
-                                    if ok:
+                                    # Guard: check if market pos already closed (e.g. stopped at BE via TP1 path)
+                                    market_still_open = await run_mt5(lambda _t=market_pos: mt5.positions_get(ticket=_t))
+                                    if not market_still_open:
                                         info["worst_be_done"] = True
+                                        log(f"  Market pos {market_pos} already closed — marking worst_be_done=True", "INFO")
                                     else:
-                                        log(f"  Failed to close market position {market_pos} — retrying next tick", "WARN")
+                                        log(f"BE TRIGGER (market+deep): price ${cp:.2f} returned to market entry ${market_actual_entry:.2f}", "INFO")
+                                        log(f"  Closing market (worst) position {market_pos} at market (breakeven)", "INFO")
+                                        ok = await run_mt5(lambda _t=market_pos, _s=side: close_position(_t, _s))
+                                        if ok:
+                                            info["worst_be_done"] = True
+                                        else:
+                                            log(f"  Failed to close market position {market_pos} — retrying next tick", "WARN")
                                 # Set SL on deep position to deep_entry + buffer
                                 if info["worst_be_done"] and not info["deep_be_done"]:
                                     deep_actual = entry_prices.get(deep_pos, deep_entry)
