@@ -1,0 +1,51 @@
+{
+  "last_updated": "2026-03-17T11:45:13+08:00",
+  "magic": 777,
+  "errors": [
+    {
+      "time": "2026-03-17T11:05:12+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 600s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:10:12+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 900s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:15:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1200s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:20:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1500s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:25:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1800s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:30:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2100s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:35:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2400s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:40:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2700s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-17T11:45:13+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 3000s - running active connectivity check..."
+    }
+  ]
+}
