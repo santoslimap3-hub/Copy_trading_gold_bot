@@ -13,7 +13,7 @@ BASE_DIR   = os.path.dirname(TOOLS_DIR)
 BOT_TRADES_PATH       = os.path.join(BASE_DIR, "data", "bot_trades.json")
 BOT_TRADES_MOMS_PATH  = os.path.join(BASE_DIR, "data", "bot_trades_moms_account.json")
 SIGNAL_RECORDS_PATH   = os.path.join(BASE_DIR, "data", "signal_records.json")
-
+ERROR_RECORDS_PATH    = os.path.join(BASE_DIR, "data", "errors_780.json")
 EXPORTER_MAIN = os.path.join(TOOLS_DIR, "bot_trades_exporter.py")
 EXPORTER_MOMS = os.path.join(TOOLS_DIR, "bot_trades_exporter_moms_account.py")
 
@@ -48,20 +48,17 @@ def trade_history():
     return jsonify(data)
 
 
-@app.route("/trade_history_moms", methods=["GET"])
-def trade_history_moms():
-    """Refresh bot_trades_moms_account.json from MT5, then return it."""
-    _run_exporter(EXPORTER_MOMS)
-    data = _load_json(BOT_TRADES_MOMS_PATH)
-    return jsonify(data)
-
-
 @app.route("/signal_records", methods=["GET"])
 def signal_record():
     """Return the full signal_records.json payload."""
     data = _load_json(SIGNAL_RECORDS_PATH)
     return jsonify(data)
 
+@app.route("/error_records", methods=["GET"])
+def error_records():
+    """Return the full error_records.json payload."""
+    data = _load_json(ERROR_RECORDS_PATH)
+    return jsonify(data)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
