@@ -1,14 +1,14 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 5,
+  "limit_orders_placed": 7,
   "limit_fills": 0,
   "limit_timeouts": 0,
-  "limit_invalidated": 11,
-  "signals_buffered": 21,
-  "zones_received_from_edit": 20,
+  "limit_invalidated": 13,
+  "signals_buffered": 23,
+  "zones_received_from_edit": 22,
   "zone_wait_timeouts": 0,
   "market_orders_no_zone": 0,
-  "market_orders_in_zone": 2,
+  "market_orders_in_zone": 3,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
   "zone_tracking_total": 0,
@@ -380,6 +380,68 @@
       "side": "SELL",
       "zone_low": 5015.5,
       "zone_high": 5019.0
+    },
+    {
+      "time": "2026-03-18 07:17:13",
+      "type": "limit_invalidated",
+      "side": "SELL",
+      "reason": "Price $5007.91 <= TP $5008.00",
+      "zone_low": 5015.5,
+      "zone_high": 5019.0
+    },
+    {
+      "time": "2026-03-18 07:48:40",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-18 07:48:48",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4992.0,
+      "zone_high": 4997.0
+    },
+    {
+      "time": "2026-03-18 07:48:48",
+      "type": "limit_placed",
+      "side": "BUY",
+      "zone_low": 4992.0,
+      "zone_high": 4997.0
+    },
+    {
+      "time": "2026-03-18 08:08:52",
+      "type": "limit_invalidated",
+      "side": "BUY",
+      "reason": "Price $4987.88 <= SL $4988.00",
+      "zone_low": 4992.0,
+      "zone_high": 4997.0
+    },
+    {
+      "time": "2026-03-18 08:22:18",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-18 08:22:30",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4979.0,
+      "zone_high": 4984.5
+    },
+    {
+      "time": "2026-03-18 08:22:30",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 4983.96,
+      "zone_low": 4979.0,
+      "zone_high": 4984.5
+    },
+    {
+      "time": "2026-03-18 08:22:30",
+      "type": "limit_placed",
+      "side": "BUY",
+      "zone_low": 4979.0,
+      "zone_high": 4984.5
     }
   ]
 }
