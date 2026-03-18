@@ -1,1 +1,60 @@
-{}
+{
+  "-4333": {
+    "ticket": -4333,
+    "side": "SELL",
+    "entry_price": 5016.03,
+    "sl_price": 5024.0,
+    "tp_levels": {
+      "1": 5012.5,
+      "2": 5010.5,
+      "3": 5008.0,
+      "4": 5006.0,
+      "5": 5001.0
+    },
+    "monitored_levels": {
+      "TP1": 5012.5,
+      "TP2": 5010.5,
+      "TP3": 5008.0,
+      "TP4": 5006.0,
+      "TP5": 5001.0,
+      "BE": 5016.03,
+      "SL": 5024.0
+    },
+    "sequence": [
+      {
+        "level": "TP1",
+        "time": "2026-03-18 06:39:42",
+        "timestamp": 1773815982.6394238,
+        "price": 5012.3,
+        "revisit": false
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-18 06:51:13",
+        "timestamp": 1773816673.7358341,
+        "price": 5010.38,
+        "revisit": false
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-18 07:03:02",
+        "timestamp": 1773817382.38847,
+        "price": 5012.47,
+        "revisit": true
+      }
+    ],
+    "levels_hit": [
+      "TP1",
+      "TP2"
+    ],
+    "levels_breached": [],
+    "registered_at": "2026-03-18 06:39:42",
+    "registered_ts": 1773815982.1235275,
+    "position_closed": true,
+    "position_closed_at": 1773815982.1235275,
+    "position_profit": 0.0,
+    "position_close_reason": "not_entered:price_invalidated:Price $5012.17 <= TP $5012.50",
+    "position_close_price": null,
+    "virtual": true
+  }
+}

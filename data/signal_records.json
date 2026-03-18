@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-03-17T13:51:35",
+  "last_updated": "2026-03-18T06:37:02",
   "records": {
     "4091": {
       "msg_id": 4091,
@@ -2512,6 +2512,75 @@
         "2026-03-17T13:50:10",
         "2026-03-17T13:50:55",
         "2026-03-17T13:51:35"
+      ]
+    },
+    "4333": {
+      "msg_id": 4333,
+      "side": "SELL",
+      "signal_time": "2026-03-18T06:36:44",
+      "signal_price": 5016.03,
+      "zone": [
+        5015.5,
+        5019.0
+      ],
+      "signal_to_worst_edge": [
+        0.53,
+        "inside"
+      ],
+      "tp_levels": null,
+      "sl_price": 5023.5,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 5016.39,
+      "best_prices_per_tp": [],
+      "outcome_sequence": [
+        0
+      ],
+      "bot_entries": {},
+      "entry_events": [
+        {
+          "time": "2026-03-18T06:36:44",
+          "type": "signal_buffered",
+          "side": "SELL"
+        },
+        {
+          "time": "2026-03-18T06:37:01",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5015.5,
+          "zone_high": 5019.0,
+          "wait_time": 17.65385866165161
+        },
+        {
+          "time": "2026-03-18T06:37:02",
+          "type": "limit_placed",
+          "side": "SELL",
+          "limit_price": 5015.5,
+          "zone_low": 5015.5,
+          "zone_high": 5019.0
+        },
+        {
+          "time": "2026-03-18T06:37:02",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 5015.5,
+          "zone_high": 5019.0,
+          "wait_time": 18.075297355651855
+        },
+        {
+          "time": "2026-03-18T06:37:02",
+          "type": "limit_placed",
+          "side": "SELL",
+          "zone_low": 5015.5,
+          "zone_high": 5019.0
+        }
+      ],
+      "tracking_active": true,
+      "tracking_complete": false,
+      "tracking_started_at": "2026-03-18T06:37:02",
+      "tracking_ended_at": null,
+      "last_updated": "2026-03-18T06:37:02",
+      "_level_times": [
+        "2026-03-18T06:37:02"
       ]
     }
   }

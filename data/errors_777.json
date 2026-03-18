@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-18T14:09:44+08:00",
+  "last_updated": "2026-03-18T15:04:45+08:00",
   "magic": 777,
   "errors": [
     {
@@ -221,6 +221,71 @@
       "time": "2026-03-18T14:09:44+08:00",
       "level": "WARN",
       "message": "No Telegram activity for 6928s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-18T14:24:44+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 314s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-18T14:29:44+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 614s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-18T14:34:44+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 914s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-18T14:37:16+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions"
+    },
+    {
+      "time": "2026-03-18T14:39:05+08:00",
+      "level": "WARN",
+      "message": "Failed to modify order 996619668: No changes"
+    },
+    {
+      "time": "2026-03-18T14:39:05+08:00",
+      "level": "WARN",
+      "message": "Failed to modify pending order 996619668 - may already be filled"
+    },
+    {
+      "time": "2026-03-18T14:39:24+08:00",
+      "level": "WARN",
+      "message": "Failed to modify order 996619668: No changes"
+    },
+    {
+      "time": "2026-03-18T14:39:24+08:00",
+      "level": "WARN",
+      "message": "Failed to modify pending order 996619668 - may already be filled"
+    },
+    {
+      "time": "2026-03-18T14:39:41+08:00",
+      "level": "WARN",
+      "message": "LIMIT ORDER INVALIDATED (MISSED WINNER): order=996619668 | Price $5012.17 <= TP $5012.50"
+    },
+    {
+      "time": "2026-03-18T14:39:41+08:00",
+      "level": "WARN",
+      "message": "   Trade was valid but limit at $5015.50 never filled - price moved to TP without us"
+    },
+    {
+      "time": "2026-03-18T14:49:44+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 599s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-18T14:59:44+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 498s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-18T15:04:45+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 798s - running active connectivity check..."
     }
   ]
 }
