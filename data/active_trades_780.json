@@ -167,6 +167,13 @@
         "timestamp": 1773826274.8474598,
         "price": 4993.01,
         "revisit": true
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-18 09:58:12",
+        "timestamp": 1773827892.6936817,
+        "price": 4991.16,
+        "revisit": true
       }
     ],
     "levels_hit": [
@@ -178,8 +185,7 @@
     ],
     "levels_breached": [
       "TP1",
-      "TP2",
-      "TP3"
+      "TP2"
     ],
     "registered_at": "2026-03-18 08:22:30",
     "registered_ts": 1773822150.4044402,
