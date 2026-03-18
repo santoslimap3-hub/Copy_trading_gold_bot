@@ -3,9 +3,11 @@ import json
 import os
 import subprocess
 import sys
+from flask_cors import CORS
+
 
 app = Flask(__name__)
-
+CORS(app)
 TOOLS_DIR  = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR   = os.path.dirname(TOOLS_DIR)
 BOT_TRADES_PATH       = os.path.join(BASE_DIR, "data", "bot_trades.json")
