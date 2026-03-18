@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-18T14:39:24+08:00",
+  "last_updated": "2026-03-18T16:08:52+08:00",
   "magic": 780,
   "errors": [
     {
@@ -26,6 +26,31 @@
       "time": "2026-03-18T14:39:24+08:00",
       "level": "WARN",
       "message": "Failed to modify order 996619704: No changes"
+    },
+    {
+      "time": "2026-03-18T15:17:13+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $5007.91 <= TP $5008.00"
+    },
+    {
+      "time": "2026-03-18T15:49:22+08:00",
+      "level": "WARN",
+      "message": "Pending order 996866138 not found"
+    },
+    {
+      "time": "2026-03-18T16:08:52+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4987.88 <= SL $4988.00"
+    },
+    {
+      "time": "2026-03-18T16:08:52+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 996866138: Invalid request"
+    },
+    {
+      "time": "2026-03-18T16:08:52+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 996866148: Invalid request"
     }
   ]
 }

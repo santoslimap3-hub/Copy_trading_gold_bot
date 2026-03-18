@@ -1,19 +1,19 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 26,
-  "limit_fills": 14,
+  "limit_orders_placed": 27,
+  "limit_fills": 15,
   "limit_timeouts": 0,
   "limit_invalidated": 12,
-  "signals_buffered": 37,
-  "zones_received_from_edit": 34,
+  "signals_buffered": 39,
+  "zones_received_from_edit": 36,
   "zone_wait_timeouts": 3,
   "market_orders_no_zone": 0,
-  "market_orders_in_zone": 11,
+  "market_orders_in_zone": 12,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
-  "zone_tracking_total": 26,
-  "zone_best_entry_reached": 15,
-  "zone_worst_entry_reached": 15,
+  "zone_tracking_total": 27,
+  "zone_best_entry_reached": 16,
+  "zone_worst_entry_reached": 16,
   "entries": [
     {
       "time": "2026-03-09 15:03:33",
@@ -1148,6 +1148,63 @@
       "zone_high": 5019.0,
       "price_min": 5012.17,
       "price_max": 5015.45
+    },
+    {
+      "time": "2026-03-18 07:48:40",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-18 07:48:48",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4992.0,
+      "zone_high": 4997.0,
+      "wait_time": 7.926046848297119
+    },
+    {
+      "time": "2026-03-18 07:48:49",
+      "type": "limit_placed",
+      "side": "BUY",
+      "limit_price": 4997.0,
+      "zone_low": 4992.0,
+      "zone_high": 4997.0
+    },
+    {
+      "time": "2026-03-18 07:48:57",
+      "type": "limit_fill",
+      "side": "BUY",
+      "limit_price": 4997.0,
+      "fill_price": null,
+      "slippage": 0,
+      "fill_time": 8.14854621887207,
+      "best_reached": true,
+      "worst_reached": true,
+      "zone_low": 4992.0,
+      "zone_high": 4997.0,
+      "price_min": 4997.01,
+      "price_max": 4997.79
+    },
+    {
+      "time": "2026-03-18 08:22:19",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-18 08:22:30",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4979.0,
+      "zone_high": 4984.5,
+      "wait_time": 10.882054567337036
+    },
+    {
+      "time": "2026-03-18 08:22:30",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 4983.94,
+      "zone_low": 4979.0,
+      "zone_high": 4984.5
     }
   ]
 }
