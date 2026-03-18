@@ -1,0 +1,2608 @@
+{
+  "last_updated": "2026-03-18T09:27:08",
+  "records": {
+    "5001": {
+      "msg_id": 5001,
+      "side": "SELL",
+      "signal_time": "2026-01-15T08:00:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5002": {
+      "msg_id": 5002,
+      "side": "SELL",
+      "signal_time": "2026-01-15T10:14:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5003": {
+      "msg_id": 5003,
+      "side": "SELL",
+      "signal_time": "2026-01-16T08:00:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5004": {
+      "msg_id": 5004,
+      "side": "BUY",
+      "signal_time": "2026-01-16T09:24:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5005": {
+      "msg_id": 5005,
+      "side": "BUY",
+      "signal_time": "2026-01-17T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5006": {
+      "msg_id": 5006,
+      "side": "BUY",
+      "signal_time": "2026-01-17T10:06:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5007": {
+      "msg_id": 5007,
+      "side": "SELL",
+      "signal_time": "2026-01-17T11:30:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5008": {
+      "msg_id": 5008,
+      "side": "BUY",
+      "signal_time": "2026-01-17T13:35:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5009": {
+      "msg_id": 5009,
+      "side": "SELL",
+      "signal_time": "2026-01-17T15:44:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5010": {
+      "msg_id": 5010,
+      "side": "BUY",
+      "signal_time": "2026-01-18T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5011": {
+      "msg_id": 5011,
+      "side": "BUY",
+      "signal_time": "2026-01-18T10:39:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5012": {
+      "msg_id": 5012,
+      "side": "SELL",
+      "signal_time": "2026-01-19T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5013": {
+      "msg_id": 5013,
+      "side": "BUY",
+      "signal_time": "2026-01-19T10:46:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5014": {
+      "msg_id": 5014,
+      "side": "BUY",
+      "signal_time": "2026-01-19T12:18:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5015": {
+      "msg_id": 5015,
+      "side": "SELL",
+      "signal_time": "2026-01-19T13:36:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5016": {
+      "msg_id": 5016,
+      "side": "SELL",
+      "signal_time": "2026-01-20T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5017": {
+      "msg_id": 5017,
+      "side": "SELL",
+      "signal_time": "2026-01-20T10:32:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5018": {
+      "msg_id": 5018,
+      "side": "BUY",
+      "signal_time": "2026-01-20T13:05:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5019": {
+      "msg_id": 5019,
+      "side": "SELL",
+      "signal_time": "2026-01-20T14:07:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5020": {
+      "msg_id": 5020,
+      "side": "SELL",
+      "signal_time": "2026-01-21T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5021": {
+      "msg_id": 5021,
+      "side": "SELL",
+      "signal_time": "2026-01-21T09:28:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5022": {
+      "msg_id": 5022,
+      "side": "SELL",
+      "signal_time": "2026-01-22T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5023": {
+      "msg_id": 5023,
+      "side": "BUY",
+      "signal_time": "2026-01-22T09:41:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5024": {
+      "msg_id": 5024,
+      "side": "BUY",
+      "signal_time": "2026-01-22T11:07:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5025": {
+      "msg_id": 5025,
+      "side": "BUY",
+      "signal_time": "2026-01-23T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5026": {
+      "msg_id": 5026,
+      "side": "BUY",
+      "signal_time": "2026-01-23T09:54:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5027": {
+      "msg_id": 5027,
+      "side": "SELL",
+      "signal_time": "2026-01-23T11:33:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5028": {
+      "msg_id": 5028,
+      "side": "SELL",
+      "signal_time": "2026-01-23T12:59:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5029": {
+      "msg_id": 5029,
+      "side": "BUY",
+      "signal_time": "2026-01-23T15:45:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5030": {
+      "msg_id": 5030,
+      "side": "SELL",
+      "signal_time": "2026-01-24T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5031": {
+      "msg_id": 5031,
+      "side": "BUY",
+      "signal_time": "2026-01-24T09:05:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5032": {
+      "msg_id": 5032,
+      "side": "SELL",
+      "signal_time": "2026-01-24T11:37:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5033": {
+      "msg_id": 5033,
+      "side": "BUY",
+      "signal_time": "2026-01-24T13:11:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5034": {
+      "msg_id": 5034,
+      "side": "SELL",
+      "signal_time": "2026-01-25T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5035": {
+      "msg_id": 5035,
+      "side": "BUY",
+      "signal_time": "2026-01-25T10:44:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5036": {
+      "msg_id": 5036,
+      "side": "SELL",
+      "signal_time": "2026-01-25T13:20:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5037": {
+      "msg_id": 5037,
+      "side": "SELL",
+      "signal_time": "2026-01-25T15:01:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5038": {
+      "msg_id": 5038,
+      "side": "BUY",
+      "signal_time": "2026-01-25T17:26:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5039": {
+      "msg_id": 5039,
+      "side": "SELL",
+      "signal_time": "2026-01-26T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5040": {
+      "msg_id": 5040,
+      "side": "SELL",
+      "signal_time": "2026-01-26T09:50:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5041": {
+      "msg_id": 5041,
+      "side": "SELL",
+      "signal_time": "2026-01-26T11:49:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5042": {
+      "msg_id": 5042,
+      "side": "SELL",
+      "signal_time": "2026-01-27T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5043": {
+      "msg_id": 5043,
+      "side": "SELL",
+      "signal_time": "2026-01-27T09:17:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5044": {
+      "msg_id": 5044,
+      "side": "SELL",
+      "signal_time": "2026-01-27T11:16:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5045": {
+      "msg_id": 5045,
+      "side": "BUY",
+      "signal_time": "2026-01-27T12:59:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5046": {
+      "msg_id": 5046,
+      "side": "SELL",
+      "signal_time": "2026-01-27T14:21:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5047": {
+      "msg_id": 5047,
+      "side": "BUY",
+      "signal_time": "2026-01-28T08:00:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5048": {
+      "msg_id": 5048,
+      "side": "BUY",
+      "signal_time": "2026-01-28T10:29:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5049": {
+      "msg_id": 5049,
+      "side": "BUY",
+      "signal_time": "2026-01-28T12:26:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5050": {
+      "msg_id": 5050,
+      "side": "BUY",
+      "signal_time": "2026-01-29T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5051": {
+      "msg_id": 5051,
+      "side": "BUY",
+      "signal_time": "2026-01-29T09:26:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5052": {
+      "msg_id": 5052,
+      "side": "SELL",
+      "signal_time": "2026-01-29T10:36:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5053": {
+      "msg_id": 5053,
+      "side": "SELL",
+      "signal_time": "2026-01-29T12:13:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5054": {
+      "msg_id": 5054,
+      "side": "SELL",
+      "signal_time": "2026-01-29T13:59:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5055": {
+      "msg_id": 5055,
+      "side": "SELL",
+      "signal_time": "2026-01-30T08:00:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5056": {
+      "msg_id": 5056,
+      "side": "BUY",
+      "signal_time": "2026-01-30T10:15:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5057": {
+      "msg_id": 5057,
+      "side": "BUY",
+      "signal_time": "2026-01-30T11:40:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5058": {
+      "msg_id": 5058,
+      "side": "BUY",
+      "signal_time": "2026-01-30T14:11:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5059": {
+      "msg_id": 5059,
+      "side": "SELL",
+      "signal_time": "2026-01-30T16:51:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5060": {
+      "msg_id": 5060,
+      "side": "SELL",
+      "signal_time": "2026-01-31T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5061": {
+      "msg_id": 5061,
+      "side": "SELL",
+      "signal_time": "2026-01-31T10:07:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5062": {
+      "msg_id": 5062,
+      "side": "SELL",
+      "signal_time": "2026-01-31T11:52:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5063": {
+      "msg_id": 5063,
+      "side": "BUY",
+      "signal_time": "2026-01-31T14:29:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5064": {
+      "msg_id": 5064,
+      "side": "SELL",
+      "signal_time": "2026-01-31T16:41:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5065": {
+      "msg_id": 5065,
+      "side": "BUY",
+      "signal_time": "2026-02-01T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5066": {
+      "msg_id": 5066,
+      "side": "SELL",
+      "signal_time": "2026-02-01T10:32:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5067": {
+      "msg_id": 5067,
+      "side": "SELL",
+      "signal_time": "2026-02-01T11:57:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5068": {
+      "msg_id": 5068,
+      "side": "BUY",
+      "signal_time": "2026-02-01T13:34:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5069": {
+      "msg_id": 5069,
+      "side": "SELL",
+      "signal_time": "2026-02-02T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5070": {
+      "msg_id": 5070,
+      "side": "BUY",
+      "signal_time": "2026-02-02T10:27:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5071": {
+      "msg_id": 5071,
+      "side": "BUY",
+      "signal_time": "2026-02-02T12:17:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5072": {
+      "msg_id": 5072,
+      "side": "BUY",
+      "signal_time": "2026-02-02T13:23:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5073": {
+      "msg_id": 5073,
+      "side": "SELL",
+      "signal_time": "2026-02-02T14:51:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5074": {
+      "msg_id": 5074,
+      "side": "BUY",
+      "signal_time": "2026-02-03T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5075": {
+      "msg_id": 5075,
+      "side": "SELL",
+      "signal_time": "2026-02-03T10:13:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5076": {
+      "msg_id": 5076,
+      "side": "SELL",
+      "signal_time": "2026-02-03T12:09:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5077": {
+      "msg_id": 5077,
+      "side": "SELL",
+      "signal_time": "2026-02-03T13:59:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5078": {
+      "msg_id": 5078,
+      "side": "SELL",
+      "signal_time": "2026-02-03T16:58:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5079": {
+      "msg_id": 5079,
+      "side": "BUY",
+      "signal_time": "2026-02-04T08:00:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5080": {
+      "msg_id": 5080,
+      "side": "BUY",
+      "signal_time": "2026-02-04T09:24:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5081": {
+      "msg_id": 5081,
+      "side": "BUY",
+      "signal_time": "2026-02-04T11:19:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5082": {
+      "msg_id": 5082,
+      "side": "SELL",
+      "signal_time": "2026-02-04T14:07:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5083": {
+      "msg_id": 5083,
+      "side": "SELL",
+      "signal_time": "2026-02-04T17:06:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5084": {
+      "msg_id": 5084,
+      "side": "SELL",
+      "signal_time": "2026-02-05T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5085": {
+      "msg_id": 5085,
+      "side": "BUY",
+      "signal_time": "2026-02-05T10:35:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5086": {
+      "msg_id": 5086,
+      "side": "SELL",
+      "signal_time": "2026-02-05T13:06:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5087": {
+      "msg_id": 5087,
+      "side": "SELL",
+      "signal_time": "2026-02-05T15:22:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5088": {
+      "msg_id": 5088,
+      "side": "BUY",
+      "signal_time": "2026-02-06T08:00:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5089": {
+      "msg_id": 5089,
+      "side": "SELL",
+      "signal_time": "2026-02-06T09:13:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5090": {
+      "msg_id": 5090,
+      "side": "BUY",
+      "signal_time": "2026-02-06T11:40:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5091": {
+      "msg_id": 5091,
+      "side": "BUY",
+      "signal_time": "2026-02-06T13:43:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5092": {
+      "msg_id": 5092,
+      "side": "SELL",
+      "signal_time": "2026-02-06T15:50:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5093": {
+      "msg_id": 5093,
+      "side": "SELL",
+      "signal_time": "2026-02-07T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5094": {
+      "msg_id": 5094,
+      "side": "SELL",
+      "signal_time": "2026-02-07T09:14:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5095": {
+      "msg_id": 5095,
+      "side": "SELL",
+      "signal_time": "2026-02-08T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5096": {
+      "msg_id": 5096,
+      "side": "SELL",
+      "signal_time": "2026-02-08T10:26:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5097": {
+      "msg_id": 5097,
+      "side": "BUY",
+      "signal_time": "2026-02-08T12:44:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5098": {
+      "msg_id": 5098,
+      "side": "BUY",
+      "signal_time": "2026-02-08T14:20:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5099": {
+      "msg_id": 5099,
+      "side": "SELL",
+      "signal_time": "2026-02-08T15:40:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5100": {
+      "msg_id": 5100,
+      "side": "BUY",
+      "signal_time": "2026-02-09T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5101": {
+      "msg_id": 5101,
+      "side": "SELL",
+      "signal_time": "2026-02-09T10:06:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5102": {
+      "msg_id": 5102,
+      "side": "BUY",
+      "signal_time": "2026-02-09T11:33:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5103": {
+      "msg_id": 5103,
+      "side": "BUY",
+      "signal_time": "2026-02-10T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5104": {
+      "msg_id": 5104,
+      "side": "SELL",
+      "signal_time": "2026-02-10T09:11:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5105": {
+      "msg_id": 5105,
+      "side": "BUY",
+      "signal_time": "2026-02-10T11:33:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5106": {
+      "msg_id": 5106,
+      "side": "BUY",
+      "signal_time": "2026-02-11T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5107": {
+      "msg_id": 5107,
+      "side": "SELL",
+      "signal_time": "2026-02-11T09:59:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5108": {
+      "msg_id": 5108,
+      "side": "SELL",
+      "signal_time": "2026-02-11T11:23:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5109": {
+      "msg_id": 5109,
+      "side": "SELL",
+      "signal_time": "2026-02-11T12:58:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5110": {
+      "msg_id": 5110,
+      "side": "SELL",
+      "signal_time": "2026-02-11T14:44:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5111": {
+      "msg_id": 5111,
+      "side": "SELL",
+      "signal_time": "2026-02-12T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5112": {
+      "msg_id": 5112,
+      "side": "SELL",
+      "signal_time": "2026-02-12T10:39:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5113": {
+      "msg_id": 5113,
+      "side": "SELL",
+      "signal_time": "2026-02-12T11:39:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5114": {
+      "msg_id": 5114,
+      "side": "SELL",
+      "signal_time": "2026-02-13T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5115": {
+      "msg_id": 5115,
+      "side": "SELL",
+      "signal_time": "2026-02-13T10:07:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5116": {
+      "msg_id": 5116,
+      "side": "BUY",
+      "signal_time": "2026-02-13T11:10:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5117": {
+      "msg_id": 5117,
+      "side": "SELL",
+      "signal_time": "2026-02-13T13:11:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5118": {
+      "msg_id": 5118,
+      "side": "SELL",
+      "signal_time": "2026-02-13T14:43:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5119": {
+      "msg_id": 5119,
+      "side": "SELL",
+      "signal_time": "2026-02-14T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5120": {
+      "msg_id": 5120,
+      "side": "SELL",
+      "signal_time": "2026-02-14T10:29:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5121": {
+      "msg_id": 5121,
+      "side": "BUY",
+      "signal_time": "2026-02-15T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5122": {
+      "msg_id": 5122,
+      "side": "SELL",
+      "signal_time": "2026-02-15T09:56:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5123": {
+      "msg_id": 5123,
+      "side": "SELL",
+      "signal_time": "2026-02-15T11:30:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5124": {
+      "msg_id": 5124,
+      "side": "BUY",
+      "signal_time": "2026-02-15T14:02:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5125": {
+      "msg_id": 5125,
+      "side": "SELL",
+      "signal_time": "2026-02-16T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5126": {
+      "msg_id": 5126,
+      "side": "BUY",
+      "signal_time": "2026-02-16T10:54:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5127": {
+      "msg_id": 5127,
+      "side": "BUY",
+      "signal_time": "2026-02-16T12:20:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5128": {
+      "msg_id": 5128,
+      "side": "SELL",
+      "signal_time": "2026-02-16T14:51:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5129": {
+      "msg_id": 5129,
+      "side": "SELL",
+      "signal_time": "2026-02-17T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5130": {
+      "msg_id": 5130,
+      "side": "SELL",
+      "signal_time": "2026-02-17T09:33:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5131": {
+      "msg_id": 5131,
+      "side": "BUY",
+      "signal_time": "2026-02-17T12:06:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5132": {
+      "msg_id": 5132,
+      "side": "SELL",
+      "signal_time": "2026-02-18T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5133": {
+      "msg_id": 5133,
+      "side": "SELL",
+      "signal_time": "2026-02-18T09:21:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5134": {
+      "msg_id": 5134,
+      "side": "BUY",
+      "signal_time": "2026-02-18T12:20:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5135": {
+      "msg_id": 5135,
+      "side": "BUY",
+      "signal_time": "2026-02-19T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5136": {
+      "msg_id": 5136,
+      "side": "BUY",
+      "signal_time": "2026-02-19T09:10:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5137": {
+      "msg_id": 5137,
+      "side": "BUY",
+      "signal_time": "2026-02-20T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5138": {
+      "msg_id": 5138,
+      "side": "SELL",
+      "signal_time": "2026-02-20T09:12:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5139": {
+      "msg_id": 5139,
+      "side": "BUY",
+      "signal_time": "2026-02-20T11:20:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5140": {
+      "msg_id": 5140,
+      "side": "SELL",
+      "signal_time": "2026-02-20T12:29:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5141": {
+      "msg_id": 5141,
+      "side": "BUY",
+      "signal_time": "2026-02-20T15:13:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5142": {
+      "msg_id": 5142,
+      "side": "BUY",
+      "signal_time": "2026-02-21T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5143": {
+      "msg_id": 5143,
+      "side": "SELL",
+      "signal_time": "2026-02-21T09:15:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5144": {
+      "msg_id": 5144,
+      "side": "BUY",
+      "signal_time": "2026-02-22T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5145": {
+      "msg_id": 5145,
+      "side": "BUY",
+      "signal_time": "2026-02-22T09:10:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5146": {
+      "msg_id": 5146,
+      "side": "SELL",
+      "signal_time": "2026-02-22T10:15:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5147": {
+      "msg_id": 5147,
+      "side": "SELL",
+      "signal_time": "2026-02-22T11:39:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5148": {
+      "msg_id": 5148,
+      "side": "BUY",
+      "signal_time": "2026-02-22T13:28:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5149": {
+      "msg_id": 5149,
+      "side": "SELL",
+      "signal_time": "2026-02-23T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5150": {
+      "msg_id": 5150,
+      "side": "BUY",
+      "signal_time": "2026-02-23T09:02:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5151": {
+      "msg_id": 5151,
+      "side": "SELL",
+      "signal_time": "2026-02-23T11:03:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5152": {
+      "msg_id": 5152,
+      "side": "BUY",
+      "signal_time": "2026-02-24T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5153": {
+      "msg_id": 5153,
+      "side": "SELL",
+      "signal_time": "2026-02-24T09:29:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5154": {
+      "msg_id": 5154,
+      "side": "BUY",
+      "signal_time": "2026-02-24T12:09:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5155": {
+      "msg_id": 5155,
+      "side": "SELL",
+      "signal_time": "2026-02-24T15:07:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5156": {
+      "msg_id": 5156,
+      "side": "SELL",
+      "signal_time": "2026-02-25T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5157": {
+      "msg_id": 5157,
+      "side": "SELL",
+      "signal_time": "2026-02-25T09:40:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5158": {
+      "msg_id": 5158,
+      "side": "BUY",
+      "signal_time": "2026-02-26T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5159": {
+      "msg_id": 5159,
+      "side": "BUY",
+      "signal_time": "2026-02-26T09:39:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5160": {
+      "msg_id": 5160,
+      "side": "SELL",
+      "signal_time": "2026-02-27T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5161": {
+      "msg_id": 5161,
+      "side": "SELL",
+      "signal_time": "2026-02-27T10:52:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5162": {
+      "msg_id": 5162,
+      "side": "SELL",
+      "signal_time": "2026-02-27T12:20:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5163": {
+      "msg_id": 5163,
+      "side": "BUY",
+      "signal_time": "2026-02-27T14:17:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5164": {
+      "msg_id": 5164,
+      "side": "BUY",
+      "signal_time": "2026-02-28T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5165": {
+      "msg_id": 5165,
+      "side": "SELL",
+      "signal_time": "2026-02-28T09:10:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5166": {
+      "msg_id": 5166,
+      "side": "BUY",
+      "signal_time": "2026-02-28T10:26:00",
+      "outcome_sequence": [
+        0,
+        1,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5167": {
+      "msg_id": 5167,
+      "side": "SELL",
+      "signal_time": "2026-03-01T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5168": {
+      "msg_id": 5168,
+      "side": "SELL",
+      "signal_time": "2026-03-01T10:06:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5169": {
+      "msg_id": 5169,
+      "side": "SELL",
+      "signal_time": "2026-03-01T12:25:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5170": {
+      "msg_id": 5170,
+      "side": "BUY",
+      "signal_time": "2026-03-01T13:41:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5171": {
+      "msg_id": 5171,
+      "side": "BUY",
+      "signal_time": "2026-03-02T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5172": {
+      "msg_id": 5172,
+      "side": "SELL",
+      "signal_time": "2026-03-02T09:25:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5173": {
+      "msg_id": 5173,
+      "side": "BUY",
+      "signal_time": "2026-03-03T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5174": {
+      "msg_id": 5174,
+      "side": "SELL",
+      "signal_time": "2026-03-03T10:53:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5175": {
+      "msg_id": 5175,
+      "side": "SELL",
+      "signal_time": "2026-03-03T12:40:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5176": {
+      "msg_id": 5176,
+      "side": "SELL",
+      "signal_time": "2026-03-03T14:13:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5177": {
+      "msg_id": 5177,
+      "side": "SELL",
+      "signal_time": "2026-03-03T16:46:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5178": {
+      "msg_id": 5178,
+      "side": "BUY",
+      "signal_time": "2026-03-04T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5179": {
+      "msg_id": 5179,
+      "side": "SELL",
+      "signal_time": "2026-03-04T09:48:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5180": {
+      "msg_id": 5180,
+      "side": "SELL",
+      "signal_time": "2026-03-04T12:17:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5181": {
+      "msg_id": 5181,
+      "side": "BUY",
+      "signal_time": "2026-03-04T15:04:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5182": {
+      "msg_id": 5182,
+      "side": "BUY",
+      "signal_time": "2026-03-05T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5183": {
+      "msg_id": 5183,
+      "side": "SELL",
+      "signal_time": "2026-03-05T10:25:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5184": {
+      "msg_id": 5184,
+      "side": "SELL",
+      "signal_time": "2026-03-05T13:06:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5185": {
+      "msg_id": 5185,
+      "side": "BUY",
+      "signal_time": "2026-03-05T14:31:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5186": {
+      "msg_id": 5186,
+      "side": "BUY",
+      "signal_time": "2026-03-06T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5187": {
+      "msg_id": 5187,
+      "side": "BUY",
+      "signal_time": "2026-03-06T10:13:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5188": {
+      "msg_id": 5188,
+      "side": "SELL",
+      "signal_time": "2026-03-06T11:54:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5189": {
+      "msg_id": 5189,
+      "side": "BUY",
+      "signal_time": "2026-03-06T13:47:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5190": {
+      "msg_id": 5190,
+      "side": "BUY",
+      "signal_time": "2026-03-06T15:04:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5191": {
+      "msg_id": 5191,
+      "side": "BUY",
+      "signal_time": "2026-03-07T08:00:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5192": {
+      "msg_id": 5192,
+      "side": "BUY",
+      "signal_time": "2026-03-07T09:13:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5193": {
+      "msg_id": 5193,
+      "side": "SELL",
+      "signal_time": "2026-03-08T08:00:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5194": {
+      "msg_id": 5194,
+      "side": "BUY",
+      "signal_time": "2026-03-08T10:36:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5195": {
+      "msg_id": 5195,
+      "side": "SELL",
+      "signal_time": "2026-03-08T13:01:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5196": {
+      "msg_id": 5196,
+      "side": "BUY",
+      "signal_time": "2026-03-09T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5197": {
+      "msg_id": 5197,
+      "side": "BUY",
+      "signal_time": "2026-03-09T09:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5198": {
+      "msg_id": 5198,
+      "side": "SELL",
+      "signal_time": "2026-03-10T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5199": {
+      "msg_id": 5199,
+      "side": "BUY",
+      "signal_time": "2026-03-10T10:57:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5200": {
+      "msg_id": 5200,
+      "side": "SELL",
+      "signal_time": "2026-03-10T12:14:00",
+      "outcome_sequence": [
+        0,
+        1,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5201": {
+      "msg_id": 5201,
+      "side": "SELL",
+      "signal_time": "2026-03-10T13:59:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5202": {
+      "msg_id": 5202,
+      "side": "BUY",
+      "signal_time": "2026-03-10T15:53:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5203": {
+      "msg_id": 5203,
+      "side": "SELL",
+      "signal_time": "2026-03-11T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5204": {
+      "msg_id": 5204,
+      "side": "BUY",
+      "signal_time": "2026-03-11T10:31:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5205": {
+      "msg_id": 5205,
+      "side": "SELL",
+      "signal_time": "2026-03-12T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5206": {
+      "msg_id": 5206,
+      "side": "BUY",
+      "signal_time": "2026-03-12T10:23:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5207": {
+      "msg_id": 5207,
+      "side": "BUY",
+      "signal_time": "2026-03-12T11:56:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5208": {
+      "msg_id": 5208,
+      "side": "BUY",
+      "signal_time": "2026-03-13T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5209": {
+      "msg_id": 5209,
+      "side": "SELL",
+      "signal_time": "2026-03-13T10:28:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5210": {
+      "msg_id": 5210,
+      "side": "BUY",
+      "signal_time": "2026-03-13T12:07:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5211": {
+      "msg_id": 5211,
+      "side": "BUY",
+      "signal_time": "2026-03-13T13:12:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5212": {
+      "msg_id": 5212,
+      "side": "BUY",
+      "signal_time": "2026-03-13T15:03:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5213": {
+      "msg_id": 5213,
+      "side": "SELL",
+      "signal_time": "2026-03-14T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5214": {
+      "msg_id": 5214,
+      "side": "BUY",
+      "signal_time": "2026-03-14T10:04:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5215": {
+      "msg_id": 5215,
+      "side": "BUY",
+      "signal_time": "2026-03-14T12:13:00",
+      "outcome_sequence": [
+        0,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5216": {
+      "msg_id": 5216,
+      "side": "BUY",
+      "signal_time": "2026-03-14T14:35:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5217": {
+      "msg_id": 5217,
+      "side": "SELL",
+      "signal_time": "2026-03-15T08:00:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5218": {
+      "msg_id": 5218,
+      "side": "SELL",
+      "signal_time": "2026-03-15T10:32:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    },
+    "5219": {
+      "msg_id": 5219,
+      "side": "BUY",
+      "signal_time": "2026-03-15T12:16:00",
+      "outcome_sequence": [
+        0,
+        -1
+      ],
+      "tracking_complete": true
+    },
+    "5220": {
+      "msg_id": 5220,
+      "side": "SELL",
+      "signal_time": "2026-03-15T13:17:00",
+      "outcome_sequence": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "tracking_complete": true
+    }
+  }
+}
