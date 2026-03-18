@@ -183,8 +183,20 @@ def _bali_iso() -> str:
     return datetime.now(tz=bali).isoformat(timespec='seconds')
 
 
+def _load_errors_from_json():
+    """Seed _error_log from the existing file so history survives restarts."""
+    global _error_log
+    try:
+        if os.path.exists(ERRORS_FILE):
+            with open(ERRORS_FILE) as f:
+                data = json.load(f)
+            _error_log = data.get("errors", [])
+    except Exception:
+        pass
+
+
 def _flush_errors_to_json():
-    """Write _error_log to data/errors_<MAGIC>.json (overwrites each time)."""
+    """Append _error_log to data/errors_<MAGIC>.json (accumulates across restarts)."""
     try:
         os.makedirs(os.path.dirname(ERRORS_FILE), exist_ok=True)
         output = {
@@ -1133,6 +1145,7 @@ async def main():
     global bot_start_time, telegram_connected, last_telegram_activity, _telegram_client
     global messages_received, messages_ignored, last_message_time, telegram_connection_losses
 
+    _load_errors_from_json()
     bot_start_time = time.time()
     start_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
