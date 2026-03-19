@@ -177,6 +177,9 @@ class SignalRecordsManager:
             if rec.get("tracking_active") and not rec.get("tracking_complete"):
                 mid  = int(key)
                 zone = rec.get("zone")
+                tp_raw = rec.get("tp_levels") or {}
+                tp_levels = {int(k): v for k, v in tp_raw.items()} if tp_raw else None
+                seq = rec.get("outcome_sequence", [])
                 self._mem[mid] = {
                     "best_in_zone":  None,
                     "price_extreme": None,  # can't recover pre-zone extreme after restart
@@ -184,6 +187,9 @@ class SignalRecordsManager:
                     "side":          rec.get("side", "BUY"),
                     "active":        True,
                     "entered_zone":  rec.get("price_entered_zone", False),
+                    "tp_levels":     tp_levels,
+                    "sl_price":      rec.get("sl_price"),
+                    "_last_tp_level": seq[-1] if seq and seq[-1] >= 1 else None,
                 }
 
     # ── static helpers ───────────────────────────────────────────────────────
@@ -203,6 +209,24 @@ class SignalRecordsManager:
     def _worst_edge(side: str, zone: List[float]) -> float:
         """Worst entry price in the zone: high for BUY, low for SELL."""
         return zone[1] if side == "BUY" else zone[0]
+
+    @staticmethod
+    def _current_outcome_level(side: str, price: float,
+                               tp_levels: Dict[int, float],
+                               sl_price: Optional[float]) -> Optional[int]:
+        """Return the current outcome level based on price vs TP/SL levels.
+
+        Returns the highest TP level currently breached (1-5), -1 for SL,
+        or None if price is between zone/TP1 (no level to record).
+        """
+        if sl_price:
+            if (side == "BUY" and price <= sl_price) or (side == "SELL" and price >= sl_price):
+                return LEVEL_SL
+        for tp_num in sorted(tp_levels.keys(), reverse=True):
+            tp_price = tp_levels[tp_num]
+            if (side == "BUY" and price >= tp_price) or (side == "SELL" and price <= tp_price):
+                return tp_num
+        return None
 
     # ── public API ────────────────────────────────────────────────────────────
 
@@ -236,6 +260,9 @@ class SignalRecordsManager:
                 "side":          side,
                 "active":        True,
                 "entered_zone":  False,
+                "tp_levels":     None,
+                "sl_price":      None,
+                "_last_tp_level": None,
             }
 
         return created[0]
@@ -287,9 +314,14 @@ class SignalRecordsManager:
         self._transact(_op)
 
         if side_ref[0] is not None:
+            tp_int = {int(k): v for k, v in tp_levels.items()} if tp_levels else None
             if msg_id in self._mem:
                 # Update zone in existing mem state (preserves price_extreme already tracked)
                 self._mem[msg_id]["zone"] = zone
+                if tp_int:
+                    self._mem[msg_id]["tp_levels"] = tp_int
+                if sl_price is not None:
+                    self._mem[msg_id]["sl_price"] = sl_price
             else:
                 # Fallback: create fresh mem state if somehow missing
                 self._mem[msg_id] = {
@@ -299,6 +331,9 @@ class SignalRecordsManager:
                     "side":          side_ref[0],
                     "active":        True,
                     "entered_zone":  False,
+                    "tp_levels":     tp_int,
+                    "sl_price":      sl_price,
+                    "_last_tp_level": None,
                 }
 
     def update_price(self, msg_id: int, current_price: float):
@@ -334,6 +369,17 @@ class SignalRecordsManager:
         if in_z:
             if self._is_better(state["side"], current_price, state.get("best_in_zone")):
                 state["best_in_zone"] = current_price
+
+        # ── TP / SL level tracking ──
+        tp_levels = state.get("tp_levels")
+        if tp_levels:
+            side = state["side"]
+            sl_price = state.get("sl_price")
+            level = self._current_outcome_level(side, current_price, tp_levels, sl_price)
+            last = state.get("_last_tp_level")
+            if level is not None and level != last:
+                state["_last_tp_level"] = level
+                self.record_level_hit(msg_id, level)
 
     def record_level_hit(self, msg_id: int, level: int):
         """
@@ -480,6 +526,15 @@ class SignalRecordsManager:
                 rec["sl_price"] = sl_price
             rec["last_updated"] = _now()
         self._transact(_op)
+
+        # Update in-memory state so update_price can track TP levels immediately
+        if msg_id in self._mem:
+            if tp_levels:
+                existing_mem = self._mem[msg_id].get("tp_levels") or {}
+                existing_mem.update({int(k): v for k, v in tp_levels.items()})
+                self._mem[msg_id]["tp_levels"] = existing_mem
+            if sl_price:
+                self._mem[msg_id]["sl_price"] = sl_price
 
     # ── read helpers ─────────────────────────────────────────────────────────
 
