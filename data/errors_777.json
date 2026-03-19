@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T17:19:28+08:00",
+  "last_updated": "2026-03-19T17:54:28+08:00",
   "magic": 777,
   "errors": [
     {
@@ -41,6 +41,31 @@
       "time": "2026-03-19T17:19:28+08:00",
       "level": "WARN",
       "message": "No Telegram activity for 1860s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T17:34:28+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 429s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T17:39:28+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 729s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T17:44:28+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1029s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T17:49:28+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1329s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T17:54:28+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1629s - running active connectivity check..."
     }
   ]
 }
