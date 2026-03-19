@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T16:05:05+08:00",
+  "last_updated": "2026-03-19T16:14:59+08:00",
   "magic": 777,
   "errors": [
     {
@@ -1536,6 +1536,11 @@
       "time": "2026-03-19T16:05:05+08:00",
       "level": "WARN",
       "message": "No Telegram activity for 311s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T16:14:59+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions"
     }
   ]
 }

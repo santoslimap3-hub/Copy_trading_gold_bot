@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T14:35:34+08:00",
+  "last_updated": "2026-03-19T16:14:56+08:00",
   "magic": 780,
   "errors": [
     {
@@ -91,6 +91,11 @@
       "time": "2026-03-19T14:35:34+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1004524620: Invalid request"
+    },
+    {
+      "time": "2026-03-19T16:14:56+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions"
     }
   ]
 }
