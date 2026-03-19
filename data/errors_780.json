@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-18T16:08:52+08:00",
+  "last_updated": "2026-03-19T14:35:34+08:00",
   "magic": 780,
   "errors": [
     {
@@ -51,6 +51,46 @@
       "time": "2026-03-18T16:08:52+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 996866148: Invalid request"
+    },
+    {
+      "time": "2026-03-18T19:44:36+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-18T19:44:36+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1825, in split_entry_monitor\n    market_pos = info.get(\"market_pos_ticket\")\n                                               \nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-18T19:59:58+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions"
+    },
+    {
+      "time": "2026-03-18T20:01:33+08:00",
+      "level": "WARN",
+      "message": "ZONE WAIT TIMEOUT: msg_id=4350 \u2014 no zone received, cancelling"
+    },
+    {
+      "time": "2026-03-18T20:19:34+08:00",
+      "level": "WARN",
+      "message": "SL+TP update FAILED - Retcode: 10016"
+    },
+    {
+      "time": "2026-03-18T20:20:01+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 997044133: Invalid request"
+    },
+    {
+      "time": "2026-03-19T14:34:58+08:00",
+      "level": "WARN",
+      "message": "Pending order 1004524620 not found"
+    },
+    {
+      "time": "2026-03-19T14:35:34+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1004524620: Invalid request"
     }
   ]
 }
