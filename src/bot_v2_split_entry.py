@@ -679,6 +679,13 @@ def find_position_from_order(order_ticket: int) -> Optional[int]:
         for d in deals:
             if d.order == order_ticket and d.entry == 0:
                 return d.position_id
+    # Fallback: if deal history missed it (timezone mismatch), check if a position
+    # exists with the same ticket (MT5 assigns the order ticket to the position)
+    pending = mt5.orders_get(ticket=order_ticket)
+    if not pending:
+        pos = mt5.positions_get(ticket=order_ticket)
+        if pos:
+            return int(pos[0].ticket)
     return None
 
 
@@ -689,6 +696,10 @@ def get_fill_price_from_order(order_ticket: int) -> Optional[float]:
         for d in deals:
             if d.order == order_ticket and d.entry == 0:
                 return float(d.price)
+    # Fallback: check position's open price directly
+    pos = mt5.positions_get(ticket=order_ticket)
+    if pos:
+        return float(pos[0].price_open)
     return None
 
 
@@ -1813,10 +1824,37 @@ async def main():
                                     invalidated, reason = True, f"Price ${cp:.2f} <= TP ${tp_val:.2f}"
                             if invalidated:
                                 log(f"SPLIT ORDER INVALIDATED: {reason}", "WARN")
-                                for key_ot in ("worst_order_ticket", "deep_order_ticket"):
+                                # Try to cancel pending orders; track if any were actually filled
+                                any_filled = False
+                                for key_ot, key_pos in [("worst_order_ticket", "worst_pos_ticket"),
+                                                        ("deep_order_ticket",  "deep_pos_ticket")]:
                                     ot = info.get(key_ot)
                                     if ot:
-                                        await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
+                                        ok = await run_mt5(lambda _ot=ot: cancel_limit_order(_ot))
+                                        if not ok:
+                                            # Cancel failed — check if order was actually filled
+                                            filled = await run_mt5(lambda _ot=ot: find_position_from_order(_ot))
+                                            if filled:
+                                                fill_px = await run_mt5(lambda _ot=ot: get_fill_price_from_order(_ot))
+                                                info[key_pos] = filled
+                                                entry_prices[filled] = fill_px or (worst_entry if "worst" in key_ot else deep_entry)
+                                                position_map[mid] = filled
+                                                tp_sl_updated[filled] = False
+                                                label = "WORST" if "worst" in key_ot else "DEEP"
+                                                log(f"INVALIDATION RECOVERY: order {ot} was filled → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                                any_filled = True
+                                                if outcome_tracker:
+                                                    outcome_tracker.register_trade(filled, side, fill_px or (worst_entry if "worst" in key_ot else deep_entry),
+                                                                                    info.get("sl") or failsafe_sl,
+                                                                                    info.get("all_tps", {}))
+                                                if signal_records:
+                                                    lp_used = worst_entry if "worst" in key_ot else deep_entry
+                                                    signal_records.record_bot_entry(mid, entered=True, entry_type="limit",
+                                                                                    entry_price=fill_px or lp_used, ticket=filled)
+                                                    _ticket_to_msg_id[filled] = mid
+                                if any_filled:
+                                    log(f"INVALIDATION RECOVERED: position(s) found — keeping split order active for BE monitoring", "INFO")
+                                    continue
                                 record_entry_stat("limit_invalidated", side=side, reason=reason,
                                                   zone_low=zone_low, zone_high=zone_high)
                                 if signal_records:
