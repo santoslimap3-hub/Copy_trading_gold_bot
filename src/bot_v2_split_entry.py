@@ -125,7 +125,8 @@ _RE_TP1        = re.compile(r"TP\s*1\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 _RE_TP_BARE    = re.compile(r"\bTP\s+(\d{4,5}(?:\.\d{1,2})?)\b", re.IGNORECASE)
 _RE_ENTRY_ZONE = re.compile(r"(\d{4,5}(?:\.\d{1,2})?)\s*[-\u2013\u2014]\s*(\d{4,5}(?:\.\d{1,2})?)")
 # Only cancel pending orders on TP3+ HIT or SL HIT (TP1/TP2 hits keep the trade running)
-_RE_TRADE_CLOSURE = re.compile(r"(?:TP\s*[3-9][\s,\d]*\s*HIT|SL\s+HIT)", re.IGNORECASE | re.MULTILINE)
+# Matches "TP3 HIT", "TP5 HIT", "TP1,2,3,4 HIT" (any listed digit >=3), "SL HIT"
+_RE_TRADE_CLOSURE = re.compile(r"(?:TP[\s\d,]*[3-9][\s,\d]*\s*HIT|SL\s+HIT)", re.IGNORECASE | re.MULTILINE)
 
 _LOG_SEP = "=" * 70
 _cached_filling_mode: Optional[int] = None
@@ -1380,7 +1381,7 @@ async def main():
             live  = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
             has_open = bool(live and [p for p in live if p.magic == MAGIC])
 
-            if is_sl or has_open:
+            if is_sl or has_open or _split_orders:
                 for mid, info in list(_split_orders.items()):
                     side_c = info["side"]
                     for key in ("worst_order_ticket", "deep_order_ticket", "order_ticket"):
@@ -1398,9 +1399,10 @@ async def main():
                             outcome_tracker.register_virtual_trade(vt_id, side_c, vt_entry, vt_sl, info["all_tps"],
                                                                    cancel_reason=f"channel_closure:{closure}")
                             log(f"VIRTUAL TRADE registered: id={vt_id} side={side_c} entry=${vt_entry:.2f}", "INFO")
+                    # Finalize signal_records tracking
+                    if signal_records:
+                        signal_records.finalize(mid)
                 _split_orders.clear()
-            elif _split_orders:
-                log(f"Closure '{closure}' but no open positions — keeping {len(_split_orders)} split order(s) active", "INFO")
 
             for mid, buf in list(_buffered_signals.items()):
                 log(f"CLOSURE '{closure}' → clearing buffered signal (msg_id={mid})", "INFO")
@@ -1424,16 +1426,22 @@ async def main():
 
         if sl_parsed or tp3:
             positions = await run_mt5(lambda: mt5.positions_get(symbol=SYMBOL))
-            if not positions:
-                log(f"SL/TP update received but no open positions{source}", "WARN")
-                return True
-            bot_positions = [p for p in positions if p.magic == MAGIC]
-            if not bot_positions:
-                log(f"SL/TP update — no bot positions{source}", "WARN")
-                return True
-            for pos in bot_positions:
-                ticket = int(pos.ticket)
-                await update_position_sl_tp(ticket, sl_parsed, all_tps, source)
+            bot_positions = [p for p in positions if p.magic == MAGIC] if positions else []
+
+            if bot_positions:
+                for pos in bot_positions:
+                    ticket = int(pos.ticket)
+                    await update_position_sl_tp(ticket, sl_parsed, all_tps, source)
+            elif _split_orders:
+                # No filled positions but pending split orders exist — apply SL/TP to them
+                for mid, info in _split_orders.items():
+                    log(f"SL/TP update → applying to split order (msg_id={mid}){source}", "INFO")
+                    await apply_real_levels_to_split(mid, sl_parsed, all_tps, source)
+                    # Update signal_records with the TP levels
+                    if signal_records:
+                        signal_records.update_tp_sl(mid, all_tps or {}, sl_parsed or 0)
+            else:
+                log(f"SL/TP update received but no open positions or split orders{source}", "WARN")
             return True
 
         return False
