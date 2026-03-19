@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T18:22:03+08:00",
+  "last_updated": "2026-03-19T18:59:31+08:00",
   "magic": 777,
   "errors": [
     {
@@ -116,6 +116,26 @@
       "time": "2026-03-19T18:22:03+08:00",
       "level": "WARN",
       "message": "   Trade was valid but limit at $4680.00 never filled - price moved to TP without us"
+    },
+    {
+      "time": "2026-03-19T18:44:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 543s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:49:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 843s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:54:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1143s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:59:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1443s - running active connectivity check..."
     }
   ]
 }
