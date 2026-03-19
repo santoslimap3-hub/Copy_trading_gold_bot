@@ -1,17 +1,17 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 28,
+  "limit_orders_placed": 29,
   "limit_fills": 15,
   "limit_timeouts": 0,
-  "limit_invalidated": 12,
-  "signals_buffered": 43,
-  "zones_received_from_edit": 39,
+  "limit_invalidated": 13,
+  "signals_buffered": 45,
+  "zones_received_from_edit": 41,
   "zone_wait_timeouts": 4,
   "market_orders_no_zone": 0,
-  "market_orders_in_zone": 14,
+  "market_orders_in_zone": 15,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
-  "zone_tracking_total": 27,
+  "zone_tracking_total": 28,
   "zone_best_entry_reached": 16,
   "zone_worst_entry_reached": 16,
   "entries": [
@@ -1278,6 +1278,61 @@
       "limit_price": 4702.5,
       "zone_low": 4697.0,
       "zone_high": 4702.5
+    },
+    {
+      "time": "2026-03-19 10:18:00",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-19 10:18:07",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4685.0,
+      "zone_high": 4690.0,
+      "wait_time": 7.380841255187988
+    },
+    {
+      "time": "2026-03-19 10:18:08",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 4689.32,
+      "zone_low": 4685.0,
+      "zone_high": 4690.0
+    },
+    {
+      "time": "2026-03-19 10:21:10",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-19 10:21:17",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4675.0,
+      "zone_high": 4680.0,
+      "wait_time": 7.161568880081177
+    },
+    {
+      "time": "2026-03-19 10:21:17",
+      "type": "limit_placed",
+      "side": "BUY",
+      "limit_price": 4680.0,
+      "zone_low": 4675.0,
+      "zone_high": 4680.0
+    },
+    {
+      "time": "2026-03-19 10:22:04",
+      "type": "limit_invalidated",
+      "side": "BUY",
+      "limit_price": 4680.0,
+      "reason": "Price $4683.32 >= TP $4683.00",
+      "best_reached": false,
+      "worst_reached": false,
+      "zone_low": 4675.0,
+      "zone_high": 4680.0,
+      "price_min": 4680.25,
+      "price_max": 4684.12
     }
   ]
 }

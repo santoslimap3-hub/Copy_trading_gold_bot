@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T17:54:28+08:00",
+  "last_updated": "2026-03-19T18:22:03+08:00",
   "magic": 777,
   "errors": [
     {
@@ -66,6 +66,56 @@
       "time": "2026-03-19T17:54:28+08:00",
       "level": "WARN",
       "message": "No Telegram activity for 1629s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T17:59:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1932s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:04:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2232s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:09:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2532s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:14:31+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2832s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-19T18:18:34+08:00",
+      "level": "WARN",
+      "message": "Message ID 4376 not in position_map - looking for recent bot positions"
+    },
+    {
+      "time": "2026-03-19T18:18:48+08:00",
+      "level": "WARN",
+      "message": "Message ID 4376 not in position_map - looking for recent bot positions"
+    },
+    {
+      "time": "2026-03-19T18:18:48+08:00",
+      "level": "WARN",
+      "message": "No open positions at all - ignoring edit"
+    },
+    {
+      "time": "2026-03-19T18:21:29+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions"
+    },
+    {
+      "time": "2026-03-19T18:22:03+08:00",
+      "level": "WARN",
+      "message": "LIMIT ORDER INVALIDATED (MISSED WINNER): order=1006582626 | Price $4683.32 >= TP $4683.00"
+    },
+    {
+      "time": "2026-03-19T18:22:03+08:00",
+      "level": "WARN",
+      "message": "   Trade was valid but limit at $4680.00 never filled - price moved to TP without us"
     }
   ]
 }

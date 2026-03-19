@@ -1,14 +1,14 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 10,
+  "limit_orders_placed": 12,
   "limit_fills": 0,
   "limit_timeouts": 0,
-  "limit_invalidated": 13,
-  "signals_buffered": 27,
-  "zones_received_from_edit": 25,
+  "limit_invalidated": 14,
+  "signals_buffered": 29,
+  "zones_received_from_edit": 27,
   "zone_wait_timeouts": 1,
   "market_orders_no_zone": 0,
-  "market_orders_in_zone": 5,
+  "market_orders_in_zone": 6,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
   "zone_tracking_total": 0,
@@ -525,6 +525,60 @@
       "side": "BUY",
       "zone_low": 4697.0,
       "zone_high": 4702.5
+    },
+    {
+      "time": "2026-03-19 10:18:00",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-19 10:18:08",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4685.0,
+      "zone_high": 4690.0
+    },
+    {
+      "time": "2026-03-19 10:18:08",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 4689.32,
+      "zone_low": 4685.0,
+      "zone_high": 4690.0
+    },
+    {
+      "time": "2026-03-19 10:18:08",
+      "type": "limit_placed",
+      "side": "BUY",
+      "zone_low": 4685.0,
+      "zone_high": 4690.0
+    },
+    {
+      "time": "2026-03-19 10:21:10",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-19 10:21:17",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4675.0,
+      "zone_high": 4680.0
+    },
+    {
+      "time": "2026-03-19 10:21:17",
+      "type": "limit_placed",
+      "side": "BUY",
+      "zone_low": 4675.0,
+      "zone_high": 4680.0
+    },
+    {
+      "time": "2026-03-19 10:26:44",
+      "type": "limit_invalidated",
+      "side": "BUY",
+      "reason": "Price $4688.01 >= TP $4687.00",
+      "zone_low": 4675.0,
+      "zone_high": 4680.0
     }
   ]
 }

@@ -1,1 +1,113 @@
-{}
+{
+  "-4378": {
+    "ticket": -4378,
+    "side": "BUY",
+    "entry_price": 4680.32,
+    "sl_price": 4670.0,
+    "tp_levels": {
+      "1": 4683.0,
+      "2": 4685.0,
+      "3": 4687.0,
+      "4": 4689.0,
+      "5": 4697.0
+    },
+    "monitored_levels": {
+      "TP1": 4683.0,
+      "TP2": 4685.0,
+      "TP3": 4687.0,
+      "TP4": 4689.0,
+      "TP5": 4697.0,
+      "BE": 4680.32,
+      "SL": 4670.0
+    },
+    "sequence": [
+      {
+        "level": "TP1",
+        "time": "2026-03-19 10:26:44",
+        "timestamp": 1773916004.606219,
+        "price": 4687.86,
+        "revisit": false
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 10:26:44",
+        "timestamp": 1773916004.606219,
+        "price": 4687.86,
+        "revisit": false
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 10:26:44",
+        "timestamp": 1773916004.606219,
+        "price": 4687.86,
+        "revisit": false
+      },
+      {
+        "level": "TP4",
+        "time": "2026-03-19 10:26:49",
+        "timestamp": 1773916009.1696312,
+        "price": 4689.17,
+        "revisit": false
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 10:27:19",
+        "timestamp": 1773916039.571848,
+        "price": 4687.69,
+        "revisit": true
+      }
+    ],
+    "levels_hit": [
+      "TP1",
+      "TP2",
+      "TP3",
+      "TP4"
+    ],
+    "levels_breached": [
+      "TP1",
+      "TP2",
+      "TP3"
+    ],
+    "registered_at": "2026-03-19 10:26:44",
+    "registered_ts": 1773916004.1047037,
+    "position_closed": true,
+    "position_closed_at": 1773916004.1047037,
+    "position_profit": 0.0,
+    "position_close_reason": "not_entered:price_invalidated:Price $4688.01 >= TP $4687.00",
+    "position_close_price": null,
+    "virtual": true
+  },
+  "-4375": {
+    "ticket": -4375,
+    "side": "BUY",
+    "entry_price": 4690.12,
+    "sl_price": 4670.0,
+    "tp_levels": {
+      "1": 4693.0,
+      "2": 4695.0,
+      "3": 4697.0,
+      "4": 4699.0,
+      "5": 4710.0
+    },
+    "monitored_levels": {
+      "TP1": 4693.0,
+      "TP2": 4695.0,
+      "TP3": 4697.0,
+      "TP4": 4699.0,
+      "TP5": 4710.0,
+      "BE": 4690.12,
+      "SL": 4670.0
+    },
+    "sequence": [],
+    "levels_hit": [],
+    "levels_breached": [],
+    "registered_at": "2026-03-19 10:26:50",
+    "registered_ts": 1773916010.5297084,
+    "position_closed": true,
+    "position_closed_at": 1773916010.5451055,
+    "position_profit": 0.0,
+    "position_close_reason": "not_entered:channel_closure:TP3 HIT",
+    "position_close_price": null,
+    "virtual": true
+  }
+}
