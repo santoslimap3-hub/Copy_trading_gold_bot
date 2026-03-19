@@ -1259,22 +1259,35 @@ async def main():
         tp3 = select_tp3(all_tps) if all_tps else None
         side_for_tp = info["side"]
         tp3_adjusted = adjust_tp(tp3, side_for_tp) if tp3 else None
+
+        async def _modify_or_detect_fill(order_ticket: int, pos_key: str):
+            """Try to modify pending order; if gone, detect fill and track the position."""
+            ok = await run_mt5(lambda _ot=order_ticket, _sl=sl or 0, _tp=tp3_adjusted or 0:
+                               modify_limit_order_sl_tp(_ot, _sl, _tp))
+            if not ok and not info.get(pos_key):
+                filled = await run_mt5(lambda _ot=order_ticket: find_position_from_order(_ot))
+                if filled:
+                    fill_px = await run_mt5(lambda _ot=order_ticket: get_fill_price_from_order(_ot))
+                    info[pos_key] = filled
+                    entry_prices[filled] = fill_px or 0
+                    tp_sl_updated[filled] = False
+                    log(f"Pending order {order_ticket} already filled → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                    tickets_to_update.append(filled)
+
         if strategy == "split_both_pending":
-            for key in ("worst_order_ticket", "deep_order_ticket"):
+            for key, pos_key in (("worst_order_ticket", "worst_pos_ticket"),
+                                 ("deep_order_ticket", "deep_pos_ticket")):
                 ot = info.get(key)
                 if ot:
-                    await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3_adjusted or 0:
-                                  modify_limit_order_sl_tp(_ot, _sl, _tp))
+                    await _modify_or_detect_fill(ot, pos_key)
         elif strategy == "split_market_and_pending":
             ot = info.get("deep_order_ticket")
             if ot:
-                await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3_adjusted or 0:
-                              modify_limit_order_sl_tp(_ot, _sl, _tp))
+                await _modify_or_detect_fill(ot, "deep_pos_ticket")
         elif strategy == "whole_lot":
             ot = info.get("order_ticket")
             if ot:
-                await run_mt5(lambda _ot=ot, _sl=sl or 0, _tp=tp3_adjusted or 0:
-                              modify_limit_order_sl_tp(_ot, _sl, _tp))
+                await _modify_or_detect_fill(ot, "pos_ticket")
 
         for ticket in tickets_to_update:
             await update_position_sl_tp(ticket, sl, all_tps, source)
