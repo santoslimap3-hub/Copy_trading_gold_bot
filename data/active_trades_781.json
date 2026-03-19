@@ -1,0 +1,206 @@
+{
+  "55809980378": {
+    "ticket": 55809980378,
+    "side": "BUY",
+    "entry_price": 4747.22,
+    "sl_price": 4742.0,
+    "tp_levels": {
+      "1": 4750.0,
+      "2": 4751.0,
+      "3": 4752.0,
+      "4": 4753.0,
+      "5": 4755.0
+    },
+    "monitored_levels": {
+      "BE": 4747.22,
+      "SL": 4742.0,
+      "TP1": 4750.0,
+      "TP2": 4751.0,
+      "TP3": 4752.0,
+      "TP4": 4753.0,
+      "TP5": 4755.0
+    },
+    "sequence": [
+      {
+        "level": "TP1",
+        "time": "2026-03-19 15:48:00",
+        "timestamp": 1773906480.3181756,
+        "price": 4750.29,
+        "revisit": false
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 15:48:00",
+        "timestamp": 1773906480.8149672,
+        "price": 4751.02,
+        "revisit": false
+      },
+      {
+        "level": "POS_CLOSED(unknown)",
+        "time": "2026-03-19 15:48:08",
+        "timestamp": 1773906488.492162,
+        "price": 0.0,
+        "profit": 0.0
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 15:48:29",
+        "timestamp": 1773906509.8468032,
+        "price": 4752.04,
+        "revisit": false
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-19 15:48:54",
+        "timestamp": 1773906534.2748253,
+        "price": 4750.0,
+        "revisit": true
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 15:49:09",
+        "timestamp": 1773906549.5669644,
+        "price": 4751.98,
+        "revisit": true
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 15:49:10",
+        "timestamp": 1773906550.073466,
+        "price": 4752.3,
+        "revisit": true
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-19 15:50:02",
+        "timestamp": 1773906602.6605935,
+        "price": 4750.0,
+        "revisit": true
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 15:50:28",
+        "timestamp": 1773906628.6780558,
+        "price": 4751.01,
+        "revisit": true
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-19 15:50:36",
+        "timestamp": 1773906636.3158607,
+        "price": 4750.0,
+        "revisit": true
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 15:51:12",
+        "timestamp": 1773906672.087765,
+        "price": 4751.27,
+        "revisit": true
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 15:51:23",
+        "timestamp": 1773906683.7513669,
+        "price": 4752.11,
+        "revisit": true
+      },
+      {
+        "level": "BE",
+        "time": "2026-03-19 15:51:59",
+        "timestamp": 1773906719.0075436,
+        "price": 4746.9,
+        "revisit": false
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-19 15:52:38",
+        "timestamp": 1773906758.4094357,
+        "price": 4750.61,
+        "revisit": true
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 15:53:20",
+        "timestamp": 1773906800.7562292,
+        "price": 4751.09,
+        "revisit": true
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-19 15:53:46",
+        "timestamp": 1773906826.3719757,
+        "price": 4750.0,
+        "revisit": true
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-19 15:54:00",
+        "timestamp": 1773906840.71877,
+        "price": 4751.42,
+        "revisit": true
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 15:54:03",
+        "timestamp": 1773906843.2753222,
+        "price": 4752.36,
+        "revisit": true
+      },
+      {
+        "level": "TP4",
+        "time": "2026-03-19 15:54:08",
+        "timestamp": 1773906848.8991501,
+        "price": 4753.01,
+        "revisit": false
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 15:54:22",
+        "timestamp": 1773906862.2128994,
+        "price": 4752.09,
+        "revisit": true
+      },
+      {
+        "level": "TP4",
+        "time": "2026-03-19 15:54:31",
+        "timestamp": 1773906871.8854003,
+        "price": 4753.17,
+        "revisit": true
+      },
+      {
+        "level": "TP3",
+        "time": "2026-03-19 15:54:34",
+        "timestamp": 1773906874.5069277,
+        "price": 4752.1,
+        "revisit": true
+      },
+      {
+        "level": "TP4",
+        "time": "2026-03-19 15:54:39",
+        "timestamp": 1773906879.0588605,
+        "price": 4753.33,
+        "revisit": true
+      }
+    ],
+    "levels_hit": [
+      "BE",
+      "TP1",
+      "TP2",
+      "TP3",
+      "TP4"
+    ],
+    "levels_breached": [
+      "TP1",
+      "TP2",
+      "TP3"
+    ],
+    "registered_at": "2026-03-19 15:47:00",
+    "registered_ts": 1773906420.1075842,
+    "position_closed": true,
+    "position_closed_at": 1773906488.492162,
+    "position_profit": 0.0,
+    "position_close_reason": "unknown",
+    "position_close_price": 0.0
+  }
+}

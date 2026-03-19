@@ -1,0 +1,46 @@
+{
+  "last_updated": "2026-03-19T15:56:59+08:00",
+  "magic": 781,
+  "errors": [
+    {
+      "time": "2026-03-19T15:37:39+08:00",
+      "level": "ERROR",
+      "message": "MT5 initialization FAILED"
+    },
+    {
+      "time": "2026-03-19T15:37:39+08:00",
+      "level": "ERROR",
+      "message": "   Last error: (-10003, \"IPC initialize failed, Process create failed 'C:\\\\MT5_2\\\\terminal64.exe'\")"
+    },
+    {
+      "time": "2026-03-19T15:47:04+08:00",
+      "level": "WARN",
+      "message": "Pending order 55809980440 not found"
+    },
+    {
+      "time": "2026-03-19T15:55:06+08:00",
+      "level": "ERROR",
+      "message": "MT5 initialization FAILED"
+    },
+    {
+      "time": "2026-03-19T15:55:06+08:00",
+      "level": "ERROR",
+      "message": "   Last error: (-10003, \"IPC initialize failed, Process create failed 'C:\\\\MT5_2\\\\terminal64.exe'\")"
+    },
+    {
+      "time": "2026-03-19T15:55:30+08:00",
+      "level": "ERROR",
+      "message": "MT5 initialization FAILED"
+    },
+    {
+      "time": "2026-03-19T15:55:30+08:00",
+      "level": "ERROR",
+      "message": "   Last error: (-10003, \"IPC initialize failed, Process create failed 'C:\\\\MT5_2\\\\terminal64.exe'\")"
+    },
+    {
+      "time": "2026-03-19T15:56:59+08:00",
+      "level": "WARN",
+      "message": "Pending order 55810122589 not found"
+    }
+  ]
+}

@@ -53,10 +53,11 @@ from signal_records import SignalRecordsManager, level_to_int
 API_ID = 34597981
 API_HASH = "2cd59609b6cacb56da261e43fdb897ea"
 CHANNEL_ID = -1003349563414
-SESSION_FILE = "trading_bot_session_split_entry"
+TEST_CHANNEL_ID = -1003817819872  # Test channel for manual signals
+SESSION_FILE = "trading_bot_session_split_entry_test"
 
 SYMBOL = "XAUUSD"
-MAGIC = 780
+MAGIC = 781
 RISK_PCT = 0.1
 FAILSAFE_SL_DISTANCE = 8.0   # $8 away from entry
 FAILSAFE_TP_DISTANCE = 8.0   # $8 away from entry (failsafe until real TP arrives)
@@ -69,7 +70,7 @@ TP_EARLY_EXIT_OFFSET    = 0.5   # $0.5 early exit: BUY TP lowered, SELL TP raise
 LIMIT_ORDER_TIMEOUT = 14400  # 4 hours
 ZONE_WAIT_TIMEOUT   = 120    # 2 min wait for zone via edit
 
-ALLOWED_CHAT_IDS = {CHANNEL_ID}
+ALLOWED_CHAT_IDS = {CHANNEL_ID, TEST_CHANNEL_ID}
 DEBUG_LOG_ALL_MESSAGES = True
 LOG_LEVEL = "INFO"
 
@@ -271,7 +272,7 @@ def check_autotrading_status():
 
 def ensure_mt5_connection():
     global mt5_connected, mt5_connection_losses
-    mt5_path = r"C:\MT5_2\terminal64.exe"
+    mt5_path = r"C:\MTAccount2\terminal64.exe"
     log(f"Initializing MT5 at: {mt5_path}", "INFO")
     init_ok = mt5.initialize(path=mt5_path)
     if not init_ok:
@@ -1150,7 +1151,7 @@ async def main():
     start_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
     signal_queue      = SignalQueue("signal_queue.json")
-    session_manager   = SessionManager("trading_bot_session_split_entry", "sessions")
+    session_manager   = SessionManager("trading_bot_session_split_entry_test", "sessions")
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
     outcome_tracker   = TradeOutcomeTracker(magic=MAGIC)
     _data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
