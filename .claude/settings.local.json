@@ -13,7 +13,8 @@
       "Read(//c/Users/santo/AppData/Local/Programs/Python//**)",
       "Bash(\"C:/Program Files/Python312/python.exe\" -c \":*)",
       "Bash(\"C:/Program Files/Python312/python.exe\" bot_trades_exporter.py)",
-      "Bash(python tools/bot_trades_exporter_moms_account.py)"
+      "Bash(python tools/bot_trades_exporter_moms_account.py)",
+      "Bash(python generate_synthetic_bot_trades.py)"
     ]
   }
 }
