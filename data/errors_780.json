@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-20T14:40:22+08:00",
+  "last_updated": "2026-03-20T17:46:40+08:00",
   "magic": 780,
   "errors": [
     {
@@ -196,6 +196,196 @@
       "time": "2026-03-20T14:40:22+08:00",
       "level": "WARN",
       "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-20T15:40:05+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T15:40:05+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1698, in split_entry_monitor\n    log(f\"SPLIT FILL ({label}): order {ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T15:40:30+08:00",
+      "level": "WARN",
+      "message": "Pending order 1014823651 not found"
+    },
+    {
+      "time": "2026-03-20T15:40:38+08:00",
+      "level": "WARN",
+      "message": "SL update FAILED - Retcode: 10016"
+    },
+    {
+      "time": "2026-03-20T15:41:50+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T15:41:51+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1698, in split_entry_monitor\n    log(f\"SPLIT FILL ({label}): order {ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T15:42:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014823659 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T15:44:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014823659 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T15:44:50+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1014823651 not found"
+    },
+    {
+      "time": "2026-03-20T15:44:50+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1014823651 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-20T15:44:57+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1014823651 not found"
+    },
+    {
+      "time": "2026-03-20T15:44:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1014823651 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-20T15:45:00+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1014823651 not found"
+    },
+    {
+      "time": "2026-03-20T15:45:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1014823651 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-20T15:45:39+08:00",
+      "level": "WARN",
+      "message": "Pending order 1014823651 not found"
+    },
+    {
+      "time": "2026-03-20T15:45:39+08:00",
+      "level": "WARN",
+      "message": "Pending order 1014823659 not found"
+    },
+    {
+      "time": "2026-03-20T15:45:39+08:00",
+      "level": "WARN",
+      "message": "Position 1014823651 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-20T15:45:54+08:00",
+      "level": "WARN",
+      "message": "Pending order 1014823651 not found"
+    },
+    {
+      "time": "2026-03-20T15:45:54+08:00",
+      "level": "WARN",
+      "message": "Pending order 1014823659 not found"
+    },
+    {
+      "time": "2026-03-20T15:45:54+08:00",
+      "level": "WARN",
+      "message": "Position 1014823651 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-20T15:58:34+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T15:58:34+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1897, in split_entry_monitor\n    log(f\"SPLIT FILL (DEEP): order {deep_ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T15:58:43+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014898457 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T16:00:44+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014898457 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T16:02:45+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014898457 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T16:12:07+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T16:12:07+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1698, in split_entry_monitor\n    log(f\"SPLIT FILL ({label}): order {ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T16:12:45+08:00",
+      "level": "WARN",
+      "message": "Pending order 1014970758 not found"
+    },
+    {
+      "time": "2026-03-20T16:15:11+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T16:15:11+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1698, in split_entry_monitor\n    log(f\"SPLIT FILL ({label}): order {ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T16:16:46+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014970844 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T16:18:46+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1014970844 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T16:20:54+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1014823651: Invalid request"
+    },
+    {
+      "time": "2026-03-20T16:20:54+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1014823659: Invalid request"
+    },
+    {
+      "time": "2026-03-20T16:20:54+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1014898457: Invalid request"
+    },
+    {
+      "time": "2026-03-20T16:20:54+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1014970758: Invalid request"
+    },
+    {
+      "time": "2026-03-20T16:20:54+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1014970844: Invalid request"
+    },
+    {
+      "time": "2026-03-20T17:46:40+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4672.55 >= TP $4672.00"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "magic": 780,
-  "total_tracked": 18,
-  "last_updated": "2026-03-19 12:43:08",
+  "total_tracked": 20,
+  "last_updated": "2026-03-20 09:46:41",
   "outcomes": [
     {
       "ticket": 991767163,
@@ -1880,6 +1880,83 @@
       "shadow_duration_seconds": 0.6100249290466309,
       "virtual": false,
       "position_close_price": 0.0
+    },
+    {
+      "ticket": 1014898379,
+      "side": "SELL",
+      "entry_price": 4704.9,
+      "sl_price": 4713.0,
+      "tp_levels": {
+        "1": 4701.0,
+        "2": 4699.0,
+        "3": 4697.0,
+        "4": 4695.0,
+        "5": 4690.0
+      },
+      "sequence": [
+        {
+          "level": "POS_CLOSED(unknown)",
+          "time": "2026-03-20 08:00:08",
+          "timestamp": 1773993608.8495517,
+          "price": 0.0,
+          "profit": 0.0
+        },
+        {
+          "level": "SL",
+          "time": "2026-03-20 08:11:45",
+          "timestamp": 1773994305.970059,
+          "price": 4713.55,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "POS_CLOSED(unknown) \u2192 SL",
+      "levels_hit": [
+        "SL"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:SL_hit",
+      "registered_at": "2026-03-20 07:57:25",
+      "closed_at": "2026-03-20 08:11:46",
+      "duration_seconds": 860.8839921951294,
+      "position_closed_at": 1773993608.8495517,
+      "position_close_reason": "unknown",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 697.5267679691315,
+      "virtual": false,
+      "position_close_price": 0.0
+    },
+    {
+      "ticket": -4429,
+      "side": "BUY",
+      "entry_price": 4668.9,
+      "sl_price": 4660.0,
+      "tp_levels": {
+        "1": 4672.0
+      },
+      "sequence": [
+        {
+          "level": "TP1",
+          "time": "2026-03-20 09:46:41",
+          "timestamp": 1774000001.8299708,
+          "price": 4672.49,
+          "revisit": false
+        }
+      ],
+      "sequence_str": "TP1",
+      "levels_hit": [
+        "TP1"
+      ],
+      "final_profit": 0.0,
+      "close_reason": "shadow:TP1_hit",
+      "registered_at": "2026-03-20 09:46:41",
+      "closed_at": "2026-03-20 09:46:41",
+      "duration_seconds": 0.6570348739624023,
+      "position_closed_at": 1774000001.2666376,
+      "position_close_reason": "not_entered:price_invalidated:Price $4672.55 >= TP $4672.00",
+      "shadow_tracked": true,
+      "shadow_duration_seconds": 0.6570348739624023,
+      "virtual": true,
+      "position_close_price": null
     }
   ]
 }
