@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-20T12:49:50+08:00",
+  "last_updated": "2026-03-20T14:59:52+08:00",
   "magic": 777,
   "errors": [
     {
@@ -1176,6 +1176,116 @@
       "time": "2026-03-20T12:49:50+08:00",
       "level": "WARN",
       "message": "No Telegram activity for 14643s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T12:54:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 14943s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T12:59:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 15243s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:04:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 15543s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:09:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 15843s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:14:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 16143s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:19:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 16443s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:24:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 16743s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:29:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 17044s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:34:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 17344s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:39:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 17644s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:44:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 17944s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:49:51+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 18244s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:54:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 18544s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T13:59:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 18844s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:04:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 19144s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:09:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 19444s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:14:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 19744s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:19:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 20044s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:24:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 20344s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:29:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 20644s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:54:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 373s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T14:59:52+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 674s - running active connectivity check..."
     }
   ]
 }

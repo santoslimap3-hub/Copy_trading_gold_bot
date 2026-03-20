@@ -4,7 +4,7 @@
   "limit_fills": 0,
   "limit_timeouts": 0,
   "limit_invalidated": 15,
-  "signals_buffered": 32,
+  "signals_buffered": 33,
   "zones_received_from_edit": 30,
   "zone_wait_timeouts": 1,
   "market_orders_no_zone": 0,
@@ -660,6 +660,11 @@
       "side": "BUY",
       "zone_low": 4589.0,
       "zone_high": 4594.0
+    },
+    {
+      "time": "2026-03-20 06:39:53",
+      "type": "signal_buffered",
+      "side": "BUY"
     }
   ]
 }

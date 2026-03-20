@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T20:43:37+08:00",
+  "last_updated": "2026-03-20T14:40:22+08:00",
   "magic": 780,
   "errors": [
     {
@@ -181,6 +181,21 @@
       "time": "2026-03-19T20:43:37+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1007883806: Invalid request"
+    },
+    {
+      "time": "2026-03-20T14:40:03+08:00",
+      "level": "ERROR",
+      "message": "AutoTrading DISABLED - cannot trade!"
+    },
+    {
+      "time": "2026-03-20T14:40:03+08:00",
+      "level": "ERROR",
+      "message": "Market half-lot entry failed"
+    },
+    {
+      "time": "2026-03-20T14:40:22+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
     }
   ]
 }
