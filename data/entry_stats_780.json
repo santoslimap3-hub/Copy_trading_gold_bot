@@ -1,11 +1,11 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 19,
+  "limit_orders_placed": 20,
   "limit_fills": 0,
   "limit_timeouts": 0,
   "limit_invalidated": 16,
-  "signals_buffered": 37,
-  "zones_received_from_edit": 34,
+  "signals_buffered": 38,
+  "zones_received_from_edit": 35,
   "zone_wait_timeouts": 1,
   "market_orders_no_zone": 0,
   "market_orders_in_zone": 9,
@@ -757,6 +757,25 @@
       "reason": "Price $4672.55 >= TP $4672.00",
       "zone_low": 4665.0,
       "zone_high": 4669.0
+    },
+    {
+      "time": "2026-03-20 10:22:16",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-20 10:22:29",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4642.0,
+      "zone_high": 4648.0
+    },
+    {
+      "time": "2026-03-20 10:22:29",
+      "type": "limit_placed",
+      "side": "BUY",
+      "zone_low": 4642.0,
+      "zone_high": 4648.0
     }
   ]
 }
