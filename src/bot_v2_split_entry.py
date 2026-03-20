@@ -1283,7 +1283,7 @@ async def main():
                     info[pos_key] = filled
                     entry_prices[filled] = fill_px or 0
                     tp_sl_updated[filled] = False
-                    log(f"Pending order {order_ticket} already filled → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                    log(f"Pending order {order_ticket} already filled → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                     tickets_to_update.append(filled)
 
         if strategy == "split_both_pending":
@@ -1643,6 +1643,7 @@ async def main():
                     record_entry_stat("zone_wait_timeout", side=side_buf)
                     if signal_records:
                         signal_records.record_bot_entry(mid, entered=False, entry_type="zone_wait_timeout")
+                        signal_records.finalize(mid)
                     if outcome_tracker:
                         buf_tps = parse_tp_levels(buf.get("text", ""))
                         buf_sl  = parse_stop_loss(buf.get("text", ""))
@@ -1695,7 +1696,7 @@ async def main():
                                     tp_sl_updated[filled] = False
                                     label = "WORST" if "worst" in key_ot else "DEEP"
                                     log(_LOG_SEP, "INFO")
-                                    log(f"SPLIT FILL ({label}): order {ot} → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                    log(f"SPLIT FILL ({label}): order {ot} → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                     log(_LOG_SEP, "INFO")
                                     record_entry_stat("limit_fill", side=side,
                                                       limit_price=worst_entry if "worst" in key_ot else deep_entry,
@@ -1791,6 +1792,7 @@ async def main():
                                     signal_records.record_entry_event(mid, "limit_timeout", side=side,
                                                                       limit_price=worst_entry, elapsed=elapsed,
                                                                       best_reached=_best, worst_reached=_worst)
+                                    signal_records.finalize(mid)
                                 if outcome_tracker and info.get("all_tps"):
                                     vt_id    = -abs(mid)
                                     vt_sl    = info.get("sl") or failsafe_sl or 0
@@ -1841,7 +1843,7 @@ async def main():
                                                 position_map[mid] = filled
                                                 tp_sl_updated[filled] = False
                                                 label = "WORST" if "worst" in key_ot else "DEEP"
-                                                log(f"INVALIDATION RECOVERY: order {ot} was filled → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                                log(f"INVALIDATION RECOVERY: order {ot} was filled → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                                 any_filled = True
                                                 if outcome_tracker:
                                                     outcome_tracker.register_trade(filled, side, fill_px or (worst_entry if "worst" in key_ot else deep_entry),
@@ -1866,6 +1868,7 @@ async def main():
                                     signal_records.record_entry_event(mid, "limit_timeout", side=side,
                                                                       limit_price=worst_entry, elapsed=elapsed,
                                                                       best_reached=_best2, worst_reached=_worst2)
+                                    signal_records.finalize(mid)
                                 if outcome_tracker and info.get("all_tps"):
                                     vt_id    = -abs(mid)
                                     vt_sl    = info.get("sl") or failsafe_sl or 0
@@ -1894,7 +1897,7 @@ async def main():
                                 entry_prices[filled] = fill_px or deep_entry
                                 tp_sl_updated[filled] = False
                                 log(_LOG_SEP, "INFO")
-                                log(f"SPLIT FILL (DEEP): order {deep_ot} → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                log(f"SPLIT FILL (DEEP): order {deep_ot} → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                 log(_LOG_SEP, "INFO")
                                 if outcome_tracker:
                                     outcome_tracker.register_trade(filled, side, fill_px or deep_entry,
@@ -2000,7 +2003,7 @@ async def main():
                                 position_map[mid]    = filled
                                 tp_sl_updated[filled] = False
                                 log(_LOG_SEP, "INFO")
-                                log(f"WHOLE LOT FILLED: order {ot} → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                log(f"WHOLE LOT FILLED: order {ot} → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                 log(_LOG_SEP, "INFO")
                                 record_entry_stat("limit_fill", side=side, limit_price=worst_entry,
                                                   fill_price=fill_px, zone_low=zone_low, zone_high=zone_high)
@@ -2033,6 +2036,7 @@ async def main():
                                     signal_records.record_entry_event(mid, "limit_timeout", side=side,
                                                                       limit_price=worst_entry, elapsed=elapsed,
                                                                       best_reached=_best, worst_reached=_worst)
+                                    signal_records.finalize(mid)
                                 if outcome_tracker and info.get("all_tps"):
                                     vt_id    = -abs(mid)
                                     vt_sl    = info.get("sl") or failsafe_sl or 0
