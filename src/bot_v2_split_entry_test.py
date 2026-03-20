@@ -1625,6 +1625,7 @@ async def main():
                     record_entry_stat("zone_wait_timeout", side=side_buf)
                     if signal_records:
                         signal_records.record_bot_entry(mid, entered=False, entry_type="zone_wait_timeout")
+                        signal_records.finalize(mid)
                     if outcome_tracker:
                         buf_tps = parse_tp_levels(buf.get("text", ""))
                         buf_sl  = parse_stop_loss(buf.get("text", ""))
@@ -1773,6 +1774,7 @@ async def main():
                                     signal_records.record_entry_event(mid, "limit_timeout", side=side,
                                                                       limit_price=worst_entry, elapsed=elapsed,
                                                                       best_reached=_best, worst_reached=_worst)
+                                    signal_records.finalize(mid)
                                 if outcome_tracker and info.get("all_tps"):
                                     vt_id    = -abs(mid)
                                     vt_sl    = info.get("sl") or failsafe_sl or 0
@@ -1821,6 +1823,7 @@ async def main():
                                     signal_records.record_entry_event(mid, "limit_timeout", side=side,
                                                                       limit_price=worst_entry, elapsed=elapsed,
                                                                       best_reached=_best2, worst_reached=_worst2)
+                                    signal_records.finalize(mid)
                                 if outcome_tracker and info.get("all_tps"):
                                     vt_id    = -abs(mid)
                                     vt_sl    = info.get("sl") or failsafe_sl or 0
@@ -1988,6 +1991,7 @@ async def main():
                                     signal_records.record_entry_event(mid, "limit_timeout", side=side,
                                                                       limit_price=worst_entry, elapsed=elapsed,
                                                                       best_reached=_best, worst_reached=_worst)
+                                    signal_records.finalize(mid)
                                 if outcome_tracker and info.get("all_tps"):
                                     vt_id    = -abs(mid)
                                     vt_sl    = info.get("sl") or failsafe_sl or 0
