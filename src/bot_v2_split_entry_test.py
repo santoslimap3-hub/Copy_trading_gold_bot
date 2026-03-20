@@ -1272,7 +1272,7 @@ async def main():
                     info[pos_key] = filled
                     entry_prices[filled] = fill_px or 0
                     tp_sl_updated[filled] = False
-                    log(f"Pending order {order_ticket} already filled → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                    log(f"Pending order {order_ticket} already filled → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                     tickets_to_update.append(filled)
 
         if strategy == "split_both_pending":
@@ -1677,7 +1677,7 @@ async def main():
                                     tp_sl_updated[filled] = False
                                     label = "WORST" if "worst" in key_ot else "DEEP"
                                     log(_LOG_SEP, "INFO")
-                                    log(f"SPLIT FILL ({label}): order {ot} → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                    log(f"SPLIT FILL ({label}): order {ot} → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                     log(_LOG_SEP, "INFO")
                                     record_entry_stat("limit_fill", side=side,
                                                       limit_price=worst_entry if "worst" in key_ot else deep_entry,
@@ -1849,7 +1849,7 @@ async def main():
                                 entry_prices[filled] = fill_px or deep_entry
                                 tp_sl_updated[filled] = False
                                 log(_LOG_SEP, "INFO")
-                                log(f"SPLIT FILL (DEEP): order {deep_ot} → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                log(f"SPLIT FILL (DEEP): order {deep_ot} → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                 log(_LOG_SEP, "INFO")
                                 if outcome_tracker:
                                     outcome_tracker.register_trade(filled, side, fill_px or deep_entry,
@@ -1955,7 +1955,7 @@ async def main():
                                 position_map[mid]    = filled
                                 tp_sl_updated[filled] = False
                                 log(_LOG_SEP, "INFO")
-                                log(f"WHOLE LOT FILLED: order {ot} → position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}", "INFO")
+                                log(f"WHOLE LOT FILLED: order {ot} → position {filled} @ ${(fill_px if fill_px else 0):.2f}", "INFO")
                                 log(_LOG_SEP, "INFO")
                                 record_entry_stat("limit_fill", side=side, limit_price=worst_entry,
                                                   fill_price=fill_px, zone_low=zone_low, zone_high=zone_high)
