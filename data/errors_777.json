@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-20T18:25:51+08:00",
+  "last_updated": "2026-03-20T22:43:37+08:00",
   "magic": 777,
   "errors": [
     {
@@ -181,6 +181,246 @@
       "time": "2026-03-20T18:25:51+08:00",
       "level": "WARN",
       "message": "No open positions at all - ignoring edit"
+    },
+    {
+      "time": "2026-03-20T18:33:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 460s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T18:43:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 313s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T18:48:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 613s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T18:53:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 913s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T18:56:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1016063798 still has FAILSAFE SL/TP (no edit received yet)"
+    },
+    {
+      "time": "2026-03-20T19:13:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 577s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T19:18:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 877s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T19:23:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1177s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T19:28:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1477s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T19:38:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 409s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T19:53:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 504s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T19:58:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 804s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:03:34+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1104s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:08:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1404s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:18:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 420s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:23:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 720s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:33:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 312s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:38:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 612s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:53:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 382s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T20:58:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 682s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:03:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 982s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:08:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1282s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:13:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1582s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:18:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1882s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:23:35+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2182s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:28:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2482s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:33:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2782s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:36:03+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions (POLLED)"
+    },
+    {
+      "time": "2026-03-20T21:36:29+08:00",
+      "level": "WARN",
+      "message": "Message ID 4458 not in position_map - looking for recent bot positions"
+    },
+    {
+      "time": "2026-03-20T21:36:29+08:00",
+      "level": "WARN",
+      "message": "No open positions at all - ignoring edit"
+    },
+    {
+      "time": "2026-03-20T21:36:35+08:00",
+      "level": "WARN",
+      "message": "Message ID 4458 not in position_map - looking for recent bot positions"
+    },
+    {
+      "time": "2026-03-20T21:36:35+08:00",
+      "level": "WARN",
+      "message": "No open positions at all - ignoring edit"
+    },
+    {
+      "time": "2026-03-20T21:36:42+08:00",
+      "level": "WARN",
+      "message": "Message ID 4458 not in position_map - looking for recent bot positions"
+    },
+    {
+      "time": "2026-03-20T21:36:42+08:00",
+      "level": "WARN",
+      "message": "No open positions at all - ignoring edit"
+    },
+    {
+      "time": "2026-03-20T21:36:48+08:00",
+      "level": "WARN",
+      "message": "LIMIT ORDER INVALIDATED (MISSED WINNER): order=1017231183 | Price $4658.78 >= TP $4645.00"
+    },
+    {
+      "time": "2026-03-20T21:36:48+08:00",
+      "level": "WARN",
+      "message": "   Trade was valid but limit at $4642.00 never filled - price moved to TP without us"
+    },
+    {
+      "time": "2026-03-20T21:43:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 357s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:48:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 657s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T21:58:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 330s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:03:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 630s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:08:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 930s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:13:36+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1230s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:18:37+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1531s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:23:37+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 1831s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:28:37+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2131s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:33:37+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2431s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:38:37+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 2731s - running active connectivity check..."
+    },
+    {
+      "time": "2026-03-20T22:43:37+08:00",
+      "level": "WARN",
+      "message": "No Telegram activity for 3031s - running active connectivity check..."
     }
   ]
 }

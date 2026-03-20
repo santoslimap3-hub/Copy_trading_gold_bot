@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-20T18:25:10+08:00",
+  "last_updated": "2026-03-20T21:36:04+08:00",
   "magic": 780,
   "errors": [
     {
@@ -416,6 +416,81 @@
       "time": "2026-03-20T18:25:10+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1015832221: Invalid request"
+    },
+    {
+      "time": "2026-03-20T18:56:26+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T18:56:26+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1897, in split_entry_monitor\n    log(f\"SPLIT FILL (DEEP): order {deep_ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T18:56:46+08:00",
+      "level": "WARN",
+      "message": "Pending order 1016063804 not found"
+    },
+    {
+      "time": "2026-03-20T18:56:46+08:00",
+      "level": "WARN",
+      "message": "Position 1016063792 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-20T18:56:46+08:00",
+      "level": "WARN",
+      "message": "Position 1016063804 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-20T18:56:48+08:00",
+      "level": "WARN",
+      "message": "Pending order 1016063804 not found"
+    },
+    {
+      "time": "2026-03-20T18:56:48+08:00",
+      "level": "WARN",
+      "message": "Position 1016063792 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-20T18:56:48+08:00",
+      "level": "WARN",
+      "message": "Position 1016063804 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-20T19:02:38+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1016063804: Invalid request"
+    },
+    {
+      "time": "2026-03-20T20:09:13+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1016492503 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-20T20:09:28+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL: Split entry monitor error: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'"
+    },
+    {
+      "time": "2026-03-20T20:09:28+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry.py\", line 1897, in split_entry_monitor\n    log(f\"SPLIT FILL (DEEP): order {deep_ot} \u2192 position {filled} @ ${fill_px:.2f if fill_px else 0:.2f}\", \"INFO\")\n                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Invalid format specifier '.2f if fill_px else 0:.2f' for object of type 'float'\n"
+    },
+    {
+      "time": "2026-03-20T20:09:31+08:00",
+      "level": "WARN",
+      "message": "Pending order 1016492523 not found"
+    },
+    {
+      "time": "2026-03-20T20:11:29+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1016492523: Invalid request"
+    },
+    {
+      "time": "2026-03-20T21:36:04+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4649.15 >= TP $4645.00"
     }
   ]
 }
