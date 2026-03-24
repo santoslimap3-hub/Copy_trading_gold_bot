@@ -37,7 +37,10 @@ def _load_json(path: str):
     if not os.path.exists(path):
         abort(404, description=f"Data file not found: {os.path.basename(path)}")
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except json.JSONDecodeError as e:
+            abort(500, description=f"Malformed JSON in {os.path.basename(path)}: {e}")
 
 
 @app.route("/trade_history", methods=["GET"])
