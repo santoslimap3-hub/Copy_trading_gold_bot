@@ -1,18 +1,6 @@
 {
   "queue": [
     {
-      "id": 4282,
-      "signal_type": "TRADE",
-      "side": "SELL",
-      "entry_price": 5024.62,
-      "sl_price": 5032.62,
-      "lot_size": 0.1,
-      "tp_levels": {},
-      "msg_text": "XAU USD SELL NOW\n\n5024 - 5028",
-      "timestamp": "2026-03-17T07:35:06.056502",
-      "executed": true
-    },
-    {
       "id": 4291,
       "signal_type": "TRADE",
       "side": "BUY",
