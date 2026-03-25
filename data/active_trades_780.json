@@ -27,12 +27,38 @@
         "timestamp": 1774423399.8049397,
         "price": 4556.96,
         "revisit": false
+      },
+      {
+        "level": "BE",
+        "time": "2026-03-25 07:26:55",
+        "timestamp": 1774423615.9128542,
+        "price": 4560.27,
+        "revisit": false
+      },
+      {
+        "level": "TP1",
+        "time": "2026-03-25 07:30:44",
+        "timestamp": 1774423844.674032,
+        "price": 4556.8,
+        "revisit": true
+      },
+      {
+        "level": "TP2",
+        "time": "2026-03-25 07:31:32",
+        "timestamp": 1774423892.7073114,
+        "price": 4554.3,
+        "revisit": false
       }
     ],
     "levels_hit": [
-      "TP1"
+      "BE",
+      "TP1",
+      "TP2"
     ],
-    "levels_breached": [],
+    "levels_breached": [
+      "TP1",
+      "TP2"
+    ],
     "registered_at": "2026-03-25 07:17:15",
     "registered_ts": 1774423035.9006085,
     "position_closed": false,
