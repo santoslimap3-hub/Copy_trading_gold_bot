@@ -1,14 +1,14 @@
 {
   "total_signals": 0,
-  "limit_orders_placed": 44,
+  "limit_orders_placed": 45,
   "limit_fills": 13,
   "limit_timeouts": 0,
   "limit_invalidated": 22,
-  "signals_buffered": 66,
-  "zones_received_from_edit": 63,
+  "signals_buffered": 67,
+  "zones_received_from_edit": 64,
   "zone_wait_timeouts": 1,
   "market_orders_no_zone": 0,
-  "market_orders_in_zone": 23,
+  "market_orders_in_zone": 24,
   "market_orders_fallback": 0,
   "total_limit_slippage": 0.0,
   "zone_tracking_total": 0,
@@ -1557,6 +1557,33 @@
       "side": "SELL",
       "zone_low": 4560.0,
       "zone_high": 4564.0
+    },
+    {
+      "time": "2026-03-25 08:00:06",
+      "type": "signal_buffered",
+      "side": "BUY"
+    },
+    {
+      "time": "2026-03-25 08:00:13",
+      "type": "zone_from_edit",
+      "side": "BUY",
+      "zone_low": 4535.0,
+      "zone_high": 4540.0
+    },
+    {
+      "time": "2026-03-25 08:00:13",
+      "type": "market_entry_in_zone",
+      "side": "BUY",
+      "entry_price": 4539.31,
+      "zone_low": 4535.0,
+      "zone_high": 4540.0
+    },
+    {
+      "time": "2026-03-25 08:00:13",
+      "type": "limit_placed",
+      "side": "BUY",
+      "zone_low": 4535.0,
+      "zone_high": 4540.0
     }
   ]
 }

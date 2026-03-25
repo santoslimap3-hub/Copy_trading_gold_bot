@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-25T00:09:40+08:00",
+  "last_updated": "2026-03-25T16:02:44+08:00",
   "magic": 780,
   "errors": [
     {
@@ -176661,6 +176661,11 @@
       "time": "2026-03-25T00:09:40+08:00",
       "level": "WARN",
       "message": "  Failed to close worst position 1046039944 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T16:02:44+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1051259672: Invalid request"
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "last_updated": "2026-03-25T16:02:43+08:00",
+  "magic": 782,
+  "errors": [
+    {
+      "time": "2026-03-25T16:00:26+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1051259560 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T16:02:43+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1051259581: Invalid request"
+    }
+  ]
+}

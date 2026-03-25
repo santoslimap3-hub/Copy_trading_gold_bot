@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "created_at": "2026-03-25T06:05:35.386638",
+    "created_at": "2026-03-25T07:47:06.507914",
     "symbol": "XAUUSD",
     "magic_numbers": [
       777,
@@ -9,25 +9,25 @@
     "days_back": 365
   },
   "summary": {
-    "total_trades": 79,
+    "total_trades": 81,
     "buy_trades": 41,
-    "sell_trades": 38,
-    "winning_trades": 39,
+    "sell_trades": 40,
+    "winning_trades": 41,
     "losing_trades": 36,
     "breakeven_trades": 4,
-    "win_rate_percent": 49.37,
-    "gross_profit": 856.96,
+    "win_rate_percent": 50.62,
+    "gross_profit": 911.04,
     "gross_loss": 1201.58,
-    "net_pnl": -344.62,
+    "net_pnl": -290.54,
     "total_commission": 0.0,
     "total_swap": 0.0,
-    "avg_net_per_trade": -4.36,
-    "avg_win": 21.97,
+    "avg_net_per_trade": -3.59,
+    "avg_win": 22.22,
     "avg_loss": 33.38,
-    "profit_factor": 0.71,
+    "profit_factor": 0.76,
     "close_reason_breakdown": {
       "SL": 46,
-      "TP": 23,
+      "TP": 25,
       "EXPERT": 10
     }
   },
@@ -1611,6 +1611,46 @@
       "commission": 0.0,
       "swap": 0.0,
       "net_profit": 31.08
+    },
+    {
+      "position_id": 1050994110,
+      "magic": 780,
+      "symbol": "XAUUSD",
+      "direction": "SELL",
+      "volume": 0.04,
+      "open_time": "2026-03-25T18:17:13+08:00",
+      "open_price": 4560.17,
+      "open_ticket": 919133395,
+      "open_comment": "Signal SELL",
+      "close_time": "2026-03-25T18:35:15+08:00",
+      "close_price": 4553.5,
+      "close_ticket": 919205874,
+      "close_comment": "[tp 4553.50]",
+      "close_reason": "TP",
+      "profit": 23.02,
+      "commission": 0.0,
+      "swap": 0.0,
+      "net_profit": 23.02
+    },
+    {
+      "position_id": 1050994119,
+      "magic": 780,
+      "symbol": "XAUUSD",
+      "direction": "SELL",
+      "volume": 0.04,
+      "open_time": "2026-03-25T18:20:06+08:00",
+      "open_price": 4562.5,
+      "open_ticket": 919142853,
+      "open_comment": "Zone SELL",
+      "close_time": "2026-03-25T18:35:15+08:00",
+      "close_price": 4553.5,
+      "close_ticket": 919205877,
+      "close_comment": "[tp 4553.50]",
+      "close_reason": "TP",
+      "profit": 31.06,
+      "commission": 0.0,
+      "swap": 0.0,
+      "net_profit": 31.06
     }
   ]
 }
