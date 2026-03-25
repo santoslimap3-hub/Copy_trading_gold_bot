@@ -267,7 +267,7 @@ def check_autotrading_status():
 
 def ensure_mt5_connection():
     global mt5_connected, mt5_connection_losses
-    mt5_path = r"C:\MT5_2\terminal64.exe"
+    mt5_path = r"C:\MT5_1\terminal64.exe"
     log(f"Initializing MT5 at: {mt5_path}", "INFO")
     init_ok = mt5.initialize(path=mt5_path)
     if not init_ok:
