@@ -423,8 +423,9 @@ class SignalRecordsManager:
                 rec.setdefault("best_prices_per_tp", []).append(
                     [best_snap, f"tp{level}"]
                 )
-                if msg_id in self._mem:
-                    self._mem[msg_id]["best_in_zone"] = None   # reset for next interval
+                # NOTE: best_in_zone is intentionally NOT reset here.
+                # The cumulative best carries forward so TP2's best is always
+                # equal to or better than TP1's best (lower for BUY, higher for SELL).
 
             # When SL is hit: also snapshot best-in-zone for the next pending TP
             if level == LEVEL_SL and best_snap is not None:
