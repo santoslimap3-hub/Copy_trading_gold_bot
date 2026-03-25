@@ -1153,7 +1153,7 @@ async def main():
     reconnect_monitor = ReconnectMonitor(alert_threshold=5, time_window_minutes=30)
     outcome_tracker   = TradeOutcomeTracker(magic=MAGIC)
     _data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
-    signal_records    = SignalRecordsManager(_data_dir, MAGIC)
+    signal_records    = SignalRecordsManager(_data_dir, MAGIC, filename="signal_records_sf.json")
 
     client = init_telegram()
     _telegram_client = client
