@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-03-24T16:19:47",
+  "last_updated": "2026-03-25T07:23:19",
   "records": {
     "212": {
       "msg_id": 212,
@@ -3639,6 +3639,87 @@
         "2026-03-24T16:09:24",
         "2026-03-24T16:09:31",
         "2026-03-24T16:09:37"
+      ]
+    },
+    "4621": {
+      "msg_id": 4621,
+      "side": "SELL",
+      "signal_time": "2026-03-25T07:17:07",
+      "signal_price": 4560.34,
+      "zone": [
+        4560.0,
+        4564.0
+      ],
+      "signal_to_worst_edge": [
+        0.34,
+        "inside"
+      ],
+      "tp_levels": {
+        "1": 4557.0,
+        "2": 4555.0,
+        "3": 4553.0,
+        "4": 4551.0,
+        "5": 4548.0
+      },
+      "sl_price": 4570.0,
+      "price_entered_zone": true,
+      "price_extreme_at_zone_arrival": 4560.6,
+      "best_prices_per_tp": [
+        [
+          4563.41,
+          "tp1"
+        ]
+      ],
+      "outcome_sequence": [
+        0,
+        1
+      ],
+      "bot_entries": {
+        "780": {
+          "entered": true,
+          "entry_type": "market",
+          "entry_price": 4560.17,
+          "ticket": 1050994110
+        }
+      },
+      "entry_events": [
+        {
+          "time": "2026-03-25T07:17:07",
+          "type": "signal_buffered",
+          "side": "SELL"
+        },
+        {
+          "time": "2026-03-25T07:17:15",
+          "type": "zone_from_edit",
+          "side": "SELL",
+          "zone_low": 4560.0,
+          "zone_high": 4564.0,
+          "wait_time": 8.265685558319092
+        },
+        {
+          "time": "2026-03-25T07:17:15",
+          "type": "market_entry_in_zone",
+          "side": "SELL",
+          "entry_price": 4560.17,
+          "zone_low": 4560.0,
+          "zone_high": 4564.0
+        },
+        {
+          "time": "2026-03-25T07:17:15",
+          "type": "limit_placed",
+          "side": "SELL",
+          "zone_low": 4560.0,
+          "zone_high": 4564.0
+        }
+      ],
+      "tracking_active": true,
+      "tracking_complete": false,
+      "tracking_started_at": "2026-03-25T07:17:15",
+      "tracking_ended_at": null,
+      "last_updated": "2026-03-25T07:23:19",
+      "_level_times": [
+        "2026-03-25T07:17:16",
+        "2026-03-25T07:23:19"
       ]
     }
   }

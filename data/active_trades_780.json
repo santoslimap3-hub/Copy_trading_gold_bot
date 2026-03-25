@@ -1,1 +1,44 @@
-{}
+{
+  "1050994110": {
+    "ticket": 1050994110,
+    "side": "SELL",
+    "entry_price": 4560.17,
+    "sl_price": 4570.0,
+    "tp_levels": {
+      "1": 4557.0,
+      "2": 4555.0,
+      "3": 4553.0,
+      "4": 4551.0,
+      "5": 4548.0
+    },
+    "monitored_levels": {
+      "BE": 4560.17,
+      "SL": 4570.0,
+      "TP1": 4557.0,
+      "TP2": 4555.0,
+      "TP3": 4553.0,
+      "TP4": 4551.0,
+      "TP5": 4548.0
+    },
+    "sequence": [
+      {
+        "level": "TP1",
+        "time": "2026-03-25 07:23:19",
+        "timestamp": 1774423399.8049397,
+        "price": 4556.96,
+        "revisit": false
+      }
+    ],
+    "levels_hit": [
+      "TP1"
+    ],
+    "levels_breached": [],
+    "registered_at": "2026-03-25 07:17:15",
+    "registered_ts": 1774423035.9006085,
+    "position_closed": false,
+    "position_closed_at": null,
+    "position_profit": null,
+    "position_close_reason": null,
+    "position_close_price": null
+  }
+}
