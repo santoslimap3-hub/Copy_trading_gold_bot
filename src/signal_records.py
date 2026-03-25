@@ -213,11 +213,13 @@ class SignalRecordsManager:
     @staticmethod
     def _current_outcome_level(side: str, price: float,
                                tp_levels: Dict[int, float],
-                               sl_price: Optional[float]) -> Optional[int]:
+                               sl_price: Optional[float],
+                               zone: Optional[List[float]] = None) -> Optional[int]:
         """Return the current outcome level based on price vs TP/SL levels.
 
         Returns the highest TP level currently breached (1-5), -1 for SL,
-        or None if price is between zone/TP1 (no level to record).
+        0 (LEVEL_ZONE) if price is inside the zone, or None if price is
+        between zone edge and TP1 (no level to record).
         """
         if sl_price:
             if (side == "BUY" and price <= sl_price) or (side == "SELL" and price >= sl_price):
@@ -226,6 +228,8 @@ class SignalRecordsManager:
             tp_price = tp_levels[tp_num]
             if (side == "BUY" and price >= tp_price) or (side == "SELL" and price <= tp_price):
                 return tp_num
+        if zone is not None and zone[0] <= price <= zone[1]:
+            return LEVEL_ZONE
         return None
 
     # ── public API ────────────────────────────────────────────────────────────
@@ -362,6 +366,7 @@ class SignalRecordsManager:
         # Zone entry — triggers one disk write, then never again
         if in_z and not state.get("entered_zone"):
             state["entered_zone"] = True
+            state["_last_tp_level"] = LEVEL_ZONE
             # Record LEVEL_ZONE in outcome_sequence (one I/O hit per signal)
             self.record_level_hit(msg_id, LEVEL_ZONE)
 
@@ -375,7 +380,7 @@ class SignalRecordsManager:
         if tp_levels:
             side = state["side"]
             sl_price = state.get("sl_price")
-            level = self._current_outcome_level(side, current_price, tp_levels, sl_price)
+            level = self._current_outcome_level(side, current_price, tp_levels, sl_price, zone)
             last = state.get("_last_tp_level")
             if level is not None and level != last:
                 state["_last_tp_level"] = level
@@ -434,10 +439,6 @@ class SignalRecordsManager:
                 rec.setdefault("best_prices_per_tp", []).append(
                     [best_snap, f"tp{next_tp}"]
                 )
-
-            # LEVEL_ZONE: only record once (skip if already first in sequence)
-            if level == LEVEL_ZONE and LEVEL_ZONE in seq:
-                return
 
             seq.append(level)
             level_ts.append(_now())
