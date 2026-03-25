@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-25T16:02:44+08:00",
+  "last_updated": "2026-03-25T16:13:13+08:00",
   "magic": 780,
   "errors": [
     {
@@ -176666,6 +176666,11 @@
       "time": "2026-03-25T16:02:44+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1051259672: Invalid request"
+    },
+    {
+      "time": "2026-03-25T16:13:13+08:00",
+      "level": "WARN",
+      "message": "Poller error for -1003349563414: Cannot send requests while disconnected"
     }
   ]
 }
