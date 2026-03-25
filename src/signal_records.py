@@ -97,9 +97,9 @@ class SignalRecordsManager:
     LOCK_RETRY     = 0.03  # seconds between lock attempts
     SHADOW_TIMEOUT = 24 * 3600  # auto-finalize inactive records after 24 h
 
-    def __init__(self, data_dir: str, magic: int):
+    def __init__(self, data_dir: str, magic: int, filename: str = "signal_records.json"):
         self._magic     = magic
-        self._file      = os.path.join(data_dir, "signal_records.json")
+        self._file      = os.path.join(data_dir, filename)
         self._lock_path = self._file + ".lock"
         os.makedirs(data_dir, exist_ok=True)
 
