@@ -20,8 +20,18 @@
       "TP4": 4551.0,
       "TP5": 4548.0
     },
-    "sequence": [],
-    "levels_hit": [],
+    "sequence": [
+      {
+        "level": "TP1",
+        "time": "2026-03-25 07:23:19",
+        "timestamp": 1774423399.8049397,
+        "price": 4556.96,
+        "revisit": false
+      }
+    ],
+    "levels_hit": [
+      "TP1"
+    ],
     "levels_breached": [],
     "registered_at": "2026-03-25 07:17:15",
     "registered_ts": 1774423035.9006085,

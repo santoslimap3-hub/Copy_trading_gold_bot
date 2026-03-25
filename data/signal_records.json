@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-03-25T07:17:44",
+  "last_updated": "2026-03-25T07:23:19",
   "records": {
     "212": {
       "msg_id": 212,
@@ -3664,9 +3664,15 @@
       "sl_price": 4570.0,
       "price_entered_zone": true,
       "price_extreme_at_zone_arrival": 4560.6,
-      "best_prices_per_tp": [],
+      "best_prices_per_tp": [
+        [
+          4563.41,
+          "tp1"
+        ]
+      ],
       "outcome_sequence": [
-        0
+        0,
+        1
       ],
       "bot_entries": {
         "780": {
@@ -3710,9 +3716,10 @@
       "tracking_complete": false,
       "tracking_started_at": "2026-03-25T07:17:15",
       "tracking_ended_at": null,
-      "last_updated": "2026-03-25T07:17:44",
+      "last_updated": "2026-03-25T07:23:19",
       "_level_times": [
-        "2026-03-25T07:17:16"
+        "2026-03-25T07:17:16",
+        "2026-03-25T07:23:19"
       ]
     }
   }
