@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-25T16:13:13+08:00",
+  "last_updated": "2026-03-25T23:24:19+08:00",
   "magic": 780,
   "errors": [
     {
@@ -176671,6 +176671,2891 @@
       "time": "2026-03-25T16:13:13+08:00",
       "level": "WARN",
       "message": "Poller error for -1003349563414: Cannot send requests while disconnected"
+    },
+    {
+      "time": "2026-03-25T17:46:19+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T17:46:30+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders (POLLED)"
+    },
+    {
+      "time": "2026-03-25T17:48:03+08:00",
+      "level": "WARN",
+      "message": "ZONE WAIT TIMEOUT: msg_id=4641 \u2014 no zone received, cancelling"
+    },
+    {
+      "time": "2026-03-25T17:48:41+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T17:48:58+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T19:15:03+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464576 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:17:04+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464576 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:19:06+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464576 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:21:07+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464576 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:23:19+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533075 not found"
+    },
+    {
+      "time": "2026-03-25T20:16:55+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:16:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:16:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:03+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:05+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:08+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:10+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:11+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:17+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:18+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:20+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:21+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:39+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:41+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:42+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:45+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464611 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:46+08:00",
+      "level": "WARN",
+      "message": "Position 1052464576 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:17:47+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:49+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:17:50+08:00",
+      "level": "WARN",
+      "message": "Position 1052464611 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:17:51+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533075 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:53+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052885548 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:55+08:00",
+      "level": "WARN",
+      "message": "Position 1052533035 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:17:55+08:00",
+      "level": "WARN",
+      "message": "Position 1052533075 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:17:57+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052885548 not found"
+    },
+    {
+      "time": "2026-03-25T20:17:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:03+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:08+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:10+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:12+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:14+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:16+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:18+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:22+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:23+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:25+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:47+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:49+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:51+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:53+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:55+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:18:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:18:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:02+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:07+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:10+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:11+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:15+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:17+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:18+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:21+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:22+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:25+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:26+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:28+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:30+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:32+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:33+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:35+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:37+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:39+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:40+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:42+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:43+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:46+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:47+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:49+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:50+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:52+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:54+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:19:56+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:19:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:00+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:01+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:04+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:06+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:08+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:09+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:12+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:13+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:15+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:16+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:22+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:29+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:31+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:33+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:37+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:38+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:40+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:41+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:43+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:44+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:46+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:47+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:49+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:51+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:53+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:54+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:20:58+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:59+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:02+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:03+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:05+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:06+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:09+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:12+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:13+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:17+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:21+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:23+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:28+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:30+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:32+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:34+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:38+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:39+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:42+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:46+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:48+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:49+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:51+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:53+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:55+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:21:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:21:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:02+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:03+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:05+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:06+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:09+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:18+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:23+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:29+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:31+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:33+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:34+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:45+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:46+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:49+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:50+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:52+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:53+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:56+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:22:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:22:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:01+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:03+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:07+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:08+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:11+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:12+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:14+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:15+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:17+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:19+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:21+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:22+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:24+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:25+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:27+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:29+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:31+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:32+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:34+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:37+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:39+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:42+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:45+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:47+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:48+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:50+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:51+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:53+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:54+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:23:57+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:23:58+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:00+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:01+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:04+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:05+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:07+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:08+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:10+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:11+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:17+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:23+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:30+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:31+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:33+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:34+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:36+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:37+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:39+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:40+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:43+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:24:47+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:48+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464611 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:50+08:00",
+      "level": "WARN",
+      "message": "Position 1052464576 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:51+08:00",
+      "level": "WARN",
+      "message": "Position 1052464611 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:52+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533075 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:54+08:00",
+      "level": "WARN",
+      "message": "Position 1052533035 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:55+08:00",
+      "level": "WARN",
+      "message": "Position 1052533075 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:57+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052885548 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:58+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052885571 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:00+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:01+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:02+08:00",
+      "level": "WARN",
+      "message": "Position 1052885548 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:25:04+08:00",
+      "level": "WARN",
+      "message": "Position 1052885571 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:25:05+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052973993 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:06+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052973993 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:08+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:18+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:20+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:22+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:24+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:26+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:29+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:30+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:32+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:34+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:36+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:38+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:40+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:41+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:45+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:47+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:48+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:50+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:51+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:54+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:55+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:25:57+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:25:58+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:01+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:02+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:05+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:06+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:08+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:12+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:18+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:20+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:21+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:24+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:25+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:27+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:28+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:31+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:32+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:34+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:37+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:39+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:43+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:45+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:47+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:49+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:50+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:51+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:53+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:55+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:26:56+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:26:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:02+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:07+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:10+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:11+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:18+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:20+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:21+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:24+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:25+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:28+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:29+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:31+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:32+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:34+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:37+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:39+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:43+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:45+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:46+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:49+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:50+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:53+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:55+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:27:57+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:27:59+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:01+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:02+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:04+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:05+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:08+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:09+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:11+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:12+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:15+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:16+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:18+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:23+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:30+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:31+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:34+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:37+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:38+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:42+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:45+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:47+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:48+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:50+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:51+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:53+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:54+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:56+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:57+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:28:59+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:00+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:03+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:07+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:09+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:17+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:22+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:23+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:25+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:26+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:28+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:29+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:31+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:32+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:34+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:37+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:39+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:42+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:45+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:47+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:48+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:50+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:51+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:53+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:54+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:29:56+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:29:58+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:00+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:01+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:03+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:07+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:09+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:12+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:17+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:21+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:23+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:29+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:30+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:32+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:33+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:36+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:37+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:39+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:40+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:42+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:43+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:45+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:47+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:49+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:50+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:52+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:53+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:55+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:56+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:30:58+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:30:59+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:01+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:03+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:05+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:06+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:08+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:08+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:10+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:11+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:13+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:14+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:16+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:17+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:22+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:26+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:27+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:29+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:30+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:32+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:33+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:35+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:36+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:38+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:39+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:41+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:42+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:46+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:48+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:49+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:51+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:52+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:55+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:56+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:31:58+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:31:59+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:02+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:03+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:06+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:07+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:09+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:10+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:12+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:13+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:15+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:16+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:19+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:20+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:23+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:24+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:26+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:28+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464611 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:29+08:00",
+      "level": "WARN",
+      "message": "Position 1052464576 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:30+08:00",
+      "level": "WARN",
+      "message": "Position 1052464611 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:31+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533075 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:33+08:00",
+      "level": "WARN",
+      "message": "Position 1052533035 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:33+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:35+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:36+08:00",
+      "level": "WARN",
+      "message": "Position 1052533075 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:37+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052885548 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:38+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052885571 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:39+08:00",
+      "level": "WARN",
+      "message": "Position 1052885548 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:40+08:00",
+      "level": "WARN",
+      "message": "Position 1052885571 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:41+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052973993 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:42+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052974016 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:43+08:00",
+      "level": "WARN",
+      "message": "Position 1052973993 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:44+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:45+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:46+08:00",
+      "level": "WARN",
+      "message": "Position 1052974016 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:48+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4534.23 >= TP $4533.00"
+    },
+    {
+      "time": "2026-03-25T20:32:51+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:52+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:54+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:55+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:32:57+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:58+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:33:00+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:33:01+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:33:03+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:33:04+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052464576: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:07+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052464611: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:07+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052533075: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:08+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:33:09+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T20:33:10+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052885548: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:11+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052885571: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:12+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052973993: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:12+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052974016: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:14+08:00",
+      "level": "WARN",
+      "message": "close_position: ticket 1052464576 not found"
+    },
+    {
+      "time": "2026-03-25T20:33:15+08:00",
+      "level": "WARN",
+      "message": "  Failed to close worst position 1052464576 \u2014 retrying next tick"
+    },
+    {
+      "time": "2026-03-25T21:50:50+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854942 not found"
+    },
+    {
+      "time": "2026-03-25T21:50:52+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854973 not found"
+    },
+    {
+      "time": "2026-03-25T21:57:18+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854942 not found"
+    },
+    {
+      "time": "2026-03-25T21:57:19+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854973 not found"
+    },
+    {
+      "time": "2026-03-25T21:57:20+08:00",
+      "level": "WARN",
+      "message": "Position 1053854942 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T21:57:21+08:00",
+      "level": "WARN",
+      "message": "Position 1053854973 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T23:09:13+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1054538416 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T23:11:14+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1054538416 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T23:16:38+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1053854942: Invalid request"
+    },
+    {
+      "time": "2026-03-25T23:16:39+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1053854973: Invalid request"
+    },
+    {
+      "time": "2026-03-25T23:16:40+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1054538416: Invalid request"
+    },
+    {
+      "time": "2026-03-25T23:17:12+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T23:22:02+08:00",
+      "level": "WARN",
+      "message": "Pending order 1054711111 not found"
+    },
+    {
+      "time": "2026-03-25T23:24:19+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1054711111: Invalid request"
     }
   ]
 }

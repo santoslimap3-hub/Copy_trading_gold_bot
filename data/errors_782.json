@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-25T16:02:43+08:00",
+  "last_updated": "2026-03-25T23:24:19+08:00",
   "magic": 782,
   "errors": [
     {
@@ -11,6 +11,316 @@
       "time": "2026-03-25T16:02:43+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1051259581: Invalid request"
+    },
+    {
+      "time": "2026-03-25T17:46:20+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T17:46:31+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T17:48:04+08:00",
+      "level": "WARN",
+      "message": "ZONE WAIT TIMEOUT: msg_id=4641 \u2014 no zone received, cancelling"
+    },
+    {
+      "time": "2026-03-25T17:48:41+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T17:48:58+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T19:14:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464575 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:16:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464575 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:18:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464575 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:20:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464575 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:22:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464575 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:22:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052464610 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T19:23:19+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533074 not found"
+    },
+    {
+      "time": "2026-03-25T20:20:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052881945 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T20:22:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052881945 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T20:24:44+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464575 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:44+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464610 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Position 1052464575 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Position 1052464610 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533074 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Position 1052533033 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Position 1052533074 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052881945 not found"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Position 1052881921 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:24:45+08:00",
+      "level": "WARN",
+      "message": "Position 1052881945 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:25:07+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052973789 not found"
+    },
+    {
+      "time": "2026-03-25T20:28:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1052973809 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464575 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052464610 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Position 1052464575 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Position 1052464610 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052533074 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Position 1052533033 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Position 1052533074 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052881945 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Position 1052881921 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Position 1052881945 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:25+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052973789 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:26+08:00",
+      "level": "WARN",
+      "message": "Pending order 1052973809 not found"
+    },
+    {
+      "time": "2026-03-25T20:32:26+08:00",
+      "level": "WARN",
+      "message": "Position 1052973789 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:26+08:00",
+      "level": "WARN",
+      "message": "Position 1052973809 not found - may have closed already"
+    },
+    {
+      "time": "2026-03-25T20:32:26+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4533.77 >= TP $4533.00"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052464575: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052464610: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052533074: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052881945: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052973789: Invalid request"
+    },
+    {
+      "time": "2026-03-25T20:33:06+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1052973809: Invalid request"
+    },
+    {
+      "time": "2026-03-25T21:50:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1053854941 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T21:50:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1053854972 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T21:50:50+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854941 not found"
+    },
+    {
+      "time": "2026-03-25T21:50:50+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854972 not found"
+    },
+    {
+      "time": "2026-03-25T21:57:18+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854941 not found"
+    },
+    {
+      "time": "2026-03-25T21:57:18+08:00",
+      "level": "WARN",
+      "message": "Pending order 1053854972 not found"
+    },
+    {
+      "time": "2026-03-25T23:10:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1054538415 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T23:12:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1054538415 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T23:14:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1054538415 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-25T23:16:38+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1053854941: Invalid request"
+    },
+    {
+      "time": "2026-03-25T23:16:38+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1053854972: Invalid request"
+    },
+    {
+      "time": "2026-03-25T23:16:38+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1054538415: Invalid request"
+    },
+    {
+      "time": "2026-03-25T23:17:12+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-25T23:22:02+08:00",
+      "level": "WARN",
+      "message": "Pending order 1054711110 not found"
+    },
+    {
+      "time": "2026-03-25T23:24:19+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1054711110: Invalid request"
     }
   ]
 }
