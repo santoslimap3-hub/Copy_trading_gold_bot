@@ -64,11 +64,13 @@ log = logging.getLogger(__name__)
 
 # ── outcome level constants ───────────────────────────────────────────────────
 LEVEL_SL   = -1
+LEVEL_BE   = -2
 LEVEL_ZONE =  0
 # 1..5 = TP1..TP5
 
 _LEVEL_NAME_MAP: Dict[str, int] = {
     "SL": -1,
+    "BE": -2,
     "ZONE": 0,
     "TP1": 1, "TP2": 2, "TP3": 3, "TP4": 4, "TP5": 5,
 }
@@ -301,9 +303,14 @@ class SignalRecordsManager:
                 rec["sl_price"] = sl_price
 
             # signal_to_worst_edge
+            # Positive = signal is past worst edge (toward TP side, outside zone)
+            # Negative = signal is on the zone-interior side of worst edge
             side  = rec["side"]
             worst = self._worst_edge(side, zone)
-            dist  = round(rec["signal_price"] - worst, 2)
+            if side == "BUY":
+                dist = round(rec["signal_price"] - worst, 2)
+            else:
+                dist = round(worst - rec["signal_price"], 2)
             loc   = "inside" if self._in_zone(rec["signal_price"], zone) else "outside"
             rec["signal_to_worst_edge"] = [dist, loc]
 

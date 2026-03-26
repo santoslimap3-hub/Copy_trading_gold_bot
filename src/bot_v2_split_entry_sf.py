@@ -1407,10 +1407,12 @@ async def main():
                             outcome_tracker.is_tracking(t) for t in tickets_for_mid
                         )
                         if not still_tracking:
+                            log(f"CLOSURE '{closure}': finalizing signal_records for msg_id={mid} "
+                                f"(tickets_for_mid={tickets_for_mid}, no active tracking)", "INFO")
                             signal_records.finalize(mid)
                         else:
                             log(f"CLOSURE '{closure}': deferring signal_records finalize for msg_id={mid} "
-                                f"(outcome tracker still shadow-tracking)", "INFO")
+                                f"(outcome tracker still shadow-tracking, tickets={tickets_for_mid})", "INFO")
                 _split_orders.clear()
 
             for mid, buf in list(_buffered_signals.items()):
