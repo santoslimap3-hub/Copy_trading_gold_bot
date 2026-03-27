@@ -36,8 +36,9 @@ VOLUME = 0.06
 STARTING_BALANCE = 1000.0          # notional account balance at data start
 WIN_RATE = 0.66                    # target win rate
 BUY_BIAS = 0.58                    # slight buy bias for bullish trend
-TRADES_PER_DAY_MIN = 1
-TRADES_PER_DAY_MAX = 3
+SIGNALS_PER_DAY_MIN = 3
+SIGNALS_PER_DAY_MAX = 4
+ENTRY_RATE = 0.45                  # only ~45% of signals result in a bot trade
 TP_DIST_MIN = 3.0                  # dollars from entry to TP
 TP_DIST_MAX = 14.0
 SL_DIST_MIN = 8.0
@@ -93,8 +94,11 @@ def _build_tp_levels(entry: float, side: str) -> dict:
     return levels
 
 
-def _generate_one_trade(dt: datetime, mid_price: float, msg_id: int):
-    """Generate one perfectly matched signal record + bot trade."""
+def _generate_one_signal(dt: datetime, mid_price: float, msg_id: int, entered: bool):
+    """Generate a signal record and optionally a matched bot trade.
+
+    Returns (sig_record, trade_record_or_None).
+    """
     side = "BUY" if random.random() < BUY_BIAS else "SELL"
     is_win = random.random() < WIN_RATE
 
@@ -116,32 +120,86 @@ def _generate_one_trade(dt: datetime, mid_price: float, msg_id: int):
     inside = "inside" if ((side == "BUY" and signal_price <= zone_high) or
                           (side == "SELL" and signal_price >= zone_low)) else "outside"
 
-    # entry price inside zone
+    # SL & TP (always present on the signal regardless of entry)
     entry_price = round(random.uniform(zone_low, zone_high), 2)
-    entry_dt = dt + timedelta(seconds=random.randint(15, 90))
-
-    # SL & TP
     sl_dist = round(random.uniform(SL_DIST_MIN, SL_DIST_MAX), 2)
     sl_price = round(entry_price - sl_dist, 2) if side == "BUY" else round(entry_price + sl_dist, 2)
     tp_levels = _build_tp_levels(entry_price, side)
 
-    # outcome
-    if is_win:
+    tracking_end = (signal_time + timedelta(hours=random.randint(2, 8))).isoformat()
+
+    # ── NO ENTRY path ────────────────────────────────────────────────
+    if not entered:
+        no_entry_reason = random.choice(["zone_wait_timeout", "price_never_reached_zone"])
+        entry_events = [
+            {"time": signal_time.isoformat(), "type": "signal_buffered"},
+            {"time": (signal_time + timedelta(seconds=random.randint(5, 20))).isoformat(),
+             "type": "zone_from_edit"},
+            {"time": (signal_time + timedelta(minutes=random.randint(30, 240))).isoformat(),
+             "type": no_entry_reason},
+        ]
+        sig_record = {
+            "msg_id": msg_id,
+            "side": side,
+            "signal_time": signal_time.isoformat(),
+            "signal_price": signal_price,
+            "zone": [zone_low, zone_high],
+            "signal_to_worst_edge": [sig_to_worst, inside],
+            "tp_levels": tp_levels,
+            "sl_price": sl_price,
+            "price_entered_zone": False,
+            "price_extreme_at_zone_arrival": None,
+            "best_prices_per_tp": [[None, f"tp{i}"] for i in range(1, 6)],
+            "outcome_sequence": [],
+            "bot_entries": {
+                str(MAGIC): {
+                    "entered": False,
+                    "entry_type": no_entry_reason,
+                    "entry_price": None,
+                    "ticket": None,
+                }
+            },
+            "entry_events": entry_events,
+            "tracking_active": False,
+            "tracking_complete": True,
+            "tracking_started_at": signal_time.isoformat(),
+            "tracking_ended_at": tracking_end,
+            "last_updated": tracking_end,
+            "_level_times": [],
+        }
+        return sig_record, None
+
+    # ── ENTRY path ───────────────────────────────────────────────────
+    entry_dt = dt + timedelta(seconds=random.randint(15, 90))
+
+    # outcome: win / loss / breakeven-after-TP1
+    BE_RATE = 0.15  # 15% of entered trades hit TP1 then reverse to BE
+    roll = random.random()
+
+    if roll < BE_RATE:
+        # ── hit TP1 then reversed to breakeven ──
+        outcome_type = "BE"
+        tp_hit = 1
+        close_price = entry_price  # closed at breakeven
+        close_reason = "EXPERT"
+        close_comment = "BE after TP1"
+        raw_profit = 0.0
+    elif is_win:
+        outcome_type = "WIN"
         tp_hit = random.choices([1, 2, 3, 4, 5], weights=[35, 30, 20, 10, 5])[0]
         close_price = tp_levels[str(tp_hit)]
         close_reason = "TP"
         close_comment = f"[tp {close_price:.2f}]"
-        pnl_sign = 1
+        price_diff = abs(close_price - entry_price)
+        raw_profit = round(price_diff * VOLUME * 100, 2)
     else:
+        outcome_type = "LOSS"
+        tp_hit = 0
         close_price = sl_price
         close_reason = "SL"
         close_comment = f"[sl {close_price:.2f}]"
-        tp_hit = 0
-        pnl_sign = -1
-
-    # profit calculation (XAUUSD: 1 lot = 100 oz, so 0.06 lot = 6 oz, $1 move = $6)
-    price_diff = abs(close_price - entry_price)
-    raw_profit = round(price_diff * VOLUME * 100, 2) * pnl_sign
+        price_diff = abs(close_price - entry_price)
+        raw_profit = round(price_diff * VOLUME * 100, 2) * -1
 
     # close time (15 min to 6 hours after entry)
     close_dt = entry_dt + timedelta(seconds=random.randint(900, 21600))
@@ -151,7 +209,9 @@ def _generate_one_trade(dt: datetime, mid_price: float, msg_id: int):
 
     # ── build outcome_sequence ───────────────────────────────────────
     outcome_seq = [0]  # entered zone
-    if is_win:
+    if outcome_type == "BE":
+        outcome_seq.extend([1, 0])        # zone → TP1 → back to zone (BE)
+    elif outcome_type == "WIN":
         for lvl in range(1, tp_hit + 1):
             outcome_seq.append(lvl)
     else:
@@ -160,7 +220,9 @@ def _generate_one_trade(dt: datetime, mid_price: float, msg_id: int):
     # ── best_prices_per_tp ───────────────────────────────────────────
     best_prices = []
     for i in range(1, 6):
-        if is_win and i <= tp_hit:
+        if outcome_type == "BE" and i == 1:
+            best_prices.append([tp_levels["1"], "tp1"])
+        elif outcome_type == "WIN" and i <= tp_hit:
             best_prices.append([tp_levels[str(i)], f"tp{i}"])
         else:
             best_prices.append([None, f"tp{i}"])
@@ -171,8 +233,6 @@ def _generate_one_trade(dt: datetime, mid_price: float, msg_id: int):
     for _ in outcome_seq:
         level_times.append(t.isoformat())
         t += timedelta(minutes=random.randint(8, 45))
-
-    tracking_end = (signal_time + timedelta(hours=random.randint(2, 8))).isoformat()
 
     # ── entry events ─────────────────────────────────────────────────
     entry_events = [
@@ -329,13 +389,15 @@ def generate_full(months: int = 3):
             continue
 
         mid = _gold_price(day_index, base_price)
-        n_trades = random.randint(TRADES_PER_DAY_MIN, TRADES_PER_DAY_MAX)
+        n_signals = random.randint(SIGNALS_PER_DAY_MIN, SIGNALS_PER_DAY_MAX)
 
-        for _ in range(n_trades):
+        for _ in range(n_signals):
             dt = _rand_time_in_session(current)
-            sig, trade = _generate_one_trade(dt, mid, msg_id)
+            entered = random.random() < ENTRY_RATE
+            sig, trade = _generate_one_signal(dt, mid, msg_id, entered)
             signals[str(msg_id)] = sig
-            trades.append(trade)
+            if trade is not None:
+                trades.append(trade)
             msg_id = _next_msg_id(msg_id)
 
         current += timedelta(days=1)
@@ -395,13 +457,15 @@ def append_days(n_days: int = 1):
 
         # slight drift per appended day
         mid = round(base_price + random.gauss(TREND_DAILY_DRIFT * d, VOLATILITY * 0.5), 2)
-        n_trades = random.randint(TRADES_PER_DAY_MIN, TRADES_PER_DAY_MAX)
+        n_signals = random.randint(SIGNALS_PER_DAY_MIN, SIGNALS_PER_DAY_MAX)
 
-        for _ in range(n_trades):
+        for _ in range(n_signals):
             dt = _rand_time_in_session(target_date)
-            sig, trade = _generate_one_trade(dt, mid, msg_id)
+            entered = random.random() < ENTRY_RATE
+            sig, trade = _generate_one_signal(dt, mid, msg_id, entered)
             signals[str(msg_id)] = sig
-            trades.append(trade)
+            if trade is not None:
+                trades.append(trade)
             msg_id = _next_msg_id(msg_id)
             new_count += 1
 
