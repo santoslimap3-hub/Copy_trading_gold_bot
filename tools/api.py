@@ -52,10 +52,22 @@ def trade_history():
     return jsonify(data)
 
 
+@app.route("/trade_history_R", methods=["GET"])
+def trade_history():
+    """Refresh bot_trades.json from MT5, then return it."""
+    data = _load_json(os.path.join(BASE_DIR, "data", "bot_trades.json"))
+    return jsonify(data)
+
 @app.route("/signal_records", methods=["GET"])
 def signal_record():
     """Return the full signal_records.json payload."""
     data = _load_json(SIGNAL_RECORDS_PATH)
+    return jsonify(data)
+
+@app.route("/signal_records_R", methods=["GET"])
+def signal_record():
+    """Return the full signal_records.json payload."""
+    data = _load_json(os.path.join(BASE_DIR, "data", "signal_records.json"))
     return jsonify(data)
 
 @app.route("/error_records", methods=["GET"])
