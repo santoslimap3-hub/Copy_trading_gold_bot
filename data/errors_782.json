@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-25T23:24:19+08:00",
+  "last_updated": "2026-03-26T21:47:49+08:00",
   "magic": 782,
   "errors": [
     {
@@ -321,6 +321,91 @@
       "time": "2026-03-25T23:24:19+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1054711110: Invalid request"
+    },
+    {
+      "time": "2026-03-26T15:19:44+08:00",
+      "level": "WARN",
+      "message": "MT5 connection went DOWN - attempting recovery"
+    },
+    {
+      "time": "2026-03-26T15:19:44+08:00",
+      "level": "WARN",
+      "message": "Attempting MT5 reconnection..."
+    },
+    {
+      "time": "2026-03-26T15:42:34+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4455.53 <= TP $4456.00"
+    },
+    {
+      "time": "2026-03-26T16:16:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1060502089 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-26T16:17:09+08:00",
+      "level": "WARN",
+      "message": "Pending order 1060502089 not found"
+    },
+    {
+      "time": "2026-03-26T16:17:52+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1060502089: Invalid request"
+    },
+    {
+      "time": "2026-03-26T16:44:18+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4421.72 >= TP $4420.00"
+    },
+    {
+      "time": "2026-03-26T18:22:46+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4438.98 <= TP $4439.00"
+    },
+    {
+      "time": "2026-03-26T19:20:54+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4451.73 <= TP $4452.00"
+    },
+    {
+      "time": "2026-03-26T19:21:46+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-26T19:21:49+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-03-26T19:23:25+08:00",
+      "level": "WARN",
+      "message": "ZONE WAIT TIMEOUT: msg_id=4746 \u2014 no zone received, cancelling"
+    },
+    {
+      "time": "2026-03-26T19:51:22+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4426.19 >= TP $4425.00"
+    },
+    {
+      "time": "2026-03-26T20:11:30+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4439.32 <= TP $4440.00"
+    },
+    {
+      "time": "2026-03-26T21:46:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1063402130 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-03-26T21:46:47+08:00",
+      "level": "WARN",
+      "message": "Pending order 1063402130 not found"
+    },
+    {
+      "time": "2026-03-26T21:47:49+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1063402130: Invalid request"
     }
   ]
 }
