@@ -4,7 +4,12 @@
       "Bash(python -c \":*)",
       "Bash(python3:*)",
       "Bash(python tools/synthetic_data_generator.py --generate)",
-      "Bash(python tools/synthetic_daily_updater.py)"
+      "Bash(python tools/synthetic_daily_updater.py)",
+      "Bash(find /c/Users/santo/Documents/2025-2026/Advanced_Software_Engineering/Copy_trading_gold_bot -type f -name signal_records*)",
+      "Bash(grep -r \"signal_records\\\\|/signal_records\\\\|signal-records\" /c/Users/santo/Documents/2025-2026/Advanced_Software_Engineering/Copy_trading_gold_bot --include=*.html --include=*.js)",
+      "Bash(grep -i \"outcomes\\\\|signal.records\\\\|signal_records\\\\|fetch\\\\|axios\\\\|$.ajax\" /c/Users/santo/Documents/2025-2026/Advanced_Software_Engineering/Copy_trading_gold_bot/data/bot_trades_dashboard.html)",
+      "Bash(grep -r \"README\\\\|ARCHITECTURE\\\\|API\" /c/Users/santo/Documents/2025-2026/Advanced_Software_Engineering/Copy_trading_gold_bot -maxdepth 2 --include=\"*.md\" --include=\"*.txt\")",
+      "Read(//c/Users/santo/Documents/2025-2026/Advanced_Software_Engineering/**)"
     ]
   }
 }
