@@ -138,6 +138,30 @@ def _generate_one_signal(dt: datetime, mid_price: float, msg_id: int, entered: b
             {"time": (signal_time + timedelta(minutes=random.randint(30, 240))).isoformat(),
              "type": no_entry_reason},
         ]
+
+        # Signal still tracks price even without bot entry (no leading 0).
+        # Always ends in -1 (SL) or 5 (TP5).
+        no_entry_win = random.random() < WIN_RATE
+        if no_entry_win:
+            no_entry_seq = list(range(1, 6))                       # 1,2,3,4,5
+            no_entry_best = [[tp_levels[str(i)], f"tp{i}"] for i in range(1, 6)]
+        else:
+            # how far did price get before SL?
+            max_tp_before_sl = random.choices([0, 1, 2, 3], weights=[50, 25, 15, 10])[0]
+            no_entry_seq = list(range(1, max_tp_before_sl + 1)) + [-1]
+            no_entry_best = []
+            for i in range(1, 6):
+                if i <= max_tp_before_sl:
+                    no_entry_best.append([tp_levels[str(i)], f"tp{i}"])
+                else:
+                    no_entry_best.append([None, f"tp{i}"])
+
+        no_entry_level_times = []
+        t = signal_time + timedelta(minutes=random.randint(5, 20))
+        for _ in no_entry_seq:
+            no_entry_level_times.append(t.isoformat())
+            t += timedelta(minutes=random.randint(8, 45))
+
         sig_record = {
             "msg_id": msg_id,
             "side": side,
@@ -149,8 +173,8 @@ def _generate_one_signal(dt: datetime, mid_price: float, msg_id: int, entered: b
             "sl_price": sl_price,
             "price_entered_zone": False,
             "price_extreme_at_zone_arrival": None,
-            "best_prices_per_tp": [[None, f"tp{i}"] for i in range(1, 6)],
-            "outcome_sequence": [],
+            "best_prices_per_tp": no_entry_best,
+            "outcome_sequence": no_entry_seq,
             "bot_entries": {
                 str(MAGIC): {
                     "entered": False,
@@ -165,7 +189,7 @@ def _generate_one_signal(dt: datetime, mid_price: float, msg_id: int, entered: b
             "tracking_started_at": signal_time.isoformat(),
             "tracking_ended_at": tracking_end,
             "last_updated": tracking_end,
-            "_level_times": [],
+            "_level_times": no_entry_level_times,
         }
         return sig_record, None
 
@@ -208,21 +232,32 @@ def _generate_one_signal(dt: datetime, mid_price: float, msg_id: int, entered: b
     close_ticket = _next_ticket()
 
     # ── build outcome_sequence ───────────────────────────────────────
+    # 0=entry zone, 1-5=TP levels, -1=SL, -2=BE (waypoint only)
+    # MUST always end in -1 (SL) or 5 (TP5).
     outcome_seq = [0]  # entered zone
     if outcome_type == "BE":
-        outcome_seq.extend([1, 0])        # zone → TP1 → back to zone (BE)
+        # hit TP1, came back to BE, then eventually hit SL or recovered to TP5
+        be_final = random.choices([-1, 5], weights=[70, 30])[0]
+        if be_final == 5:
+            outcome_seq.extend([1, -2, 1, 2, 3, 4, 5])
+        else:
+            outcome_seq.extend([1, -2, -1])
     elif outcome_type == "WIN":
-        for lvl in range(1, tp_hit + 1):
+        for lvl in range(1, 6):           # always track through to TP5
             outcome_seq.append(lvl)
     else:
+        # how far before SL?
+        max_tp_before_sl = random.choices([0, 1, 2, 3], weights=[50, 25, 15, 10])[0]
+        for lvl in range(1, max_tp_before_sl + 1):
+            outcome_seq.append(lvl)
         outcome_seq.append(-1)
 
     # ── best_prices_per_tp ───────────────────────────────────────────
     best_prices = []
+    # determine highest TP reached in the sequence
+    max_tp_reached = max((x for x in outcome_seq if x > 0), default=0)
     for i in range(1, 6):
-        if outcome_type == "BE" and i == 1:
-            best_prices.append([tp_levels["1"], "tp1"])
-        elif outcome_type == "WIN" and i <= tp_hit:
+        if i <= max_tp_reached:
             best_prices.append([tp_levels[str(i)], f"tp{i}"])
         else:
             best_prices.append([None, f"tp{i}"])
