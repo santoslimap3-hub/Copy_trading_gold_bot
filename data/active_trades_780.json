@@ -54,9 +54,7 @@
       "BE",
       "TP1"
     ],
-    "levels_breached": [
-      "BE"
-    ],
+    "levels_breached": [],
     "registered_at": "2026-03-30 13:43:20",
     "registered_ts": 1774878200.7717407,
     "position_closed": true,
