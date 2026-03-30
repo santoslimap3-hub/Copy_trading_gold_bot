@@ -1,1 +1,108 @@
-{}
+{
+  "1084600926": {
+    "ticket": 1084600926,
+    "side": "BUY",
+    "entry_price": 4546.0,
+    "sl_price": 4536.0,
+    "tp_levels": {
+      "1": 4549.0,
+      "2": 4551.0,
+      "3": 4553.0,
+      "4": 4555.0,
+      "5": 4565.0
+    },
+    "monitored_levels": {
+      "TP1": 4549.0,
+      "BE": 4546.0,
+      "SL": 4536.0,
+      "TP2": 4551.0,
+      "TP3": 4553.0,
+      "TP4": 4555.0,
+      "TP5": 4565.0
+    },
+    "sequence": [
+      {
+        "level": "TP1",
+        "time": "2026-03-30 13:43:48",
+        "timestamp": 1774878228.1626568,
+        "price": 4549.11,
+        "revisit": false
+      },
+      {
+        "level": "BE",
+        "time": "2026-03-30 13:43:59",
+        "timestamp": 1774878239.987872,
+        "price": 4545.7,
+        "revisit": false
+      },
+      {
+        "level": "POS_CLOSED(unknown)",
+        "time": "2026-03-30 13:44:17",
+        "timestamp": 1774878257.1695118,
+        "price": 0.0,
+        "profit": 0.0
+      },
+      {
+        "level": "BE",
+        "time": "2026-03-30 13:44:23",
+        "timestamp": 1774878263.3234787,
+        "price": 4544.55,
+        "revisit": true
+      }
+    ],
+    "levels_hit": [
+      "BE",
+      "TP1"
+    ],
+    "levels_breached": [
+      "BE"
+    ],
+    "registered_at": "2026-03-30 13:43:20",
+    "registered_ts": 1774878200.7717407,
+    "position_closed": true,
+    "position_closed_at": 1774878257.1695118,
+    "position_profit": 0.0,
+    "position_close_reason": "unknown",
+    "position_close_price": 0.0
+  },
+  "1084600938": {
+    "ticket": 1084600938,
+    "side": "BUY",
+    "entry_price": 4543.5,
+    "sl_price": 4536.0,
+    "tp_levels": {
+      "1": 4549.0,
+      "2": 4551.0,
+      "3": 4553.0,
+      "4": 4555.0,
+      "5": 4565.0
+    },
+    "monitored_levels": {
+      "TP1": 4549.0,
+      "TP2": 4551.0,
+      "TP3": 4553.0,
+      "TP4": 4555.0,
+      "TP5": 4565.0,
+      "BE": 4543.5,
+      "SL": 4536.0
+    },
+    "sequence": [
+      {
+        "level": "POS_CLOSED(unknown)",
+        "time": "2026-03-30 13:45:00",
+        "timestamp": 1774878300.4605134,
+        "price": 0.0,
+        "profit": 0.0
+      }
+    ],
+    "levels_hit": [],
+    "levels_breached": [],
+    "registered_at": "2026-03-30 13:44:09",
+    "registered_ts": 1774878249.7719226,
+    "position_closed": true,
+    "position_closed_at": 1774878300.4605134,
+    "position_profit": 0.0,
+    "position_close_reason": "unknown",
+    "position_close_price": 0.0
+  }
+}
