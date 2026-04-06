@@ -54,7 +54,8 @@ def trade_history():
 
 @app.route("/trade_history_R", methods=["GET"])
 def trade_history_real():
-    """Return real bot_trades.json."""
+    """Refresh bot_trades.json from MT5, then return it."""
+    _run_exporter(EXPORTER_MAIN)
     data = _load_json(os.path.join(BASE_DIR, "data", "bot_trades.json"))
     return jsonify(data)
 
