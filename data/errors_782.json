@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-02T22:24:22+08:00",
+  "last_updated": "2026-04-06T22:35:10+08:00",
   "magic": 782,
   "errors": [
     {
@@ -19936,6 +19936,681 @@
       "time": "2026-04-02T22:24:22+08:00",
       "level": "WARN",
       "message": "Failed to cancel order 1110930310: Invalid request"
+    },
+    {
+      "time": "2026-04-06T16:43:53+08:00",
+      "level": "WARN",
+      "message": "SL/TP update received but no open positions or split orders"
+    },
+    {
+      "time": "2026-04-06T16:45:33+08:00",
+      "level": "WARN",
+      "message": "ZONE WAIT TIMEOUT: msg_id=5101 \u2014 no zone received, cancelling"
+    },
+    {
+      "time": "2026-04-06T17:05:28+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809197 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:07:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:09:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:11:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:13:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:15:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:17:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:19:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:21:29+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:23:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:25:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:27:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:29:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:31:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:33:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:35:30+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:37:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:39:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:41:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:43:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:45:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:47:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T17:49:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1118809211 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:13:31+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:15:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:17:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:19:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:20:30+08:00",
+      "level": "WARN",
+      "message": "Pending order 1119064086 not found"
+    },
+    {
+      "time": "2026-04-06T18:21:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:23:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:25:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:27:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:29:32+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:31:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:33:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:35:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:37:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:39:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:41:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:43:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:45:33+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119064086 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:51:21+08:00",
+      "level": "WARN",
+      "message": "Pending order 1118809211 not found"
+    },
+    {
+      "time": "2026-04-06T18:51:21+08:00",
+      "level": "WARN",
+      "message": "Position 1118809197 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T18:51:22+08:00",
+      "level": "WARN",
+      "message": "Position 1118809211 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T18:51:22+08:00",
+      "level": "WARN",
+      "message": "Pending order 1119064086 not found"
+    },
+    {
+      "time": "2026-04-06T18:51:22+08:00",
+      "level": "WARN",
+      "message": "Position 1119064068 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T18:51:22+08:00",
+      "level": "WARN",
+      "message": "Position 1119064086 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T18:53:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:55:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:57:24+08:00",
+      "level": "WARN",
+      "message": "Pending order 1119308944 not found"
+    },
+    {
+      "time": "2026-04-06T18:57:25+08:00",
+      "level": "WARN",
+      "message": "Failed to modify order 1119308948: No changes"
+    },
+    {
+      "time": "2026-04-06T18:57:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:59:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T18:59:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:01:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:01:34+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:03:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:03:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:05:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:05:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:07:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:07:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:09:35+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:09:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:11:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:11:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:13:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:13:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:15:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:15:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:17:36+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:17:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:19:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:19:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:21:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:21:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:23:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:23:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:25:37+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:25:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:27:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:27:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:29:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:29:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:31:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:31:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:33:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:33:38+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:35:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:35:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:37:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:37:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:39:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:39:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:41:39+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:41:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:43:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308944 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T19:43:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119308948 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:00:39+08:00",
+      "level": "WARN",
+      "message": "Pending order 1118809211 not found"
+    },
+    {
+      "time": "2026-04-06T20:00:40+08:00",
+      "level": "WARN",
+      "message": "Position 1118809197 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T20:00:40+08:00",
+      "level": "WARN",
+      "message": "Position 1118809211 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T20:00:40+08:00",
+      "level": "WARN",
+      "message": "Pending order 1119064086 not found"
+    },
+    {
+      "time": "2026-04-06T20:00:41+08:00",
+      "level": "WARN",
+      "message": "Position 1119064068 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T20:00:41+08:00",
+      "level": "WARN",
+      "message": "Position 1119064086 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T20:00:41+08:00",
+      "level": "WARN",
+      "message": "Pending order 1119308944 not found"
+    },
+    {
+      "time": "2026-04-06T20:00:41+08:00",
+      "level": "WARN",
+      "message": "Pending order 1119308948 not found"
+    },
+    {
+      "time": "2026-04-06T20:00:42+08:00",
+      "level": "WARN",
+      "message": "Position 1119308944 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T20:00:42+08:00",
+      "level": "WARN",
+      "message": "Position 1119308948 not found - may have closed already"
+    },
+    {
+      "time": "2026-04-06T20:05:32+08:00",
+      "level": "WARN",
+      "message": "SPLIT ORDER INVALIDATED: Price $4686.14 >= TP $4686.00"
+    },
+    {
+      "time": "2026-04-06T20:06:47+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1118809211: Invalid request"
+    },
+    {
+      "time": "2026-04-06T20:06:48+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1119064086: Invalid request"
+    },
+    {
+      "time": "2026-04-06T20:06:48+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1119308944: Invalid request"
+    },
+    {
+      "time": "2026-04-06T20:06:48+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1119308948: Invalid request"
+    },
+    {
+      "time": "2026-04-06T20:15:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119718147 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:17:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119718154 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:19:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119718154 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:21:40+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119718154 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:35:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:37:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:39:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:41:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:43:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:45:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T20:47:41+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1119839550 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T21:05:59+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1119718154: Invalid request"
+    },
+    {
+      "time": "2026-04-06T21:05:59+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1119839550: Invalid request"
+    },
+    {
+      "time": "2026-04-06T22:25:49+08:00",
+      "level": "ERROR",
+      "message": "CRITICAL in on_edit: 5134"
+    },
+    {
+      "time": "2026-04-06T22:25:50+08:00",
+      "level": "ERROR",
+      "message": "Traceback (most recent call last):\n  File \"C:\\Users\\Administrator\\Documents\\GitHub\\Copy_trading_gold_bot\\src\\bot_v2_split_entry_sf.py\", line 1574, in on_edit\n    del _buffered_signals[msg_id]\n        ~~~~~~~~~~~~~~~~~^^^^^^^^\nKeyError: 5134\n"
+    },
+    {
+      "time": "2026-04-06T22:27:42+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1120740746 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T22:29:42+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1120740746 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T22:31:42+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1120740746 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T22:33:43+08:00",
+      "level": "WARN",
+      "message": "WARNING: Ticket 1120740746 still has FAILSAFE SL/TP"
+    },
+    {
+      "time": "2026-04-06T22:35:10+08:00",
+      "level": "WARN",
+      "message": "Failed to cancel order 1120740746: Invalid request"
     }
   ]
 }
