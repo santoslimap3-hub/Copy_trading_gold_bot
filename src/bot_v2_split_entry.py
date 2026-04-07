@@ -1410,9 +1410,22 @@ async def main():
                             outcome_tracker.register_virtual_trade(vt_id, side_c, vt_entry, vt_sl, info["all_tps"],
                                                                    cancel_reason=f"channel_closure:{closure}")
                             log(f"VIRTUAL TRADE registered: id={vt_id} side={side_c} entry=${vt_entry:.2f}", "INFO")
-                    # Finalize signal_records tracking
+                    # Only finalize signal_records if the outcome tracker is NOT
+                    # still shadow-tracking tickets for this signal.  Otherwise the
+                    # shadow tracker's finalization path will call finalize() once
+                    # the highest TP (or SL / timeout) is reached.
                     if signal_records:
-                        signal_records.finalize(mid)
+                        tickets_for_mid = [t for t, m in _ticket_to_msg_id.items() if m == mid]
+                        still_tracking = outcome_tracker and any(
+                            outcome_tracker.is_tracking(t) for t in tickets_for_mid
+                        )
+                        if not still_tracking:
+                            log(f"CLOSURE '{closure}': finalizing signal_records for msg_id={mid} "
+                                f"(tickets_for_mid={tickets_for_mid}, no active tracking)", "INFO")
+                            signal_records.finalize(mid)
+                        else:
+                            log(f"CLOSURE '{closure}': deferring signal_records finalize for msg_id={mid} "
+                                f"(outcome tracker still shadow-tracking, tickets={tickets_for_mid})", "INFO")
                 _split_orders.clear()
 
             for mid, buf in list(_buffered_signals.items()):
