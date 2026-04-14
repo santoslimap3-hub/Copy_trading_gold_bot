@@ -18,9 +18,9 @@ BOT_MAGIC_NUMBERS = [777, 780]
 DAYS_BACK = 365
 
 # MT5 terminal path — pins the exporter to the instance running the magic=780 bot.
-# bot_v2_split_entry.py (magic=780) runs on C:\MT5_2\terminal64.exe.
+# bot_v2_split_entry.py (magic=780) runs on C:\MTAccount2\terminal64.exe.
 # If that path doesn't exist (e.g. running locally), falls back to the default instance.
-MT5_PATH = r"C:\MT5_2\terminal64.exe"
+MT5_PATH = r"C:\MTAccount2\terminal64.exe"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
